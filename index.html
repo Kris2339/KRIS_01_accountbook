@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="생활 가계부">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- System font only -->
   <title>생활 가계부</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
@@ -45,11 +45,11 @@
     }
 
     body {
-      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       font-size: 14px;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      background: var(--gray-50);
+      background: #FAFAFA;
       overscroll-behavior: none;
       -webkit-overflow-scrolling: touch;
       color: var(--gray-900);
@@ -65,7 +65,7 @@
     .container {
       max-width: 480px;
       margin: 0 auto;
-      background: var(--gray-50);
+      background: #FAFAFA;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -74,9 +74,10 @@
 
     /* 헤더 */
     .header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      padding: max(24px, env(safe-area-inset-top)) 20px 20px;
-      box-shadow: var(--shadow-md);
+      background: white;
+      padding: max(16px, env(safe-area-inset-top)) 16px 8px;
+      box-shadow: none;
+      border-bottom: 1px solid #f0f0f0;
     }
 
     /* 달력 탭이 아닐 때 헤더 숨기기 */
@@ -109,84 +110,89 @@
 
     .month-selector {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      gap: 16px;
     }
 
     .month-selector button {
-      background: rgba(255, 255, 255, 0.2);
+      background: transparent;
       border: none;
-      color: white;
-      padding: 8px 12px;
-      font-size: 14px;
-      font-weight: 600;
+      color: #999;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 4px;
       transition: all 0.2s;
     }
 
     .month-selector button:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: #f5f5f5;
     }
 
     .month-selector button:active {
-      background: rgba(255, 255, 255, 0.4);
+      background: #eee;
       transform: scale(0.95);
     }
 
     .month-selector span {
-      font-size: 18px;
-      font-weight: 700;
-      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
     }
 
     /* 요약 카드 */
     .summary {
       background: white;
       margin: 0;
-      padding: 10px 16px;
-      box-shadow: var(--shadow-sm);
-      border-bottom: 1px solid var(--gray-100);
+      padding: 8px 16px;
+      box-shadow: none;
+      border-bottom: 1px solid #f0f0f0;
     }
 
     .summary-row {
       display: flex;
-      justify-content: space-around;
+      justify-content: flex-start;
       align-items: center;
-      gap: 8px;
+      gap: 24px;
     }
 
     .summary-item {
-      text-align: center;
-      flex: 1;
-      padding: 4px 0;
+      text-align: left;
+      padding: 2px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .summary-item.balance-item {
+      margin-left: auto;
     }
 
     .summary-label {
-      color: var(--gray-500);
+      color: #888;
       font-size: 11px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 500;
+      margin-bottom: 0;
     }
 
     .summary-value {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
     }
 
     .summary-value.income {
-      color: var(--success);
+      color: #4A90D9;
     }
 
     .summary-value.expense {
-      color: var(--danger);
+      color: #D97B7B;
     }
 
     .summary-value.balance {
-      color: var(--primary);
+      color: #D97B7B;
     }
 
     /* 콘텐츠 영역 */
@@ -231,119 +237,153 @@
     .calendar {
       background: white;
       border-radius: 0;
-      padding: 10px 12px;
+      padding: 8px 4px;
       margin-bottom: 0;
-      box-shadow: var(--shadow-sm);
+      box-shadow: none;
       overflow: hidden;
     }
 
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
+      gap: 0;
       max-width: 100%;
     }
 
     .calendar-day-header {
       text-align: center;
-      padding: 4px 0;
+      padding: 6px 0;
       font-size: 10px;
-      color: var(--gray-400);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: #aaa;
+      font-weight: 500;
     }
 
     .calendar-day-header.sun {
-      color: #FF6B6B;
+      color: #D97B7B;
     }
 
     .calendar-day-header.sat {
-      color: #6C5DD3;
+      color: #7B8BD9;
     }
 
     .calendar-day {
-      aspect-ratio: 1;
-      border-radius: 50%;
+      aspect-ratio: 0.85;
+      border-radius: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      padding-top: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background 0.15s ease;
       position: relative;
       background: transparent;
       min-height: 0;
     }
 
     .calendar-day:hover {
-      background: var(--gray-100);
-      transform: scale(1.1);
+      background: #f8f8f8;
     }
 
     .calendar-day:active {
-      transform: scale(0.95);
+      background: #f0f0f0;
     }
 
     .calendar-day.other-month {
-      opacity: 0.3;
+      opacity: 0.25;
     }
 
     .calendar-day.today {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 2px 8px rgba(108, 93, 211, 0.3);
+      background: transparent;
+    }
+
+    .calendar-day.today .calendar-day-number {
+      background: #e8e8e8;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* 다른 날짜가 선택되었을 때 오늘 날짜를 연하게 */
-    body[data-has-selected="true"] .calendar-day.today:not(.selected) {
+    body[data-has-selected="true"] .calendar-day.today:not(.selected) .calendar-day-number {
       opacity: 0.5;
     }
 
     .calendar-day.selected {
-      background: var(--primary-dark);
-      color: white;
-      box-shadow: 0 2px 12px rgba(108, 93, 211, 0.4);
-      transform: scale(1.05);
+      background: #f0f0f0;
+      border-radius: 8px;
     }
 
-    .calendar-day.today .calendar-day-number,
     .calendar-day.selected .calendar-day-number {
-      color: white;
+      background: #ddd;
     }
 
     .calendar-day-number {
       font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-900);
+      font-weight: 500;
+      color: #333;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .calendar-day.sun .calendar-day-number {
-      color: #FF6B6B;
+      color: #D97B7B;
     }
 
     .calendar-day.sat .calendar-day-number {
-      color: #6C5DD3;
+      color: #7B8BD9;
     }
 
-    .calendar-day-dots {
+    .calendar-day-amounts {
       display: flex;
-      gap: 3px;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
       margin-top: 2px;
+      width: 100%;
+      padding: 0 2px;
+    }
+
+    .calendar-day-amount {
+      font-size: 9px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .calendar-day-amount.income {
+      color: #4A90D9;
+    }
+
+    .calendar-day-amount.expense {
+      color: #D97B7B;
+    }
+
+    /* 금액이 클 경우 더 작은 폰트 */
+    .calendar-day-amount.small-font {
+      font-size: 7px;
+    }
+
+    .calendar-day-amount.tiny-font {
+      font-size: 6px;
+    }
+
+    /* 기존 dots 스타일 - 사용하지 않지만 호환성 유지 */
+    .calendar-day-dots {
+      display: none;
     }
 
     .calendar-day-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-    }
-
-    .calendar-day-dot.income {
-      background: var(--success);
-    }
-
-    .calendar-day-dot.expense {
-      background: var(--danger);
+      display: none;
     }
 
     /* 달력 하단 선택된 날짜의 거래 내역 */
@@ -778,14 +818,14 @@
       position: fixed;
       bottom: calc(85px + env(safe-area-inset-bottom));
       right: 20px;
-      width: 60px;
-      height: 60px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #222;
       color: white;
       border: none;
-      font-size: 28px;
-      box-shadow: var(--shadow-lg);
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       cursor: pointer;
       z-index: 99;
       transition: all 0.2s ease;
@@ -796,7 +836,7 @@
 
     .fab:hover {
       transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(108, 93, 211, 0.4);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
 
     .fab:active {
@@ -1338,14 +1378,14 @@
       <div class="summary-row">
         <div class="summary-item">
           <div class="summary-label">수입</div>
-          <div class="summary-value income" id="totalIncome">0원</div>
+          <div class="summary-value income" id="totalIncome">+0원</div>
         </div>
         <div class="summary-item">
           <div class="summary-label">지출</div>
-          <div class="summary-value expense" id="totalExpense">0원</div>
+          <div class="summary-value expense" id="totalExpense">-0원</div>
         </div>
-        <div class="summary-item">
-          <div class="summary-label">잔액</div>
+        <div class="summary-item balance-item">
+          <div class="summary-label">합계</div>
           <div class="summary-value balance" id="totalBalance">0원</div>
         </div>
       </div>
@@ -1504,7 +1544,12 @@
     </nav>
 
     <!-- 플로팅 버튼 -->
-    <button class="fab" id="addTransactionBtn">+</button>
+    <button class="fab" id="addTransactionBtn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+      </svg>
+    </button>
   </div>
 
   <!-- 거래 추가 모달 -->
@@ -1923,8 +1968,7 @@
     // ============================================
     function updateMonthDisplay() {
       const month = state.currentDate.getMonth() + 1;
-      const year = state.currentDate.getFullYear();
-      document.getElementById('currentMonth').textContent = `${year}년 ${month}월`;
+      document.getElementById('currentMonth').textContent = `${month}월`;
     }
 
     function updateSummary() {
@@ -1944,9 +1988,26 @@
 
       const balance = income - expense;
 
-      document.getElementById('totalIncome').textContent = formatMoney(income);
-      document.getElementById('totalExpense').textContent = formatMoney(expense);
-      document.getElementById('totalBalance').textContent = formatMoney(balance);
+      document.getElementById('totalIncome').textContent = '+' + formatMoney(income);
+      document.getElementById('totalExpense').textContent = '-' + formatMoney(expense);
+      document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + formatMoney(balance);
+    }
+
+    // 금액을 간략하게 포맷팅 (달력용)
+    function formatCalendarAmount(amount) {
+      if (amount >= 100000000) {
+        return { text: Math.floor(amount / 100000000) + '억', fontClass: 'tiny-font' };
+      } else if (amount >= 10000000) {
+        return { text: (amount / 10000).toFixed(0) + '만', fontClass: 'tiny-font' };
+      } else if (amount >= 1000000) {
+        return { text: (amount / 10000).toFixed(0) + '만', fontClass: 'small-font' };
+      } else if (amount >= 100000) {
+        return { text: (amount / 10000).toFixed(0) + '만', fontClass: '' };
+      } else if (amount >= 10000) {
+        return { text: (amount / 10000).toFixed(1).replace('.0', '') + '만', fontClass: '' };
+      } else {
+        return { text: amount.toLocaleString(), fontClass: '' };
+      }
     }
 
     function renderCalendar() {
@@ -1993,13 +2054,16 @@
         if (dayOfWeek === 0) className += ' sun';
         if (dayOfWeek === 6) className += ' sat';
 
+        const incomeFormatted = income > 0 ? formatCalendarAmount(income) : null;
+        const expenseFormatted = expense > 0 ? formatCalendarAmount(expense) : null;
+
         html += `
           <div class="${className}" onclick="onCalendarDayClick('${dateStr}')" ondblclick="onCalendarDayDoubleClick('${dateStr}')">
             <div class="calendar-day-number">${current.getDate()}</div>
             ${(income > 0 || expense > 0) ? `
-              <div class="calendar-day-dots">
-                ${income > 0 ? `<div class="calendar-day-dot income"></div>` : ''}
-                ${expense > 0 ? `<div class="calendar-day-dot expense"></div>` : ''}
+              <div class="calendar-day-amounts">
+                ${income > 0 ? `<div class="calendar-day-amount income ${incomeFormatted.fontClass}">+${incomeFormatted.text}</div>` : ''}
+                ${expense > 0 ? `<div class="calendar-day-amount expense ${expenseFormatted.fontClass}">-${expenseFormatted.text}</div>` : ''}
               </div>
             ` : ''}
           </div>
