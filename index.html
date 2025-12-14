@@ -221,16 +221,16 @@
     /* 카드 공통 스타일 */
     .card {
       background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      transition: all 0.2s ease;
-      border: 1px solid var(--gray-100);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 8px;
+      box-shadow: none;
+      transition: background 0.15s;
+      border: 1px solid #f0f0f0;
     }
 
     .card:hover {
-      box-shadow: var(--shadow-md);
+      background: #fafafa;
     }
 
     /* 달력 */
@@ -344,20 +344,21 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1px;
-      margin-top: 2px;
+      gap: 0;
+      margin-top: 1px;
       width: 100%;
-      padding: 0 2px;
+      padding: 0 1px;
     }
 
     .calendar-day-amount {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
       text-align: center;
+      line-height: 1.2;
     }
 
     .calendar-day-amount.income {
@@ -392,15 +393,16 @@
       border-radius: 0;
       padding: 12px 16px;
       margin-bottom: 0;
-      margin-top: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-top: 1px;
+      box-shadow: none;
+      border-top: 1px solid #f0f0f0;
       min-height: 80px;
     }
 
     .calendar-selected-date {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--gray-900);
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
       margin-bottom: 8px;
     }
 
@@ -411,23 +413,24 @@
 
     .calendar-transaction-card {
       background: white;
-      border-radius: 8px;
+      border-radius: 4px;
       padding: 0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      box-shadow: none;
+      border: 1px solid #f0f0f0;
     }
 
     .calendar-transaction-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--gray-100);
+      padding: 10px 12px;
+      border-bottom: 1px solid #f5f5f5;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
 
     .calendar-transaction-row:hover {
-      background: var(--gray-50);
+      background: #fafafa;
     }
 
     .calendar-transaction-row:last-child {
@@ -442,37 +445,36 @@
     }
 
     .transaction-memo {
-      font-size: 12px;
-      color: var(--gray-500);
+      font-size: 11px;
+      color: #888;
     }
 
     /* 거래 내역 리스트 */
     .transaction-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .transaction-item {
       background: white;
-      border-radius: 12px;
+      border-radius: 4px;
       padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-100);
+      transition: background 0.15s;
+      box-shadow: none;
+      border: 1px solid #f0f0f0;
     }
 
     .transaction-item:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
+      background: #fafafa;
     }
 
     .transaction-item:active {
-      transform: translateY(0) scale(0.98);
+      background: #f5f5f5;
     }
 
     .transaction-left {
@@ -481,69 +483,77 @@
 
     .transaction-date-badge {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--gray-100);
-      color: var(--gray-600);
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      background: #f5f5f5;
+      color: #666;
+      padding: 2px 6px;
+      border-radius: 2px;
       margin-right: 6px;
     }
 
     .transaction-user {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--gray-100);
-      color: var(--gray-700);
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      background: #f5f5f5;
+      color: #555;
+      padding: 2px 6px;
+      border-radius: 2px;
       margin-right: 6px;
     }
 
     .transaction-category {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-900);
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
       letter-spacing: -0.3px;
-      margin-top: 6px;
+      margin-top: 4px;
+    }
+
+    /* 카테고리 아이콘(이모지)을 흑백/뮤트하게 */
+    .category-icon {
+      display: inline-block;
+      filter: grayscale(100%);
+      opacity: 0.7;
+      margin-right: 4px;
     }
 
     .transaction-method {
-      font-size: 12px;
-      color: var(--gray-500);
-      margin-top: 3px;
-      font-weight: 500;
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+      font-weight: 400;
     }
 
     .transaction-amount {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
     }
 
     .transaction-amount.income {
-      color: var(--success);
+      color: #4A90D9;
     }
 
     .transaction-amount.expense {
-      color: var(--danger);
+      color: #D97B7B;
     }
 
     .transaction-amount.transfer {
-      color: var(--warning);
+      color: #888;
     }
 
     /* 자산 카드 - 새로운 디자인 */
     .asset-card {
       background: white;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-100);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 8px;
+      box-shadow: none;
+      border: 1px solid #f0f0f0;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background 0.15s;
     }
 
     .asset-card:hover {
@@ -710,35 +720,35 @@
     /* 필터 버튼 그룹 */
     .filter-buttons {
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 12px;
       overflow-x: auto;
       padding-bottom: 4px;
     }
 
     .filter-btn {
-      padding: 10px 18px;
+      padding: 6px 12px;
       background: white;
-      border: 2px solid var(--gray-100);
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 700;
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 500;
       white-space: nowrap;
       cursor: pointer;
-      color: var(--gray-600);
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
+      color: #666;
+      transition: all 0.15s;
+      box-shadow: none;
     }
 
     .filter-btn:hover {
-      border-color: var(--primary-light);
-      color: var(--primary);
+      border-color: #ccc;
+      color: #333;
     }
 
     .filter-btn.active {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #333;
       color: white;
-      border-color: var(--primary);
+      border-color: #333;
       box-shadow: var(--shadow);
     }
 
@@ -749,15 +759,13 @@
       left: 0;
       right: 0;
       background: white;
-      border-top: 1px solid var(--gray-100);
+      border-top: 1px solid #eee;
       display: flex;
-      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
       z-index: 100;
       max-width: 480px;
       margin: 0 auto;
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.95);
+      box-shadow: none;
     }
 
     .nav-item {
@@ -765,52 +773,43 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 8px 0;
+      padding: 6px 0;
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--gray-400);
-      transition: all 0.2s ease;
+      color: #bbb;
+      transition: color 0.15s;
       position: relative;
     }
 
     .nav-item.active {
-      color: var(--primary);
+      color: #333;
     }
 
     .nav-item.active::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 32px;
-      height: 3px;
-      background: var(--primary);
-      border-radius: 0 0 3px 3px;
+      display: none;
     }
 
     .nav-icon {
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease;
     }
 
     .nav-item.active .nav-icon {
-      transform: scale(1.1);
+      transform: none;
     }
 
     .nav-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
 
     .nav-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0;
     }
 
     /* 플로팅 버튼 */
@@ -876,8 +875,8 @@
 
     .modal {
       background: white;
-      border-radius: 20px 20px 0 0;
-      padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+      border-radius: 8px 8px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
       max-width: 480px;
       width: 100%;
       max-height: 85vh;
@@ -885,31 +884,31 @@
       overflow-x: hidden;
       overscroll-behavior-x: none;
       touch-action: pan-y;
-      animation: slideUp 0.3s;
+      animation: slideUp 0.25s;
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--gray-900);
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
     }
 
     .modal-close {
       background: none;
       border: none;
-      font-size: 28px;
-      color: var(--gray-400);
+      font-size: 24px;
+      color: #999;
       cursor: pointer;
       padding: 0;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -917,37 +916,37 @@
 
     /* 폼 요소 */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .form-label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: var(--gray-700);
-      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
     }
 
     .form-input {
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
       font-size: 14px;
       background: white;
-      transition: all 0.2s;
+      transition: border-color 0.15s;
     }
 
     .form-input:focus {
       outline: none;
-      border-color: var(--primary);
+      border-color: #333;
     }
 
     /* 금액 입력 */
     .amount-input-wrapper {
       position: relative;
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
     .amount-input-wrapper .form-input {
@@ -955,84 +954,83 @@
     }
 
     .reset-amount-btn {
-      padding: 12px 16px;
-      background: var(--gray-100);
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-700);
+      padding: 10px 14px;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
       white-space: nowrap;
     }
 
     .reset-amount-btn:active {
-      background: var(--gray-200);
+      background: #eee;
     }
 
     .quick-amount-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 12px;
+      gap: 6px;
+      margin-top: 10px;
     }
 
     .quick-amount-btn {
-      padding: 10px;
-      background: var(--gray-100);
+      padding: 8px;
+      background: #f5f5f5;
       border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-700);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
 
     .quick-amount-btn:active {
-      background: var(--gray-200);
-      transform: scale(0.95);
+      background: #eee;
     }
 
     /* 선택 그리드 */
     .select-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
     .select-item {
-      padding: 12px;
-      background: var(--gray-100);
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px;
+      padding: 10px;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
       text-align: center;
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-700);
-      transition: all 0.2s;
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
+      transition: all 0.15s;
     }
 
     .select-item:active {
-      transform: scale(0.95);
+      background: #eee;
     }
 
     .select-item.selected {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: #333;
+      border-color: #333;
       color: white;
     }
 
     .expand-toggle {
       grid-column: 1 / -1;
-      padding: 12px;
+      padding: 10px;
       background: none;
       border: none;
-      color: var(--primary);
-      font-size: 14px;
-      font-weight: 600;
+      color: #666;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
       text-align: center;
     }
@@ -1040,46 +1038,44 @@
     /* 버튼 */
     .btn {
       width: 100%;
-      padding: 16px;
+      padding: 14px;
       border: none;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
+      margin-top: 10px;
+      transition: all 0.15s;
+      box-shadow: none;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #333;
       color: white;
     }
 
     .btn-primary:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
+      background: #222;
     }
 
     .btn-primary:active {
-      transform: translateY(0) scale(0.98);
+      background: #444;
     }
 
     .btn-secondary {
       background: white;
-      color: var(--gray-700);
-      border: 2px solid var(--gray-200);
+      color: #555;
+      border: 1px solid #ddd;
       box-shadow: none;
     }
 
     .btn-secondary:hover {
-      border-color: var(--primary);
-      color: var(--primary);
+      border-color: #bbb;
+      color: #333;
     }
 
     .btn-secondary:active {
-      background: var(--gray-50);
-      transform: scale(0.98);
+      background: #f5f5f5;
     }
 
     /* 설정 페이지 - 개선된 UI */
@@ -1281,41 +1277,40 @@
 
     /* 버튼 스타일 */
     .btn {
-      padding: 14px 20px;
+      padding: 12px 16px;
       border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
       text-align: center;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #333;
       color: white;
     }
 
     .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
+      background: #222;
     }
 
     .btn-primary:active {
-      transform: translateY(0);
+      background: #444;
     }
 
     .btn-secondary {
-      background: var(--gray-100);
-      color: var(--gray-700);
+      background: #f5f5f5;
+      color: #555;
     }
 
     .btn-secondary:hover {
-      background: var(--gray-200);
+      background: #eee;
     }
 
     .btn-danger {
-      background: var(--danger);
+      background: #D97B7B;
       color: white;
     }
 
@@ -1993,20 +1988,17 @@
       document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + formatMoney(balance);
     }
 
-    // 금액을 간략하게 포맷팅 (달력용)
+    // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 조정
     function formatCalendarAmount(amount) {
-      if (amount >= 100000000) {
-        return { text: Math.floor(amount / 100000000) + '억', fontClass: 'tiny-font' };
-      } else if (amount >= 10000000) {
-        return { text: (amount / 10000).toFixed(0) + '만', fontClass: 'tiny-font' };
-      } else if (amount >= 1000000) {
-        return { text: (amount / 10000).toFixed(0) + '만', fontClass: 'small-font' };
-      } else if (amount >= 100000) {
-        return { text: (amount / 10000).toFixed(0) + '만', fontClass: '' };
-      } else if (amount >= 10000) {
-        return { text: (amount / 10000).toFixed(1).replace('.0', '') + '만', fontClass: '' };
+      const text = amount.toLocaleString();
+      const len = text.length;
+
+      if (len >= 9) {
+        return { text, fontClass: 'tiny-font' };
+      } else if (len >= 7) {
+        return { text, fontClass: 'small-font' };
       } else {
-        return { text: amount.toLocaleString(), fontClass: '' };
+        return { text, fontClass: '' };
       }
     }
 
@@ -2116,7 +2108,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `${category.icon} ${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
 
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
@@ -2187,7 +2179,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `${category.icon} ${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
 
       const dateDisplay = showDate ? formatDateKo(t.transactionDate) : '';
 
@@ -2358,7 +2350,7 @@
         sortedCategories.forEach(([catId, amount]) => {
           const category = state.categories.find(c => c.id === catId);
           const percent = (amount / maxCategoryExpense) * 100;
-          const categoryDisplay = category ? (category.icon ? `${category.icon} ${category.name}` : category.name) : '기타';
+          const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : '기타';
           html += `
             <div class="bar-item">
               <div class="bar-label">
@@ -2719,7 +2711,7 @@
       if (category) {
         html += `<div class="detail-row">
           <span class="detail-label">카테고리</span>
-          <span class="detail-value">${category.icon ? category.icon + ' ' : ''}${category.name}</span>
+          <span class="detail-value">${category.icon ? `<span class="category-icon">${category.icon}</span>` : ''}${category.name}</span>
         </div>`;
       }
 
