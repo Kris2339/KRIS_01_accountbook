@@ -58,8 +58,7 @@
 
     body.modal-open {
       overflow: hidden;
-      position: fixed;
-      width: 100%;
+      touch-action: none;
     }
 
     .container {
@@ -80,8 +79,30 @@
       border-bottom: 1px solid #f0f0f0;
     }
 
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-add-btn {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      font-weight: 300;
+      color: #333;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+
     /* 달력 탭이 아닐 때 헤더 숨기기 */
     body:not([data-active-tab="calendar"]) .header {
+      display: none;
+    }
+
+    /* 달력 탭일 때 FAB 숨기기 */
+    body[data-active-tab="calendar"] .fab {
       display: none;
     }
 
@@ -93,11 +114,10 @@
     }
 
     .tab-title h2 {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
-      color: var(--gray-900);
+      color: #333;
       margin: 0;
-      letter-spacing: -0.5px;
     }
 
     .header h1 {
@@ -221,16 +241,16 @@
     /* 카드 공통 스타일 */
     .card {
       background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      transition: all 0.2s ease;
-      border: 1px solid var(--gray-100);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 8px;
+      box-shadow: none;
+      transition: background 0.15s;
+      border: 1px solid #f0f0f0;
     }
 
     .card:hover {
-      box-shadow: var(--shadow-md);
+      background: #fafafa;
     }
 
     /* 달력 */
@@ -344,10 +364,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1px;
-      margin-top: 2px;
+      gap: 0;
+      margin-top: 1px;
       width: 100%;
-      padding: 0 2px;
+      padding: 0 1px;
     }
 
     .calendar-day-amount {
@@ -358,6 +378,7 @@
       text-overflow: ellipsis;
       max-width: 100%;
       text-align: center;
+      line-height: 1.2;
     }
 
     .calendar-day-amount.income {
@@ -370,11 +391,11 @@
 
     /* 금액이 클 경우 더 작은 폰트 */
     .calendar-day-amount.small-font {
-      font-size: 7px;
+      font-size: 8px;
     }
 
     .calendar-day-amount.tiny-font {
-      font-size: 6px;
+      font-size: 7px;
     }
 
     /* 기존 dots 스타일 - 사용하지 않지만 호환성 유지 */
@@ -392,15 +413,16 @@
       border-radius: 0;
       padding: 12px 16px;
       margin-bottom: 0;
-      margin-top: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-top: 1px;
+      box-shadow: none;
+      border-top: 1px solid #f0f0f0;
       min-height: 80px;
     }
 
     .calendar-selected-date {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--gray-900);
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
       margin-bottom: 8px;
     }
 
@@ -411,23 +433,24 @@
 
     .calendar-transaction-card {
       background: white;
-      border-radius: 8px;
+      border-radius: 4px;
       padding: 0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      box-shadow: none;
+      border: 1px solid #f0f0f0;
     }
 
     .calendar-transaction-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--gray-100);
+      padding: 10px 12px;
+      border-bottom: 1px solid #f5f5f5;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.15s;
     }
 
     .calendar-transaction-row:hover {
-      background: var(--gray-50);
+      background: #fafafa;
     }
 
     .calendar-transaction-row:last-child {
@@ -442,37 +465,113 @@
     }
 
     .transaction-memo {
-      font-size: 12px;
-      color: var(--gray-500);
+      font-size: 11px;
+      color: #888;
     }
 
     /* 거래 내역 리스트 */
     .transaction-list {
       display: flex;
       flex-direction: column;
+      gap: 10px;
+    }
+
+    /* 날짜별 그룹 카드 */
+    .date-group-card {
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+    }
+
+    .date-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .date-group-date {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .date-group-summary {
+      display: flex;
       gap: 8px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .date-group-summary .income {
+      color: #4A90D9;
+    }
+
+    .date-group-summary .expense {
+      color: #D97B7B;
+    }
+
+    .date-group-items {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .date-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid #f5f5f5;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .date-group-item:last-child {
+      border-bottom: none;
+    }
+
+    .date-group-item:hover {
+      background: #fafafa;
+    }
+
+    .date-group-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .transaction-memo-inline {
+      font-size: 11px;
+      color: #888;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .transaction-item {
       background: white;
-      border-radius: 12px;
+      border-radius: 4px;
       padding: 12px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-100);
+      transition: background 0.15s;
+      box-shadow: none;
+      border: 1px solid #f0f0f0;
     }
 
     .transaction-item:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
+      background: #fafafa;
     }
 
     .transaction-item:active {
-      transform: translateY(0) scale(0.98);
+      background: #f5f5f5;
     }
 
     .transaction-left {
@@ -481,147 +580,280 @@
 
     .transaction-date-badge {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--gray-100);
-      color: var(--gray-600);
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      background: #f5f5f5;
+      color: #666;
+      padding: 2px 6px;
+      border-radius: 2px;
       margin-right: 6px;
     }
 
     .transaction-user {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--gray-100);
-      color: var(--gray-700);
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      background: #f5f5f5;
+      color: #555;
+      padding: 2px 6px;
+      border-radius: 2px;
       margin-right: 6px;
     }
 
     .transaction-category {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-900);
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
       letter-spacing: -0.3px;
-      margin-top: 6px;
+      margin-top: 4px;
+    }
+
+    /* 카테고리 아이콘 */
+    .category-icon {
+      display: inline-block;
+      margin-right: 4px;
     }
 
     .transaction-method {
-      font-size: 12px;
-      color: var(--gray-500);
-      margin-top: 3px;
-      font-weight: 500;
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+      font-weight: 400;
     }
 
     .transaction-amount {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
     }
 
     .transaction-amount.income {
-      color: var(--success);
+      color: #4A90D9;
     }
 
     .transaction-amount.expense {
-      color: var(--danger);
+      color: #D97B7B;
     }
 
     .transaction-amount.transfer {
-      color: var(--warning);
+      color: #888;
     }
 
-    /* 자산 카드 - 새로운 디자인 */
-    .asset-card {
+    /* 예산 요약 카드 */
+    .budget-summary-card {
       background: white;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 4px;
+      padding: 16px;
       margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-100);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      border: 1px solid #f0f0f0;
     }
 
-    .asset-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    .asset-card:active {
-      transform: translateY(0) scale(0.98);
-    }
-
-    .asset-header {
+    .budget-summary-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
 
+    .budget-month {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .budget-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+
+    .budget-status.good {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .budget-status.warning {
+      background: #FFF3E0;
+      color: #E65100;
+    }
+
+    .budget-status.bad {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .budget-summary-amounts {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .budget-summary-item {
+      text-align: center;
+    }
+
+    .budget-summary-label {
+      font-size: 10px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .budget-summary-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .budget-summary-value.expense {
+      color: #D97B7B;
+    }
+
+    .budget-progress-bar {
+      height: 6px;
+      background: #f0f0f0;
+      border-radius: 3px;
+      overflow: visible;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .budget-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .budget-progress-fill.good {
+      background: #4CAF50;
+    }
+
+    .budget-progress-fill.warning {
+      background: #FF9800;
+    }
+
+    .budget-progress-fill.bad {
+      background: #D97B7B;
+    }
+
+    .budget-progress-marker {
+      position: absolute;
+      top: -3px;
+      width: 2px;
+      height: 12px;
+      background: #333;
+      border-radius: 1px;
+    }
+
+    .budget-summary-desc {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .budget-days-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    /* 자산 카드 */
+    .asset-card {
+      background: white;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 8px;
+      box-shadow: none;
+      border: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .asset-card:hover {
+      background: #fafafa;
+    }
+
+    .asset-card:active {
+      background: #f5f5f5;
+    }
+
+    .asset-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
     .asset-name {
       font-size: 13px;
       font-weight: 600;
-      color: var(--gray-600);
+      color: #333;
     }
 
-    .asset-balance {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--gray-900);
-      letter-spacing: -0.5px;
+    .asset-budget-remaining {
+      font-size: 14px;
+      font-weight: 600;
+      color: #4CAF50;
+    }
+
+    .asset-budget-remaining.expense {
+      color: #D97B7B;
     }
 
     .asset-budget-bar {
-      height: 8px;
-      background: var(--gray-100);
-      border-radius: 4px;
+      height: 4px;
+      background: #f0f0f0;
+      border-radius: 2px;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .budget-progress {
       height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      transition: width 0.3s ease, background 0.3s ease;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .budget-progress.good {
+      background: #4CAF50;
     }
 
     .budget-progress.warning {
-      background: var(--warning);
+      background: #FF9800;
     }
 
-    .budget-progress.danger {
-      background: var(--danger);
+    .budget-progress.bad {
+      background: #D97B7B;
     }
 
     .asset-budget-info {
       display: flex;
       justify-content: space-between;
       font-size: 11px;
-      color: var(--gray-500);
-      font-weight: 500;
+      color: #888;
+      font-weight: 400;
+    }
+
+    .no-budget {
+      color: #ccc;
     }
 
     /* 차트 */
     .chart {
       background: white;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 4px;
+      padding: 16px;
       margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-100);
+      border: 1px solid #e0e0e0;
     }
 
     .chart-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: var(--gray-900);
-      letter-spacing: -0.3px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #333;
     }
 
     .chart-canvas {
@@ -635,7 +867,7 @@
     }
 
     .bar-item {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .bar-item:last-child {
@@ -645,40 +877,40 @@
     .bar-label {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 14px;
+      margin-bottom: 6px;
+      font-size: 13px;
     }
 
     .bar-label span:first-child {
-      font-weight: 600;
-      color: var(--gray-700);
+      font-weight: 500;
+      color: #555;
     }
 
     .bar-label span:last-child {
-      font-weight: 700;
-      color: var(--gray-900);
+      font-weight: 600;
+      color: #333;
     }
 
     .bar-bg {
-      height: 8px;
-      background: var(--gray-100);
-      border-radius: 4px;
+      height: 6px;
+      background: #f0f0f0;
+      border-radius: 3px;
       overflow: hidden;
     }
 
     .bar-fill {
       height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      transition: width 0.3s ease;
+      background: #333;
+      border-radius: 3px;
+      transition: width 0.2s ease;
     }
 
     .bar-fill.warning {
-      background: var(--warning);
+      background: #e6a23c;
     }
 
     .bar-fill.danger {
-      background: var(--danger);
+      background: #D97B7B;
     }
 
     /* 검색바 */
@@ -710,35 +942,35 @@
     /* 필터 버튼 그룹 */
     .filter-buttons {
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 12px;
       overflow-x: auto;
       padding-bottom: 4px;
     }
 
     .filter-btn {
-      padding: 10px 18px;
+      padding: 6px 12px;
       background: white;
-      border: 2px solid var(--gray-100);
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 700;
+      border: 1px solid #e0e0e0;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 500;
       white-space: nowrap;
       cursor: pointer;
-      color: var(--gray-600);
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
+      color: #666;
+      transition: all 0.15s;
+      box-shadow: none;
     }
 
     .filter-btn:hover {
-      border-color: var(--primary-light);
-      color: var(--primary);
+      border-color: #ccc;
+      color: #333;
     }
 
     .filter-btn.active {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #333;
       color: white;
-      border-color: var(--primary);
+      border-color: #333;
       box-shadow: var(--shadow);
     }
 
@@ -749,15 +981,13 @@
       left: 0;
       right: 0;
       background: white;
-      border-top: 1px solid var(--gray-100);
+      border-top: 1px solid #eee;
       display: flex;
-      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
       z-index: 100;
       max-width: 480px;
       margin: 0 auto;
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.95);
+      box-shadow: none;
     }
 
     .nav-item {
@@ -765,52 +995,43 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 8px 0;
+      padding: 6px 0;
       background: none;
       border: none;
       cursor: pointer;
-      color: var(--gray-400);
-      transition: all 0.2s ease;
+      color: #bbb;
+      transition: color 0.15s;
       position: relative;
     }
 
     .nav-item.active {
-      color: var(--primary);
+      color: #333;
     }
 
     .nav-item.active::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 32px;
-      height: 3px;
-      background: var(--primary);
-      border-radius: 0 0 3px 3px;
+      display: none;
     }
 
     .nav-icon {
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease;
     }
 
     .nav-item.active .nav-icon {
-      transform: scale(1.1);
+      transform: none;
     }
 
     .nav-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
     }
 
     .nav-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0;
     }
 
     /* 플로팅 버튼 */
@@ -854,14 +1075,19 @@
       background: rgba(0, 0, 0, 0.4);
       z-index: 1000;
       animation: fadeIn 0.2s;
-      overflow-x: hidden;
-      overscroll-behavior-x: none;
+      overflow: hidden;
+      overscroll-behavior: none;
     }
 
     .modal-overlay.active {
       display: flex;
       align-items: flex-end;
       justify-content: center;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+      touch-action: none;
     }
 
     @keyframes fadeIn {
@@ -876,8 +1102,8 @@
 
     .modal {
       background: white;
-      border-radius: 20px 20px 0 0;
-      padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+      border-radius: 8px 8px 0 0;
+      padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
       max-width: 480px;
       width: 100%;
       max-height: 85vh;
@@ -885,31 +1111,31 @@
       overflow-x: hidden;
       overscroll-behavior-x: none;
       touch-action: pan-y;
-      animation: slideUp 0.3s;
+      animation: slideUp 0.25s;
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--gray-900);
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
     }
 
     .modal-close {
       background: none;
       border: none;
-      font-size: 28px;
-      color: var(--gray-400);
+      font-size: 24px;
+      color: #999;
       cursor: pointer;
       padding: 0;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -917,37 +1143,40 @@
 
     /* 폼 요소 */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      overflow: hidden;
     }
 
     .form-label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: var(--gray-700);
-      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
     }
 
     .form-input {
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
+      max-width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
       font-size: 14px;
       background: white;
-      transition: all 0.2s;
+      transition: border-color 0.15s;
+      box-sizing: border-box;
     }
 
     .form-input:focus {
       outline: none;
-      border-color: var(--primary);
+      border-color: #333;
     }
 
     /* 금액 입력 */
     .amount-input-wrapper {
       position: relative;
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
     .amount-input-wrapper .form-input {
@@ -955,84 +1184,107 @@
     }
 
     .reset-amount-btn {
-      padding: 12px 16px;
-      background: var(--gray-100);
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-700);
+      padding: 10px 14px;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
       white-space: nowrap;
     }
 
     .reset-amount-btn:active {
-      background: var(--gray-200);
+      background: #eee;
     }
 
     .quick-amount-buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 12px;
+      gap: 6px;
+      margin-top: 10px;
     }
 
     .quick-amount-btn {
-      padding: 10px;
-      background: var(--gray-100);
+      padding: 8px;
+      background: #f5f5f5;
       border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-700);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
 
     .quick-amount-btn:active {
-      background: var(--gray-200);
-      transform: scale(0.95);
+      background: #eee;
+    }
+
+    /* 숫자패드 */
+    .numpad-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .numpad-btn {
+      padding: 12px 8px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .numpad-btn:active {
+      background: #f0f0f0;
     }
 
     /* 선택 그리드 */
     .select-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 6px;
     }
 
     .select-item {
-      padding: 12px;
-      background: var(--gray-100);
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px;
+      padding: 10px;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
       text-align: center;
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-700);
-      transition: all 0.2s;
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
+      transition: all 0.15s;
     }
 
     .select-item:active {
-      transform: scale(0.95);
+      background: #eee;
     }
 
     .select-item.selected {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: #333;
+      border-color: #333;
       color: white;
     }
 
     .expand-toggle {
       grid-column: 1 / -1;
-      padding: 12px;
+      padding: 10px;
       background: none;
       border: none;
-      color: var(--primary);
-      font-size: 14px;
-      font-weight: 600;
+      color: #666;
+      font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
       text-align: center;
     }
@@ -1040,74 +1292,70 @@
     /* 버튼 */
     .btn {
       width: 100%;
-      padding: 16px;
+      padding: 14px;
       border: none;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 700;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
+      margin-top: 10px;
+      transition: all 0.15s;
+      box-shadow: none;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #333;
       color: white;
     }
 
     .btn-primary:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
+      background: #222;
     }
 
     .btn-primary:active {
-      transform: translateY(0) scale(0.98);
+      background: #444;
     }
 
     .btn-secondary {
       background: white;
-      color: var(--gray-700);
-      border: 2px solid var(--gray-200);
+      color: #555;
+      border: 1px solid #ddd;
       box-shadow: none;
     }
 
     .btn-secondary:hover {
-      border-color: var(--primary);
-      color: var(--primary);
+      border-color: #bbb;
+      color: #333;
     }
 
     .btn-secondary:active {
-      background: var(--gray-50);
-      transform: scale(0.98);
+      background: #f5f5f5;
     }
 
     /* 설정 페이지 - 개선된 UI */
     .settings-section {
       background: white;
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 4px;
+      padding: 16px;
       margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-100);
+      border: 1px solid #e0e0e0;
     }
 
     .settings-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 18px;
-      color: var(--gray-900);
-      letter-spacing: -0.3px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: #333;
     }
 
     .connection-status {
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      background: var(--gray-100);
-      color: var(--gray-600);
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      background: #f5f5f5;
+      color: #666;
       text-align: center;
     }
 
@@ -1119,17 +1367,17 @@
     .settings-item-card {
       display: flex;
       align-items: center;
-      padding: 14px 16px;
-      background: var(--gray-50);
-      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fafafa;
+      border-radius: 4px;
       margin-bottom: 8px;
-      transition: all 0.2s;
-      border: 1px solid transparent;
+      transition: all 0.15s;
+      border: 1px solid #f0f0f0;
     }
 
     .settings-item-card:hover {
       background: white;
-      border-color: var(--gray-200);
+      border-color: #e0e0e0;
     }
 
     .settings-item-card:last-child {
@@ -1141,16 +1389,16 @@
     }
 
     .item-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--gray-900);
-      margin-bottom: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 2px;
     }
 
     .item-meta {
-      font-size: 12px;
-      color: var(--gray-500);
-      font-weight: 500;
+      font-size: 11px;
+      color: #999;
+      font-weight: 400;
     }
 
     .item-actions {
@@ -1160,24 +1408,24 @@
 
     .icon-btn {
       background: white;
-      border: 1.5px solid var(--gray-200);
-      font-size: 12px;
-      font-weight: 600;
+      border: 1px solid #ddd;
+      font-size: 11px;
+      font-weight: 500;
       cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 8px;
-      height: 32px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      color: var(--gray-600);
+      transition: all 0.15s;
+      color: #666;
       white-space: nowrap;
     }
 
     .icon-btn:hover {
-      background: var(--gray-50);
-      border-color: var(--gray-300);
+      background: #f5f5f5;
+      border-color: #ccc;
     }
 
     .icon-btn:active {
@@ -1185,47 +1433,47 @@
     }
 
     .icon-btn.favorite {
-      color: var(--warning);
-      border-color: var(--warning);
-      background: rgba(255, 184, 77, 0.1);
+      color: #e6a23c;
+      border-color: #e6a23c;
+      background: rgba(230, 162, 60, 0.08);
     }
 
     .icon-btn.favorite:hover {
-      background: rgba(255, 184, 77, 0.2);
+      background: rgba(230, 162, 60, 0.15);
     }
 
     .icon-btn.reorder {
-      color: var(--gray-600);
-      border-color: var(--gray-300);
+      color: #666;
+      border-color: #ddd;
       background: white;
-      font-size: 14px;
-      padding: 4px 8px;
+      font-size: 12px;
+      padding: 4px 6px;
     }
 
     .icon-btn.reorder:hover {
-      background: var(--gray-50);
-      color: var(--primary);
-      border-color: var(--primary);
+      background: #f5f5f5;
+      color: #333;
+      border-color: #ccc;
     }
 
     .icon-btn.edit {
-      color: var(--primary);
-      border-color: var(--primary);
-      background: rgba(108, 93, 211, 0.05);
+      color: #4A90D9;
+      border-color: #4A90D9;
+      background: rgba(74, 144, 217, 0.05);
     }
 
     .icon-btn.edit:hover {
-      background: rgba(108, 93, 211, 0.1);
+      background: rgba(74, 144, 217, 0.1);
     }
 
     .icon-btn.delete {
-      color: var(--danger);
-      border-color: var(--danger);
-      background: rgba(255, 107, 107, 0.05);
+      color: #D97B7B;
+      border-color: #D97B7B;
+      background: rgba(217, 123, 123, 0.05);
     }
 
     .icon-btn.delete:hover {
-      background: rgba(255, 107, 107, 0.1);
+      background: rgba(217, 123, 123, 0.1);
     }
 
     /* 자산 이동 */
@@ -1256,66 +1504,63 @@
 
     /* 동기화 버튼 */
     .sync-button {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-md);
+      background: #333;
+      border-radius: 4px;
+      padding: 14px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s;
       border: none;
       width: 100%;
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       color: white;
     }
 
     .sync-button:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+      background: #222;
     }
 
     /* 버튼 스타일 */
     .btn {
-      padding: 14px 20px;
+      padding: 12px 16px;
       border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
       text-align: center;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      background: #333;
       color: white;
     }
 
     .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
+      background: #222;
     }
 
     .btn-primary:active {
-      transform: translateY(0);
+      background: #444;
     }
 
     .btn-secondary {
-      background: var(--gray-100);
-      color: var(--gray-700);
+      background: #f5f5f5;
+      color: #555;
     }
 
     .btn-secondary:hover {
-      background: var(--gray-200);
+      background: #eee;
     }
 
     .btn-danger {
-      background: var(--danger);
+      background: #D97B7B;
       color: white;
     }
 
@@ -1366,10 +1611,13 @@
   <div class="container">
     <!-- 헤더 -->
     <div class="header">
-      <div class="month-selector">
-        <button id="prevMonth">◀</button>
-        <span id="currentMonth"></span>
-        <button id="nextMonth">▶</button>
+      <div class="header-row">
+        <div class="month-selector">
+          <button id="prevMonth">◀</button>
+          <span id="currentMonth"></span>
+          <button id="nextMonth">▶</button>
+        </div>
+        <button class="header-add-btn" id="headerAddBtn">+</button>
       </div>
     </div>
 
@@ -1413,9 +1661,6 @@
 
       <!-- 내역 탭 -->
       <div class="tab-content" id="log-content">
-        <div class="tab-title">
-          <h2>내역</h2>
-        </div>
         <div class="search-bar">
           <input type="text" class="search-input" id="searchInput" placeholder="거래 내역 검색">
         </div>
@@ -1428,21 +1673,15 @@
         <div class="transaction-list" id="transactionList"></div>
       </div>
 
-      <!-- 자산 탭 -->
+      <!-- 예산 탭 -->
       <div class="tab-content" id="assets-content">
-        <div class="tab-title">
-          <h2>자산</h2>
-        </div>
+        <div id="budgetSummary"></div>
         <div id="assetsList"></div>
-        <button class="btn btn-secondary" id="transferAssetBtn">자산 이동</button>
         <button class="btn btn-secondary" id="setBudgetBtn">예산 설정</button>
       </div>
 
       <!-- 통계 탭 -->
       <div class="tab-content" id="stats-content">
-        <div class="tab-title">
-          <h2>통계</h2>
-        </div>
         <div class="filter-buttons">
           <button class="filter-btn active" data-period="week">주간</button>
           <button class="filter-btn" data-period="month">월간</button>
@@ -1460,9 +1699,6 @@
 
       <!-- 설정 탭 -->
       <div class="tab-content" id="settings-content">
-        <div class="tab-title">
-          <h2>설정</h2>
-        </div>
         <!-- 수동 동기화 버튼 -->
         <button class="sync-button" id="syncData">
           <span>🔄</span>
@@ -1516,11 +1752,11 @@
       <button class="nav-item" data-tab="assets">
         <div class="nav-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
           </svg>
         </div>
-        <div class="nav-label">자산</div>
+        <div class="nav-label">예산</div>
       </button>
       <button class="nav-item" data-tab="stats">
         <div class="nav-icon">
@@ -1585,11 +1821,28 @@
           <button class="quick-amount-btn" data-amount="1000">+1천</button>
           <button class="quick-amount-btn" data-amount="100">+1백</button>
         </div>
+        <div class="numpad-buttons">
+          <button class="numpad-btn" data-num="1">1</button>
+          <button class="numpad-btn" data-num="2">2</button>
+          <button class="numpad-btn" data-num="3">3</button>
+          <button class="numpad-btn" data-num="4">4</button>
+          <button class="numpad-btn" data-num="5">5</button>
+          <button class="numpad-btn" data-num="6">6</button>
+          <button class="numpad-btn" data-num="7">7</button>
+          <button class="numpad-btn" data-num="8">8</button>
+          <button class="numpad-btn" data-num="9">9</button>
+          <button class="numpad-btn" data-num="0">0</button>
+        </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">카테고리</label>
         <div class="select-grid" id="categorySelect"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">메모 (선택)</label>
+        <input type="text" class="form-input" id="memoInput" placeholder="메모">
       </div>
 
       <div class="form-group">
@@ -1605,11 +1858,6 @@
       <div class="form-group">
         <label class="form-label">날짜</label>
         <input type="date" class="form-input" id="dateInput">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">메모 (선택)</label>
-        <input type="text" class="form-input" id="memoInput" placeholder="메모">
       </div>
 
       <button class="btn btn-primary" id="saveTransaction">저장</button>
@@ -1993,20 +2241,17 @@
       document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + formatMoney(balance);
     }
 
-    // 금액을 간략하게 포맷팅 (달력용)
+    // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 조정
     function formatCalendarAmount(amount) {
-      if (amount >= 100000000) {
-        return { text: Math.floor(amount / 100000000) + '억', fontClass: 'tiny-font' };
-      } else if (amount >= 10000000) {
-        return { text: (amount / 10000).toFixed(0) + '만', fontClass: 'tiny-font' };
-      } else if (amount >= 1000000) {
-        return { text: (amount / 10000).toFixed(0) + '만', fontClass: 'small-font' };
-      } else if (amount >= 100000) {
-        return { text: (amount / 10000).toFixed(0) + '만', fontClass: '' };
-      } else if (amount >= 10000) {
-        return { text: (amount / 10000).toFixed(1).replace('.0', '') + '만', fontClass: '' };
+      const text = amount.toLocaleString();
+      const len = text.length;
+
+      if (len >= 9) {
+        return { text, fontClass: 'tiny-font' };
+      } else if (len >= 7) {
+        return { text, fontClass: 'small-font' };
       } else {
-        return { text: amount.toLocaleString(), fontClass: '' };
+        return { text, fontClass: '' };
       }
     }
 
@@ -2116,7 +2361,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `${category.icon} ${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
 
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
@@ -2164,10 +2409,62 @@
       if (transactions.length === 0) {
         html = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">거래 내역이 없습니다</div></div>';
       } else {
-        html = transactions.map(t => renderTransactionItem(t, true)).join('');
+        // 날짜별로 그룹화
+        const groupedByDate = {};
+        transactions.forEach(t => {
+          if (!groupedByDate[t.transactionDate]) {
+            groupedByDate[t.transactionDate] = [];
+          }
+          groupedByDate[t.transactionDate].push(t);
+        });
+
+        // 날짜별 카드 생성
+        Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+          const dayTransactions = groupedByDate[date];
+          const dayIncome = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+          const dayExpense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+          html += `<div class="date-group-card">
+            <div class="date-group-header">
+              <span class="date-group-date">${formatDateKo(date)}</span>
+              <span class="date-group-summary">
+                ${dayIncome > 0 ? `<span class="income">+${formatMoney(dayIncome)}</span>` : ''}
+                ${dayExpense > 0 ? `<span class="expense">-${formatMoney(dayExpense)}</span>` : ''}
+              </span>
+            </div>
+            <div class="date-group-items">
+              ${dayTransactions.map(t => renderTransactionItemCompact(t)).join('')}
+            </div>
+          </div>`;
+        });
       }
 
       document.getElementById('transactionList').innerHTML = html;
+    }
+
+    // 날짜 그룹 내에서 사용할 간단한 거래 아이템
+    function renderTransactionItemCompact(t) {
+      const user = state.users.find(u => u.id === t.userId);
+      const category = state.categories.find(c => c.id === t.categoryId);
+      const asset = state.assets.find(a => a.id === t.assetId);
+      const toAsset = t.toAssetId ? state.assets.find(a => a.id === t.toAssetId) : null;
+
+      const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
+      const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+
+      return `
+        <div class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
+          <div class="date-group-item-left">
+            ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+            <span class="transaction-category">${categoryDisplay}</span>
+            ${t.memo ? `<span class="transaction-memo-inline">${t.memo}</span>` : ''}
+          </div>
+          <div class="transaction-amount ${amountClass}">
+            ${amountPrefix}${formatMoney(t.amount)}
+          </div>
+        </div>
+      `;
     }
 
     function renderTransactionItem(t, showDate = false) {
@@ -2187,7 +2484,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `${category.icon} ${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
 
       const dateDisplay = showDate ? formatDateKo(t.transactionDate) : '';
 
@@ -2208,30 +2505,116 @@
     }
 
     function renderAssetsList() {
+      const { start, end } = getMonthRange(state.currentDate);
+      const today = new Date();
+      const currentMonth = state.currentDate.getMonth();
+      const currentYear = state.currentDate.getFullYear();
+
+      // 이번달 총 일수 및 남은 일수 계산
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const daysPassed = today.getMonth() === currentMonth && today.getFullYear() === currentYear
+        ? today.getDate()
+        : (today > end ? daysInMonth : 0);
+      const daysRemaining = daysInMonth - daysPassed;
+      const daysPassedPercent = (daysPassed / daysInMonth) * 100;
+
+      // 월 전체 예산 및 지출 합계
+      let totalBudget = 0;
+      let totalSpent = 0;
+
       const sortedAssets = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
 
-      let html = sortedAssets.map(asset => {
-        const balance = calculateAssetBalance(asset.id);
+      sortedAssets.forEach(asset => {
         const budget = asset.budget || 0;
-        const { start, end } = getMonthRange(state.currentDate);
+        totalBudget += budget;
 
         const assetTransactions = state.transactions.filter(t => {
           const tDate = new Date(t.transactionDate);
-          return tDate >= start && tDate <= end && t.assetId === asset.id;
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
         });
 
-        const spent = assetTransactions
-          .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + t.amount, 0);
+        totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
+      });
+
+      const spentPercent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+      const remainingBudget = totalBudget - totalSpent;
+
+      // 예산 소진 상태 판단
+      let statusClass = 'good';
+      let statusText = '양호';
+      let statusDesc = '';
+
+      if (totalBudget > 0) {
+        if (spentPercent > daysPassedPercent + 10) {
+          statusClass = 'bad';
+          statusText = '주의';
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+        } else if (spentPercent > daysPassedPercent) {
+          statusClass = 'warning';
+          statusText = '보통';
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+        } else {
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+        }
+      }
+
+      // 월 요약 표시
+      let summaryHtml = `
+        <div class="budget-summary-card">
+          <div class="budget-summary-header">
+            <span class="budget-month">${currentMonth + 1}월 예산 현황</span>
+            ${totalBudget > 0 ? `<span class="budget-status ${statusClass}">${statusText}</span>` : ''}
+          </div>
+          <div class="budget-summary-amounts">
+            <div class="budget-summary-item">
+              <span class="budget-summary-label">예산</span>
+              <span class="budget-summary-value">${formatMoney(totalBudget)}</span>
+            </div>
+            <div class="budget-summary-item">
+              <span class="budget-summary-label">지출</span>
+              <span class="budget-summary-value expense">${formatMoney(totalSpent)}</span>
+            </div>
+            <div class="budget-summary-item">
+              <span class="budget-summary-label">남음</span>
+              <span class="budget-summary-value ${remainingBudget < 0 ? 'expense' : ''}">${formatMoney(remainingBudget)}</span>
+            </div>
+          </div>
+          ${totalBudget > 0 ? `
+            <div class="budget-progress-bar">
+              <div class="budget-progress-fill ${statusClass}" style="width: ${Math.min(spentPercent, 100)}%"></div>
+              <div class="budget-progress-marker" style="left: ${daysPassedPercent}%"></div>
+            </div>
+            <div class="budget-summary-desc">${statusDesc}</div>
+            <div class="budget-days-info">
+              <span>경과: ${daysPassed}일</span>
+              <span>남음: ${daysRemaining}일</span>
+            </div>
+          ` : '<div class="budget-summary-desc">예산을 설정해주세요</div>'}
+        </div>
+      `;
+
+      document.getElementById('budgetSummary').innerHTML = summaryHtml;
+
+      // 개별 자산 예산 카드
+      let html = sortedAssets.map(asset => {
+        const budget = asset.budget || 0;
+
+        const assetTransactions = state.transactions.filter(t => {
+          const tDate = new Date(t.transactionDate);
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+        });
+
+        const spent = assetTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const remaining = budget - spent;
 
         let progressPercent = 0;
-        let progressClass = '';
+        let progressClass = 'good';
 
         if (budget > 0) {
           progressPercent = Math.min((spent / budget) * 100, 100);
-          if (progressPercent >= 100) {
-            progressClass = 'danger';
-          } else if (progressPercent >= 80) {
+          if (progressPercent > daysPassedPercent + 10) {
+            progressClass = 'bad';
+          } else if (progressPercent > daysPassedPercent) {
             progressClass = 'warning';
           }
         }
@@ -2240,17 +2623,22 @@
           <div class="asset-card" onclick="showAssetTransactions('${asset.id}', '${asset.name}')">
             <div class="asset-header">
               <span class="asset-name">${asset.name}</span>
-              <span class="asset-balance">${formatMoney(balance)}</span>
+              <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining >= 0 ? '+' : ''}${formatMoney(remaining)}</span>
             </div>
             ${budget > 0 ? `
               <div class="asset-budget-bar">
                 <div class="budget-progress ${progressClass}" style="width: ${progressPercent}%"></div>
               </div>
               <div class="asset-budget-info">
-                <span>지출: ${formatMoney(spent)}</span>
-                <span>예산: ${formatMoney(budget)}</span>
+                <span>지출 ${formatMoney(spent)}</span>
+                <span>예산 ${formatMoney(budget)}</span>
               </div>
-            ` : ''}
+            ` : `
+              <div class="asset-budget-info">
+                <span>지출 ${formatMoney(spent)}</span>
+                <span class="no-budget">예산 미설정</span>
+              </div>
+            `}
           </div>
         `;
       }).join('');
@@ -2297,10 +2685,42 @@
           </div>
         `;
       } else {
-        const html = assetTransactions.map(t => renderTransactionItem(t, true)).join('');
+        // 날짜별로 그룹화
+        const groupedByDate = {};
+        assetTransactions.forEach(t => {
+          if (!groupedByDate[t.transactionDate]) {
+            groupedByDate[t.transactionDate] = [];
+          }
+          groupedByDate[t.transactionDate].push(t);
+        });
+
+        let html = '';
+        Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+          const dayTransactions = groupedByDate[date];
+          const dayIncome = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+          const dayExpense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+          const dateObj = new Date(date);
+          const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()];
+          const dateDisplay = `${dateObj.getMonth() + 1}/${dateObj.getDate()} (${dayOfWeek})`;
+
+          html += `<div class="date-group-card">
+            <div class="date-group-header">
+              <span class="date-group-date">${dateDisplay}</span>
+              <div class="date-group-amounts">
+                ${dayIncome > 0 ? `<span class="income">+${formatMoney(dayIncome)}</span>` : ''}
+                ${dayExpense > 0 ? `<span class="expense">-${formatMoney(dayExpense)}</span>` : ''}
+              </div>
+            </div>
+            <div class="date-group-items">
+              ${dayTransactions.map(t => renderTransactionItemCompact(t)).join('')}
+            </div>
+          </div>`;
+        });
         document.getElementById('assetTransactionsList').innerHTML = html;
       }
 
+      document.body.classList.add('modal-open');
       document.getElementById('assetTransactionsModal').classList.add('active');
     }
 
@@ -2358,7 +2778,7 @@
         sortedCategories.forEach(([catId, amount]) => {
           const category = state.categories.find(c => c.id === catId);
           const percent = (amount / maxCategoryExpense) * 100;
-          const categoryDisplay = category ? (category.icon ? `${category.icon} ${category.name}` : category.name) : '기타';
+          const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : '기타';
           html += `
             <div class="bar-item">
               <div class="bar-label">
@@ -2630,7 +3050,13 @@
       renderSelectGrid('userSelect', state.users, state.selectedUser);
       updateTransactionModalForType();
 
-      document.getElementById('transactionModal').classList.add('active');
+      const modal = document.getElementById('transactionModal');
+      modal.classList.add('active');
+      // 모달 스크롤 위치 초기화
+      const modalContent = modal.querySelector('.modal');
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
       document.body.classList.add('modal-open');
     }
 
@@ -2719,7 +3145,7 @@
       if (category) {
         html += `<div class="detail-row">
           <span class="detail-label">카테고리</span>
-          <span class="detail-value">${category.icon ? category.icon + ' ' : ''}${category.name}</span>
+          <span class="detail-value">${category.icon ? `<span class="category-icon">${category.icon}</span>` : ''}${category.name}</span>
         </div>`;
       }
 
@@ -2899,9 +3325,6 @@
         return;
       }
 
-      document.getElementById('transactionModal').classList.add('active');
-      document.body.classList.add('modal-open');
-
       // 수정 모드 설정
       state.editingTransactionId = transactionId;
 
@@ -2916,8 +3339,8 @@
       document.getElementById('dateInput').value = transaction.transactionDate;
       document.getElementById('memoInput').value = transaction.memo || '';
 
-      // UI 업데이트
-      renderSelectGrid('userSelect', state.users, state.selectedUser, null, true);
+      // UI 업데이트 - 사용자 선택 활성화
+      renderSelectGrid('userSelect', state.users, state.selectedUser);
 
       // 유형 선택
       document.querySelectorAll('[data-type]').forEach(el => {
@@ -2927,12 +3350,21 @@
         }
       });
 
-      renderSelectGrid('categorySelect', state.categories.filter(c => c.type === transaction.type), state.selectedCategory, null, true);
-      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod, null, true);
-      renderSelectGrid('assetSelect', state.assets, state.selectedAsset, null, true);
+      renderSelectGrid('categorySelect', state.categories.filter(c => c.type === transaction.type), state.selectedCategory);
+      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod);
+      renderSelectGrid('assetSelect', state.assets, state.selectedAsset);
 
       // 모달 제목 변경
       document.querySelector('#transactionModal .modal-title').textContent = '거래 수정';
+
+      // 모달 열기 및 스크롤 위치 초기화
+      const modal = document.getElementById('transactionModal');
+      modal.classList.add('active');
+      const modalContent = modal.querySelector('.modal');
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+      document.body.classList.add('modal-open');
     }
 
     function deleteTransaction(transactionId) {
@@ -3135,16 +3567,6 @@
     }
 
     async function switchTab(tabName) {
-      // 탭 전환 시 Supabase에서 최신 데이터 자동 로드
-      if (state.supabaseClient) {
-        try {
-          await loadFromSupabase();
-          console.log('✅ 탭 전환 시 데이터 동기화 완료');
-        } catch (error) {
-          console.error('탭 전환 시 동기화 실패:', error);
-        }
-      }
-
       document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
       });
@@ -3158,23 +3580,36 @@
       // body에 현재 활성 탭 설정 (헤더 표시/숨김 제어)
       document.body.setAttribute('data-active-tab', tabName);
 
-      // 월간 요약과 월 선택기를 달력 탭에만 표시
+      // 요소들
       const summaryElement = document.querySelector('.summary');
       const monthSelectorElement = document.querySelector('.month-selector');
+      const headerAddBtn = document.getElementById('headerAddBtn');
 
+      // 달력 탭
       if (tabName === 'calendar') {
         summaryElement.style.display = 'block';
         monthSelectorElement.style.display = 'flex';
+        headerAddBtn.style.display = 'flex';
         renderCalendar();
         renderSelectedDateTransactions(state.selectedDate);
-      } else {
+      }
+      // 내역, 예산 탭 - 월 선택기만 표시
+      else if (tabName === 'log' || tabName === 'assets') {
         summaryElement.style.display = 'none';
-        monthSelectorElement.style.display = 'none';
+        monthSelectorElement.style.display = 'flex';
+        headerAddBtn.style.display = 'none';
         if (tabName === 'log') {
           renderTransactionList();
-        } else if (tabName === 'assets') {
+        } else {
           renderAssetsList();
-        } else if (tabName === 'stats') {
+        }
+      }
+      // 통계, 설정 탭 - 모두 숨김
+      else {
+        summaryElement.style.display = 'none';
+        monthSelectorElement.style.display = 'none';
+        headerAddBtn.style.display = 'none';
+        if (tabName === 'stats') {
           renderStats();
         }
       }
@@ -3239,6 +3674,7 @@
 
       // 거래 추가 버튼
       document.getElementById('addTransactionBtn').addEventListener('click', openTransactionModal);
+      document.getElementById('headerAddBtn').addEventListener('click', openTransactionModal);
 
       // 거래 타입 선택
       document.querySelectorAll('[data-type]').forEach(item => {
@@ -3289,23 +3725,19 @@
         });
       });
 
-      // 거래 저장
-      document.getElementById('saveTransaction').addEventListener('click', saveTransaction);
-
-      // 자산 이동
-      document.getElementById('transferAssetBtn').addEventListener('click', () => {
-        state.selectedFromAsset = null;
-        state.selectedToAsset = null;
-        document.getElementById('transferAmountInput').value = '';
-        document.getElementById('transferDateInput').value = formatDate(new Date());
-
-        renderSelectGrid('fromAssetSelect', state.assets, state.selectedFromAsset);
-        renderSelectGrid('toAssetSelect', state.assets, state.selectedToAsset);
-
-        document.getElementById('transferModal').classList.add('active');
+      // 숫자패드 버튼
+      document.querySelectorAll('.numpad-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const num = btn.dataset.num;
+          const input = document.getElementById('amountInput');
+          const rawValue = input.value.replace(/,/g, '');
+          const newValue = rawValue + num;
+          input.value = formatNumber(parseInt(newValue) || 0);
+        });
       });
 
-      document.getElementById('saveTransfer').addEventListener('click', saveTransfer);
+      // 거래 저장
+      document.getElementById('saveTransaction').addEventListener('click', saveTransaction);
 
       // 예산 설정
       document.getElementById('setBudgetBtn').addEventListener('click', openBudgetModal);
