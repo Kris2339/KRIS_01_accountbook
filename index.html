@@ -58,8 +58,7 @@
 
     body.modal-open {
       overflow: hidden;
-      position: fixed;
-      width: 100%;
+      touch-action: none;
     }
 
     .container {
@@ -475,7 +474,84 @@
     .transaction-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
+    }
+
+    /* 날짜별 그룹 카드 */
+    .date-group-card {
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #f0f0f0;
+      overflow: hidden;
+    }
+
+    .date-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .date-group-date {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .date-group-summary {
+      display: flex;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .date-group-summary .income {
+      color: #4A90D9;
+    }
+
+    .date-group-summary .expense {
+      color: #D97B7B;
+    }
+
+    .date-group-items {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .date-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid #f5f5f5;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .date-group-item:last-child {
+      border-bottom: none;
+    }
+
+    .date-group-item:hover {
+      background: #fafafa;
+    }
+
+    .date-group-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .transaction-memo-inline {
+      font-size: 11px;
+      color: #888;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .transaction-item {
@@ -564,11 +640,131 @@
       color: #888;
     }
 
-    /* 자산 카드 - 새로운 디자인 */
-    .asset-card {
+    /* 예산 요약 카드 */
+    .budget-summary-card {
       background: white;
       border-radius: 4px;
       padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .budget-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .budget-month {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .budget-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+
+    .budget-status.good {
+      background: #E8F5E9;
+      color: #2E7D32;
+    }
+
+    .budget-status.warning {
+      background: #FFF3E0;
+      color: #E65100;
+    }
+
+    .budget-status.bad {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .budget-summary-amounts {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .budget-summary-item {
+      text-align: center;
+    }
+
+    .budget-summary-label {
+      font-size: 10px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .budget-summary-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .budget-summary-value.expense {
+      color: #D97B7B;
+    }
+
+    .budget-progress-bar {
+      height: 6px;
+      background: #f0f0f0;
+      border-radius: 3px;
+      overflow: visible;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .budget-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .budget-progress-fill.good {
+      background: #4CAF50;
+    }
+
+    .budget-progress-fill.warning {
+      background: #FF9800;
+    }
+
+    .budget-progress-fill.bad {
+      background: #D97B7B;
+    }
+
+    .budget-progress-marker {
+      position: absolute;
+      top: -3px;
+      width: 2px;
+      height: 12px;
+      background: #333;
+      border-radius: 1px;
+    }
+
+    .budget-summary-desc {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .budget-days-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    /* 자산 카드 */
+    .asset-card {
+      background: white;
+      border-radius: 4px;
+      padding: 12px;
       margin-bottom: 8px;
       box-shadow: none;
       border: 1px solid #f0f0f0;
@@ -577,63 +773,72 @@
     }
 
     .asset-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
+      background: #fafafa;
     }
 
     .asset-card:active {
-      transform: translateY(0) scale(0.98);
+      background: #f5f5f5;
     }
 
     .asset-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .asset-name {
       font-size: 13px;
       font-weight: 600;
-      color: var(--gray-600);
+      color: #333;
     }
 
-    .asset-balance {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--gray-900);
-      letter-spacing: -0.5px;
+    .asset-budget-remaining {
+      font-size: 14px;
+      font-weight: 600;
+      color: #4CAF50;
+    }
+
+    .asset-budget-remaining.expense {
+      color: #D97B7B;
     }
 
     .asset-budget-bar {
-      height: 8px;
-      background: var(--gray-100);
-      border-radius: 4px;
+      height: 4px;
+      background: #f0f0f0;
+      border-radius: 2px;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .budget-progress {
       height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      transition: width 0.3s ease, background 0.3s ease;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .budget-progress.good {
+      background: #4CAF50;
     }
 
     .budget-progress.warning {
-      background: var(--warning);
+      background: #FF9800;
     }
 
-    .budget-progress.danger {
-      background: var(--danger);
+    .budget-progress.bad {
+      background: #D97B7B;
     }
 
     .asset-budget-info {
       display: flex;
       justify-content: space-between;
       font-size: 11px;
-      color: var(--gray-500);
-      font-weight: 500;
+      color: #888;
+      font-weight: 400;
+    }
+
+    .no-budget {
+      color: #ccc;
     }
 
     /* 차트 */
@@ -873,14 +1078,19 @@
       background: rgba(0, 0, 0, 0.4);
       z-index: 1000;
       animation: fadeIn 0.2s;
-      overflow-x: hidden;
-      overscroll-behavior-x: none;
+      overflow: hidden;
+      overscroll-behavior: none;
     }
 
     .modal-overlay.active {
       display: flex;
       align-items: flex-end;
       justify-content: center;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+      touch-action: none;
     }
 
     @keyframes fadeIn {
@@ -1473,13 +1683,13 @@
         <div class="transaction-list" id="transactionList"></div>
       </div>
 
-      <!-- 자산 탭 -->
+      <!-- 예산 탭 -->
       <div class="tab-content" id="assets-content">
         <div class="tab-title">
-          <h2>자산</h2>
+          <h2>예산</h2>
         </div>
+        <div id="budgetSummary"></div>
         <div id="assetsList"></div>
-        <button class="btn btn-secondary" id="transferAssetBtn">자산 이동</button>
         <button class="btn btn-secondary" id="setBudgetBtn">예산 설정</button>
       </div>
 
@@ -1561,11 +1771,11 @@
       <button class="nav-item" data-tab="assets">
         <div class="nav-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
           </svg>
         </div>
-        <div class="nav-label">자산</div>
+        <div class="nav-label">예산</div>
       </button>
       <button class="nav-item" data-tab="stats">
         <div class="nav-icon">
@@ -2218,10 +2428,62 @@
       if (transactions.length === 0) {
         html = '<div class="empty-state"><div class="empty-state-icon">📝</div><div class="empty-state-text">거래 내역이 없습니다</div></div>';
       } else {
-        html = transactions.map(t => renderTransactionItem(t, true)).join('');
+        // 날짜별로 그룹화
+        const groupedByDate = {};
+        transactions.forEach(t => {
+          if (!groupedByDate[t.transactionDate]) {
+            groupedByDate[t.transactionDate] = [];
+          }
+          groupedByDate[t.transactionDate].push(t);
+        });
+
+        // 날짜별 카드 생성
+        Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+          const dayTransactions = groupedByDate[date];
+          const dayIncome = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+          const dayExpense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+          html += `<div class="date-group-card">
+            <div class="date-group-header">
+              <span class="date-group-date">${formatDateKo(date)}</span>
+              <span class="date-group-summary">
+                ${dayIncome > 0 ? `<span class="income">+${formatMoney(dayIncome)}</span>` : ''}
+                ${dayExpense > 0 ? `<span class="expense">-${formatMoney(dayExpense)}</span>` : ''}
+              </span>
+            </div>
+            <div class="date-group-items">
+              ${dayTransactions.map(t => renderTransactionItemCompact(t)).join('')}
+            </div>
+          </div>`;
+        });
       }
 
       document.getElementById('transactionList').innerHTML = html;
+    }
+
+    // 날짜 그룹 내에서 사용할 간단한 거래 아이템
+    function renderTransactionItemCompact(t) {
+      const user = state.users.find(u => u.id === t.userId);
+      const category = state.categories.find(c => c.id === t.categoryId);
+      const asset = state.assets.find(a => a.id === t.assetId);
+      const toAsset = t.toAssetId ? state.assets.find(a => a.id === t.toAssetId) : null;
+
+      const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
+      const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+
+      return `
+        <div class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
+          <div class="date-group-item-left">
+            ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+            <span class="transaction-category">${categoryDisplay}</span>
+            ${t.memo ? `<span class="transaction-memo-inline">${t.memo}</span>` : ''}
+          </div>
+          <div class="transaction-amount ${amountClass}">
+            ${amountPrefix}${formatMoney(t.amount)}
+          </div>
+        </div>
+      `;
     }
 
     function renderTransactionItem(t, showDate = false) {
@@ -2262,30 +2524,116 @@
     }
 
     function renderAssetsList() {
+      const { start, end } = getMonthRange(state.currentDate);
+      const today = new Date();
+      const currentMonth = state.currentDate.getMonth();
+      const currentYear = state.currentDate.getFullYear();
+
+      // 이번달 총 일수 및 남은 일수 계산
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const daysPassed = today.getMonth() === currentMonth && today.getFullYear() === currentYear
+        ? today.getDate()
+        : (today > end ? daysInMonth : 0);
+      const daysRemaining = daysInMonth - daysPassed;
+      const daysPassedPercent = (daysPassed / daysInMonth) * 100;
+
+      // 월 전체 예산 및 지출 합계
+      let totalBudget = 0;
+      let totalSpent = 0;
+
       const sortedAssets = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
 
-      let html = sortedAssets.map(asset => {
-        const balance = calculateAssetBalance(asset.id);
+      sortedAssets.forEach(asset => {
         const budget = asset.budget || 0;
-        const { start, end } = getMonthRange(state.currentDate);
+        totalBudget += budget;
 
         const assetTransactions = state.transactions.filter(t => {
           const tDate = new Date(t.transactionDate);
-          return tDate >= start && tDate <= end && t.assetId === asset.id;
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
         });
 
-        const spent = assetTransactions
-          .filter(t => t.type === 'expense')
-          .reduce((sum, t) => sum + t.amount, 0);
+        totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
+      });
+
+      const spentPercent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+      const remainingBudget = totalBudget - totalSpent;
+
+      // 예산 소진 상태 판단
+      let statusClass = 'good';
+      let statusText = '양호';
+      let statusDesc = '';
+
+      if (totalBudget > 0) {
+        if (spentPercent > daysPassedPercent + 10) {
+          statusClass = 'bad';
+          statusText = '주의';
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+        } else if (spentPercent > daysPassedPercent) {
+          statusClass = 'warning';
+          statusText = '보통';
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+        } else {
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+        }
+      }
+
+      // 월 요약 표시
+      let summaryHtml = `
+        <div class="budget-summary-card">
+          <div class="budget-summary-header">
+            <span class="budget-month">${currentMonth + 1}월 예산 현황</span>
+            ${totalBudget > 0 ? `<span class="budget-status ${statusClass}">${statusText}</span>` : ''}
+          </div>
+          <div class="budget-summary-amounts">
+            <div class="budget-summary-item">
+              <span class="budget-summary-label">예산</span>
+              <span class="budget-summary-value">${formatMoney(totalBudget)}</span>
+            </div>
+            <div class="budget-summary-item">
+              <span class="budget-summary-label">지출</span>
+              <span class="budget-summary-value expense">${formatMoney(totalSpent)}</span>
+            </div>
+            <div class="budget-summary-item">
+              <span class="budget-summary-label">남음</span>
+              <span class="budget-summary-value ${remainingBudget < 0 ? 'expense' : ''}">${formatMoney(remainingBudget)}</span>
+            </div>
+          </div>
+          ${totalBudget > 0 ? `
+            <div class="budget-progress-bar">
+              <div class="budget-progress-fill ${statusClass}" style="width: ${Math.min(spentPercent, 100)}%"></div>
+              <div class="budget-progress-marker" style="left: ${daysPassedPercent}%"></div>
+            </div>
+            <div class="budget-summary-desc">${statusDesc}</div>
+            <div class="budget-days-info">
+              <span>경과: ${daysPassed}일</span>
+              <span>남음: ${daysRemaining}일</span>
+            </div>
+          ` : '<div class="budget-summary-desc">예산을 설정해주세요</div>'}
+        </div>
+      `;
+
+      document.getElementById('budgetSummary').innerHTML = summaryHtml;
+
+      // 개별 자산 예산 카드
+      let html = sortedAssets.map(asset => {
+        const budget = asset.budget || 0;
+
+        const assetTransactions = state.transactions.filter(t => {
+          const tDate = new Date(t.transactionDate);
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+        });
+
+        const spent = assetTransactions.reduce((sum, t) => sum + t.amount, 0);
+        const remaining = budget - spent;
 
         let progressPercent = 0;
-        let progressClass = '';
+        let progressClass = 'good';
 
         if (budget > 0) {
           progressPercent = Math.min((spent / budget) * 100, 100);
-          if (progressPercent >= 100) {
-            progressClass = 'danger';
-          } else if (progressPercent >= 80) {
+          if (progressPercent > daysPassedPercent + 10) {
+            progressClass = 'bad';
+          } else if (progressPercent > daysPassedPercent) {
             progressClass = 'warning';
           }
         }
@@ -2294,17 +2642,22 @@
           <div class="asset-card" onclick="showAssetTransactions('${asset.id}', '${asset.name}')">
             <div class="asset-header">
               <span class="asset-name">${asset.name}</span>
-              <span class="asset-balance">${formatMoney(balance)}</span>
+              <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining >= 0 ? '+' : ''}${formatMoney(remaining)}</span>
             </div>
             ${budget > 0 ? `
               <div class="asset-budget-bar">
                 <div class="budget-progress ${progressClass}" style="width: ${progressPercent}%"></div>
               </div>
               <div class="asset-budget-info">
-                <span>지출: ${formatMoney(spent)}</span>
-                <span>예산: ${formatMoney(budget)}</span>
+                <span>지출 ${formatMoney(spent)}</span>
+                <span>예산 ${formatMoney(budget)}</span>
               </div>
-            ` : ''}
+            ` : `
+              <div class="asset-budget-info">
+                <span>지출 ${formatMoney(spent)}</span>
+                <span class="no-budget">예산 미설정</span>
+              </div>
+            `}
           </div>
         `;
       }).join('');
@@ -2351,10 +2704,42 @@
           </div>
         `;
       } else {
-        const html = assetTransactions.map(t => renderTransactionItem(t, true)).join('');
+        // 날짜별로 그룹화
+        const groupedByDate = {};
+        assetTransactions.forEach(t => {
+          if (!groupedByDate[t.transactionDate]) {
+            groupedByDate[t.transactionDate] = [];
+          }
+          groupedByDate[t.transactionDate].push(t);
+        });
+
+        let html = '';
+        Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
+          const dayTransactions = groupedByDate[date];
+          const dayIncome = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+          const dayExpense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+          const dateObj = new Date(date);
+          const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][dateObj.getDay()];
+          const dateDisplay = `${dateObj.getMonth() + 1}/${dateObj.getDate()} (${dayOfWeek})`;
+
+          html += `<div class="date-group-card">
+            <div class="date-group-header">
+              <span class="date-group-date">${dateDisplay}</span>
+              <div class="date-group-amounts">
+                ${dayIncome > 0 ? `<span class="income">+${formatMoney(dayIncome)}</span>` : ''}
+                ${dayExpense > 0 ? `<span class="expense">-${formatMoney(dayExpense)}</span>` : ''}
+              </div>
+            </div>
+            <div class="date-group-items">
+              ${dayTransactions.map(t => renderTransactionItemCompact(t)).join('')}
+            </div>
+          </div>`;
+        });
         document.getElementById('assetTransactionsList').innerHTML = html;
       }
 
+      document.body.classList.add('modal-open');
       document.getElementById('assetTransactionsModal').classList.add('active');
     }
 
@@ -2959,9 +3344,6 @@
         return;
       }
 
-      document.getElementById('transactionModal').classList.add('active');
-      document.body.classList.add('modal-open');
-
       // 수정 모드 설정
       state.editingTransactionId = transactionId;
 
@@ -2976,8 +3358,8 @@
       document.getElementById('dateInput').value = transaction.transactionDate;
       document.getElementById('memoInput').value = transaction.memo || '';
 
-      // UI 업데이트
-      renderSelectGrid('userSelect', state.users, state.selectedUser, null, true);
+      // UI 업데이트 - 사용자 선택 활성화
+      renderSelectGrid('userSelect', state.users, state.selectedUser);
 
       // 유형 선택
       document.querySelectorAll('[data-type]').forEach(el => {
@@ -2987,12 +3369,21 @@
         }
       });
 
-      renderSelectGrid('categorySelect', state.categories.filter(c => c.type === transaction.type), state.selectedCategory, null, true);
-      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod, null, true);
-      renderSelectGrid('assetSelect', state.assets, state.selectedAsset, null, true);
+      renderSelectGrid('categorySelect', state.categories.filter(c => c.type === transaction.type), state.selectedCategory);
+      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod);
+      renderSelectGrid('assetSelect', state.assets, state.selectedAsset);
 
       // 모달 제목 변경
       document.querySelector('#transactionModal .modal-title').textContent = '거래 수정';
+
+      // 모달 열기 및 스크롤 위치 초기화
+      const modal = document.getElementById('transactionModal');
+      modal.classList.add('active');
+      const modalContent = modal.querySelector('.modal');
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+      document.body.classList.add('modal-open');
     }
 
     function deleteTransaction(transactionId) {
@@ -3374,6 +3765,7 @@
         renderSelectGrid('fromAssetSelect', state.assets, state.selectedFromAsset);
         renderSelectGrid('toAssetSelect', state.assets, state.selectedToAsset);
 
+        document.body.classList.add('modal-open');
         document.getElementById('transferModal').classList.add('active');
       });
 
