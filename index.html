@@ -371,7 +371,7 @@
     }
 
     .calendar-day-amount {
-      font-size: 8px;
+      font-size: 9px;
       font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
@@ -391,11 +391,11 @@
 
     /* 금액이 클 경우 더 작은 폰트 */
     .calendar-day-amount.small-font {
-      font-size: 7px;
+      font-size: 8px;
     }
 
     .calendar-day-amount.tiny-font {
-      font-size: 6px;
+      font-size: 7px;
     }
 
     /* 기존 dots 스타일 - 사용하지 않지만 호환성 유지 */
@@ -1661,9 +1661,6 @@
 
       <!-- 내역 탭 -->
       <div class="tab-content" id="log-content">
-        <div class="tab-title">
-          <h2>내역</h2>
-        </div>
         <div class="search-bar">
           <input type="text" class="search-input" id="searchInput" placeholder="거래 내역 검색">
         </div>
@@ -1678,9 +1675,6 @@
 
       <!-- 예산 탭 -->
       <div class="tab-content" id="assets-content">
-        <div class="tab-title">
-          <h2>예산</h2>
-        </div>
         <div id="budgetSummary"></div>
         <div id="assetsList"></div>
         <button class="btn btn-secondary" id="setBudgetBtn">예산 설정</button>
@@ -1688,9 +1682,6 @@
 
       <!-- 통계 탭 -->
       <div class="tab-content" id="stats-content">
-        <div class="tab-title">
-          <h2>통계</h2>
-        </div>
         <div class="filter-buttons">
           <button class="filter-btn active" data-period="week">주간</button>
           <button class="filter-btn" data-period="month">월간</button>
@@ -1708,9 +1699,6 @@
 
       <!-- 설정 탭 -->
       <div class="tab-content" id="settings-content">
-        <div class="tab-title">
-          <h2>설정</h2>
-        </div>
         <!-- 수동 동기화 버튼 -->
         <button class="sync-button" id="syncData">
           <span>🔄</span>
@@ -3592,23 +3580,36 @@
       // body에 현재 활성 탭 설정 (헤더 표시/숨김 제어)
       document.body.setAttribute('data-active-tab', tabName);
 
-      // 월간 요약과 월 선택기를 달력 탭에만 표시
+      // 요소들
       const summaryElement = document.querySelector('.summary');
       const monthSelectorElement = document.querySelector('.month-selector');
+      const headerAddBtn = document.getElementById('headerAddBtn');
 
+      // 달력 탭
       if (tabName === 'calendar') {
         summaryElement.style.display = 'block';
         monthSelectorElement.style.display = 'flex';
+        headerAddBtn.style.display = 'flex';
         renderCalendar();
         renderSelectedDateTransactions(state.selectedDate);
-      } else {
+      }
+      // 내역, 예산 탭 - 월 선택기만 표시
+      else if (tabName === 'log' || tabName === 'assets') {
         summaryElement.style.display = 'none';
-        monthSelectorElement.style.display = 'none';
+        monthSelectorElement.style.display = 'flex';
+        headerAddBtn.style.display = 'none';
         if (tabName === 'log') {
           renderTransactionList();
-        } else if (tabName === 'assets') {
+        } else {
           renderAssetsList();
-        } else if (tabName === 'stats') {
+        }
+      }
+      // 통계, 설정 탭 - 모두 숨김
+      else {
+        summaryElement.style.display = 'none';
+        monthSelectorElement.style.display = 'none';
+        headerAddBtn.style.display = 'none';
+        if (tabName === 'stats') {
           renderStats();
         }
       }
@@ -3737,22 +3738,6 @@
 
       // 거래 저장
       document.getElementById('saveTransaction').addEventListener('click', saveTransaction);
-
-      // 자산 이동
-      document.getElementById('transferAssetBtn').addEventListener('click', () => {
-        state.selectedFromAsset = null;
-        state.selectedToAsset = null;
-        document.getElementById('transferAmountInput').value = '';
-        document.getElementById('transferDateInput').value = formatDate(new Date());
-
-        renderSelectGrid('fromAssetSelect', state.assets, state.selectedFromAsset);
-        renderSelectGrid('toAssetSelect', state.assets, state.selectedToAsset);
-
-        document.body.classList.add('modal-open');
-        document.getElementById('transferModal').classList.add('active');
-      });
-
-      document.getElementById('saveTransfer').addEventListener('click', saveTransfer);
 
       // 예산 설정
       document.getElementById('setBudgetBtn').addEventListener('click', openBudgetModal);
