@@ -80,8 +80,30 @@
       border-bottom: 1px solid #f0f0f0;
     }
 
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-add-btn {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      font-weight: 300;
+      color: #333;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+
     /* 달력 탭이 아닐 때 헤더 숨기기 */
     body:not([data-active-tab="calendar"]) .header {
+      display: none;
+    }
+
+    /* 달력 탭일 때 FAB 숨기기 */
+    body[data-active-tab="calendar"] .fab {
       display: none;
     }
 
@@ -511,11 +533,9 @@
       margin-top: 4px;
     }
 
-    /* 카테고리 아이콘(이모지)을 흑백/뮤트하게 */
+    /* 카테고리 아이콘 */
     .category-icon {
       display: inline-block;
-      filter: grayscale(100%);
-      opacity: 0.7;
       margin-right: 4px;
     }
 
@@ -917,6 +937,7 @@
     /* 폼 요소 */
     .form-group {
       margin-bottom: 16px;
+      overflow: hidden;
     }
 
     .form-label {
@@ -929,12 +950,14 @@
 
     .form-input {
       width: 100%;
+      max-width: 100%;
       padding: 10px 12px;
       border: 1px solid #e0e0e0;
       border-radius: 4px;
       font-size: 14px;
       background: white;
       transition: border-color 0.15s;
+      box-sizing: border-box;
     }
 
     .form-input:focus {
@@ -991,6 +1014,30 @@
 
     .quick-amount-btn:active {
       background: #eee;
+    }
+
+    /* 숫자패드 */
+    .numpad-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .numpad-btn {
+      padding: 12px 8px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .numpad-btn:active {
+      background: #f0f0f0;
     }
 
     /* 선택 그리드 */
@@ -1361,10 +1408,13 @@
   <div class="container">
     <!-- 헤더 -->
     <div class="header">
-      <div class="month-selector">
-        <button id="prevMonth">◀</button>
-        <span id="currentMonth"></span>
-        <button id="nextMonth">▶</button>
+      <div class="header-row">
+        <div class="month-selector">
+          <button id="prevMonth">◀</button>
+          <span id="currentMonth"></span>
+          <button id="nextMonth">▶</button>
+        </div>
+        <button class="header-add-btn" id="headerAddBtn">+</button>
       </div>
     </div>
 
@@ -1580,11 +1630,28 @@
           <button class="quick-amount-btn" data-amount="1000">+1천</button>
           <button class="quick-amount-btn" data-amount="100">+1백</button>
         </div>
+        <div class="numpad-buttons">
+          <button class="numpad-btn" data-num="1">1</button>
+          <button class="numpad-btn" data-num="2">2</button>
+          <button class="numpad-btn" data-num="3">3</button>
+          <button class="numpad-btn" data-num="4">4</button>
+          <button class="numpad-btn" data-num="5">5</button>
+          <button class="numpad-btn" data-num="6">6</button>
+          <button class="numpad-btn" data-num="7">7</button>
+          <button class="numpad-btn" data-num="8">8</button>
+          <button class="numpad-btn" data-num="9">9</button>
+          <button class="numpad-btn" data-num="0">0</button>
+        </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">카테고리</label>
         <div class="select-grid" id="categorySelect"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">메모 (선택)</label>
+        <input type="text" class="form-input" id="memoInput" placeholder="메모">
       </div>
 
       <div class="form-group">
@@ -1600,11 +1667,6 @@
       <div class="form-group">
         <label class="form-label">날짜</label>
         <input type="date" class="form-input" id="dateInput">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">메모 (선택)</label>
-        <input type="text" class="form-input" id="memoInput" placeholder="메모">
       </div>
 
       <button class="btn btn-primary" id="saveTransaction">저장</button>
@@ -2622,7 +2684,13 @@
       renderSelectGrid('userSelect', state.users, state.selectedUser);
       updateTransactionModalForType();
 
-      document.getElementById('transactionModal').classList.add('active');
+      const modal = document.getElementById('transactionModal');
+      modal.classList.add('active');
+      // 모달 스크롤 위치 초기화
+      const modalContent = modal.querySelector('.modal');
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
       document.body.classList.add('modal-open');
     }
 
@@ -3231,6 +3299,7 @@
 
       // 거래 추가 버튼
       document.getElementById('addTransactionBtn').addEventListener('click', openTransactionModal);
+      document.getElementById('headerAddBtn').addEventListener('click', openTransactionModal);
 
       // 거래 타입 선택
       document.querySelectorAll('[data-type]').forEach(item => {
@@ -3278,6 +3347,17 @@
           const currentAmount = parseFormattedNumber(input.value);
           const newAmount = currentAmount + amount;
           input.value = formatNumber(newAmount);
+        });
+      });
+
+      // 숫자패드 버튼
+      document.querySelectorAll('.numpad-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const num = btn.dataset.num;
+          const input = document.getElementById('amountInput');
+          const rawValue = input.value.replace(/,/g, '');
+          const newValue = rawValue + num;
+          input.value = formatNumber(parseInt(newValue) || 0);
         });
       });
 
