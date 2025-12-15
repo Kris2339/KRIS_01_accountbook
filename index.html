@@ -96,13 +96,16 @@
       line-height: 1;
     }
 
-    /* 달력 탭이 아닐 때 헤더 숨기기 */
-    body:not([data-active-tab="calendar"]) .header {
+    /* 통계, 설정 탭일 때 헤더 숨기기 */
+    body[data-active-tab="stats"] .header,
+    body[data-active-tab="settings"] .header {
       display: none;
     }
 
-    /* 달력 탭일 때 FAB 숨기기 */
-    body[data-active-tab="calendar"] .fab {
+    /* 달력, 내역, 예산 탭일 때 FAB 숨기기 */
+    body[data-active-tab="calendar"] .fab,
+    body[data-active-tab="log"] .fab,
+    body[data-active-tab="assets"] .fab {
       display: none;
     }
 
@@ -2526,14 +2529,18 @@
 
       sortedAssets.forEach(asset => {
         const budget = asset.budget || 0;
-        totalBudget += budget;
 
-        const assetTransactions = state.transactions.filter(t => {
-          const tDate = new Date(t.transactionDate);
-          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
-        });
+        // 예산이 설정된 자산만 총 예산/지출에 포함
+        if (budget > 0) {
+          totalBudget += budget;
 
-        totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
+          const assetTransactions = state.transactions.filter(t => {
+            const tDate = new Date(t.transactionDate);
+            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+          });
+
+          totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
+        }
       });
 
       const spentPercent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
