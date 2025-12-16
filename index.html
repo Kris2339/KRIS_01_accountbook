@@ -1686,8 +1686,8 @@
       <!-- 통계 탭 -->
       <div class="tab-content" id="stats-content">
         <div class="filter-buttons">
-          <button class="filter-btn active" data-period="week">주간</button>
-          <button class="filter-btn" data-period="month">월간</button>
+          <button class="filter-btn" data-period="week">주간</button>
+          <button class="filter-btn active" data-period="month">월간</button>
           <button class="filter-btn" data-period="year">연간</button>
         </div>
 
@@ -2044,21 +2044,27 @@
 
     function getMonthRange(date) {
       const start = new Date(date.getFullYear(), date.getMonth(), 1);
+      start.setHours(0, 0, 0, 0);
       const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
       return { start, end };
     }
 
     function getWeekRange(date) {
       const start = new Date(date);
       start.setDate(date.getDate() - date.getDay());
+      start.setHours(0, 0, 0, 0);
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
       return { start, end };
     }
 
     function getYearRange(date) {
       const start = new Date(date.getFullYear(), 0, 1);
+      start.setHours(0, 0, 0, 0);
       const end = new Date(date.getFullYear(), 11, 31);
+      end.setHours(23, 59, 59, 999);
       return { start, end };
     }
 
@@ -2676,13 +2682,18 @@
     }
 
     function showAssetTransactions(assetId, assetName) {
-      const assetTransactions = state.transactions.filter(t =>
-        t.assetId === assetId || (t.type === 'transfer' && t.toAssetId === assetId)
-      );
+      const { start, end } = getMonthRange(state.currentDate);
+      const currentMonth = state.currentDate.getMonth() + 1;
+
+      const assetTransactions = state.transactions.filter(t => {
+        const tDate = new Date(t.transactionDate);
+        return tDate >= start && tDate <= end &&
+               (t.assetId === assetId || (t.type === 'transfer' && t.toAssetId === assetId));
+      });
 
       assetTransactions.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate));
 
-      document.getElementById('assetModalTitle').textContent = `${assetName} 내역`;
+      document.getElementById('assetModalTitle').textContent = `${assetName} ${currentMonth}월 내역`;
 
       if (assetTransactions.length === 0) {
         document.getElementById('assetTransactionsList').innerHTML = `
