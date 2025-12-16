@@ -2070,7 +2070,8 @@
 
     function getStatsPeriodRange() {
       if (state.statsFilter === 'week') {
-        return getWeekRange(state.currentDate);
+        // 주간은 오늘 기준으로 현재 주
+        return getWeekRange(new Date());
       } else if (state.statsFilter === 'year') {
         return getYearRange(state.currentDate);
       } else {
@@ -2857,7 +2858,6 @@
       }
 
       let labels = [];
-      let incomeData = [];
       let expenseData = [];
 
       if (state.statsFilter === 'week') {
@@ -2868,11 +2868,9 @@
           const dateStr = formatDate(date);
 
           const dayTransactions = state.transactions.filter(t => t.transactionDate === dateStr);
-          const income = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
           const expense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
           labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
-          incomeData.push(income);
           expenseData.push(expense);
         }
       } else if (state.statsFilter === 'year') {
@@ -2887,11 +2885,9 @@
             return tDate >= start && tDate <= end;
           });
 
-          const income = monthTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
           const expense = monthTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
           labels.push(`${date.getMonth() + 1}월`);
-          incomeData.push(income);
           expenseData.push(expense);
         }
       } else {
@@ -2906,11 +2902,9 @@
             return tDate >= start && tDate <= end;
           });
 
-          const income = monthTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
           const expense = monthTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
           labels.push(`${date.getMonth() + 1}월`);
-          incomeData.push(income);
           expenseData.push(expense);
         }
       }
@@ -2921,18 +2915,10 @@
           labels: labels,
           datasets: [
             {
-              label: '수입',
-              data: incomeData,
-              borderColor: '#0AC569',
-              backgroundColor: 'rgba(10, 197, 105, 0.1)',
-              tension: 0.4,
-              fill: true
-            },
-            {
               label: '지출',
               data: expenseData,
-              borderColor: '#F04452',
-              backgroundColor: 'rgba(240, 68, 82, 0.1)',
+              borderColor: '#D97B7B',
+              backgroundColor: 'rgba(217, 123, 123, 0.1)',
               tension: 0.4,
               fill: true
             }
@@ -2943,8 +2929,7 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: true,
-              position: 'top'
+              display: false
             }
           },
           scales: {
