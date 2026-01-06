@@ -2281,10 +2281,15 @@
 
     function updateSummary() {
       const { start, end } = getMonthRange(state.currentDate);
-      const monthTransactions = state.transactions.filter(t => {
+      let monthTransactions = state.transactions.filter(t => {
         const tDate = new Date(t.transactionDate);
         return tDate >= start && tDate <= end;
       });
+
+      // 사용자 필터 적용
+      if (state.calendarUserFilter !== 'all') {
+        monthTransactions = monthTransactions.filter(t => t.userId === state.calendarUserFilter);
+      }
 
       const income = monthTransactions
         .filter(t => t.type === 'income')
@@ -3736,6 +3741,7 @@
           document.querySelectorAll('.user-filter-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           state.calendarUserFilter = btn.dataset.user;
+          updateSummary();
           renderCalendar();
           renderSelectedDateTransactions(state.selectedDate);
         });
