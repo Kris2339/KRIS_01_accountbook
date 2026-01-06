@@ -241,6 +241,14 @@
       display: block;
     }
 
+    /* 달력 탭 레이아웃 - 달력 고정, 거래내역만 스크롤 */
+    #calendar-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
     /* 카드 공통 스타일 */
     .card {
       background: white;
@@ -264,6 +272,7 @@
       margin-bottom: 0;
       box-shadow: none;
       overflow: hidden;
+      flex-shrink: 0; /* 달력 고정 */
     }
 
     .calendar-grid {
@@ -321,7 +330,7 @@
     }
 
     .calendar-day.today .calendar-day-number {
-      background: #e8e8e8;
+      background: #c0c0c0;
       border-radius: 50%;
       width: 22px;
       height: 22px;
@@ -336,12 +345,14 @@
     }
 
     .calendar-day.selected {
-      background: #f0f0f0;
+      background: #d5d5d5;
       border-radius: 8px;
     }
 
+    /* 선택된 날짜에는 작은 원 제거 */
     .calendar-day.selected .calendar-day-number {
-      background: #ddd;
+      background: transparent;
+      border-radius: 0;
     }
 
     .calendar-day-number {
@@ -420,6 +431,10 @@
       box-shadow: none;
       border-top: 1px solid #f0f0f0;
       min-height: 80px;
+      flex: 1; /* 남은 공간 차지 */
+      overflow-y: auto; /* 세로 스크롤 활성화 */
+      display: flex;
+      flex-direction: column;
     }
 
     .calendar-selected-date {
@@ -430,8 +445,8 @@
     }
 
     .calendar-transaction-list {
-      max-height: 300px;
-      overflow-y: auto;
+      flex: 1; /* 부모 컨테이너 내에서 확장 */
+      overflow-y: auto; /* 필요시 스크롤 */
     }
 
     .calendar-transaction-card {
