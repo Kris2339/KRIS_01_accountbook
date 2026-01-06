@@ -242,8 +242,8 @@
     }
 
     /* 달력 탭 레이아웃 - 달력 고정, 거래내역만 스크롤 */
-    #calendar-content {
-      display: flex;
+    #calendar-content.active {
+      display: flex !important;
       flex-direction: column;
       height: 100%;
       overflow: hidden;
