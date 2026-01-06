@@ -256,7 +256,10 @@
 
     /* 달력 탭일 때 content의 overflow 숨김 */
     body[data-active-tab="calendar"] .content {
-      overflow: hidden;
+      overflow: hidden !important;
+      overflow-y: hidden !important;
+      display: flex;
+      flex-direction: column;
     }
 
     /* 달력 탭 제외한 탭들의 패딩 */
@@ -480,7 +483,6 @@
 
     .calendar-transaction-list {
       flex: 1; /* 부모 컨테이너 내에서 확장 */
-      overflow-y: auto; /* 필요시 스크롤 */
     }
 
     .calendar-transaction-card {
