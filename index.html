@@ -254,6 +254,11 @@
       padding: 0;
     }
 
+    /* 달력 탭일 때 content의 overflow 숨김 */
+    body[data-active-tab="calendar"] .content {
+      overflow: hidden;
+    }
+
     /* 달력 탭 제외한 탭들의 패딩 */
     #log-content,
     #assets-content,
@@ -509,6 +514,12 @@
       flex-direction: column;
       gap: 2px;
       flex: 1;
+    }
+
+    .calendar-transaction-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .transaction-memo {
@@ -2443,8 +2454,10 @@
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
           <div class="calendar-transaction-info">
-            ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
-            <div class="transaction-category">${categoryDisplay}</div>
+            <div class="calendar-transaction-main">
+              ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+              <div class="transaction-category">${categoryDisplay}</div>
+            </div>
             ${t.memo ? `<div class="transaction-memo">${t.memo}</div>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
@@ -3132,10 +3145,15 @@
     }
 
     function updateTransactionModalForType() {
-      const categories = state.categories.filter(c => c.type === state.selectedType);
+      const categories = state.categories
+        .filter(c => c.type === state.selectedType)
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+      const paymentMethods = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
+      const assets = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
+
       renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
-      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod, null, true);
-      renderSelectGrid('assetSelect', state.assets, state.selectedAsset, null, true);
+      renderSelectGrid('paymentMethodSelect', paymentMethods, state.selectedPaymentMethod, null, true);
+      renderSelectGrid('assetSelect', assets, state.selectedAsset, null, true);
     }
 
     function selectItem(containerId, itemId) {
