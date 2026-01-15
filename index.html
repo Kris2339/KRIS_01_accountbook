@@ -3034,9 +3034,14 @@
       if (!container) return;
 
       const isExpanded = state.expandedSections[containerId];
-      const displayItems = (allowExpand && !isExpanded)
+      let displayItems = (allowExpand && !isExpanded)
         ? items.filter(item => item.isFavorite)
         : items;
+
+      // displayOrder로 정렬 (카테고리는 이미 updateTransactionModalForType에서 정렬됨)
+      if (displayItems.length > 0 && displayItems[0].displayOrder !== undefined) {
+        displayItems = [...displayItems].sort((a, b) => a.displayOrder - b.displayOrder);
+      }
 
       let html = displayItems.map(item => {
         const selected = item.id === selectedId ? 'selected' : '';
