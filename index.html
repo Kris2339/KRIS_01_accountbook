@@ -2223,7 +2223,7 @@
       }
     }
 
-    const debouncedSyncToSupabase = debounce(saveToSupabase, 5000);
+    const debouncedSyncToSupabase = debounce(saveToSupabase, 1000);
 
     function saveData() {
       saveLocalData();
@@ -3748,6 +3748,14 @@
       } catch (error) {
         console.error('Supabase 자동 연결 실패:', error);
       }
+
+      // 페이지 닫기 전 데이터 저장 (데이터 유실 방지)
+      window.addEventListener('beforeunload', () => {
+        if (!state.useLocalStorage && state.supabaseClient) {
+          // debounce를 거치지 않고 즉시 저장
+          saveToSupabase();
+        }
+      });
 
       // 월 변경
       document.getElementById('prevMonth').addEventListener('click', () => {
