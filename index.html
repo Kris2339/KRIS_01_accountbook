@@ -2476,6 +2476,11 @@
         return tDate >= start && tDate <= end;
       });
 
+      // 사용자 필터 적용
+      if (state.calendarUserFilter && state.calendarUserFilter !== 'all') {
+        transactions = transactions.filter(t => t.userId === state.calendarUserFilter);
+      }
+
       if (state.logFilter !== 'all') {
         transactions = transactions.filter(t => t.type === state.logFilter);
       }
@@ -2626,7 +2631,8 @@
 
           const assetTransactions = state.transactions.filter(t => {
             const tDate = new Date(t.transactionDate);
-            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+            const matchesUser = !state.calendarUserFilter || state.calendarUserFilter === 'all' || t.userId === state.calendarUserFilter;
+            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense' && matchesUser;
           });
 
           totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -2698,7 +2704,8 @@
 
         const assetTransactions = state.transactions.filter(t => {
           const tDate = new Date(t.transactionDate);
-          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+          const matchesUser = !state.calendarUserFilter || state.calendarUserFilter === 'all' || t.userId === state.calendarUserFilter;
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense' && matchesUser;
         });
 
         const spent = assetTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -3771,12 +3778,25 @@
       // 사용자 필터
       document.querySelectorAll('.user-filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.querySelectorAll('.user-filter-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          state.calendarUserFilter = btn.dataset.user;
+          const selectedUser = btn.dataset.user;
+
+          // 토글 기능: 이미 선택된 버튼을 다시 클릭하면 전체로 변경
+          if (btn.classList.contains('active') && selectedUser !== 'all') {
+            document.querySelectorAll('.user-filter-btn').forEach(b => b.classList.remove('active'));
+            const allBtn = document.querySelector('.user-filter-btn[data-user="all"]');
+            if (allBtn) allBtn.classList.add('active');
+            state.calendarUserFilter = 'all';
+          } else {
+            document.querySelectorAll('.user-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.calendarUserFilter = selectedUser;
+          }
+
           updateSummary();
           renderCalendar();
           renderSelectedDateTransactions(state.selectedDate);
+          renderTransactionList();
+          renderAssetsList();
         });
       });
 
