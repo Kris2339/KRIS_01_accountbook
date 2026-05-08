@@ -165,28 +165,64 @@
       color: #333;
     }
 
-    /* 요약 카드 */
+    /* 사용자 필터 - 개선된 디자인 */
+    .user-filter {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .user-filter-btn {
+      background: transparent;
+      border: 1px solid #e0e0e0;
+      color: #666;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: all 0.2s ease;
+      letter-spacing: -0.2px;
+    }
+
+    .user-filter-btn:hover {
+      border-color: #d0d0d0;
+      background: #fafafa;
+    }
+
+    .user-filter-btn:active {
+      transform: scale(0.96);
+    }
+
+    .user-filter-btn.active {
+      background: #333;
+      color: white;
+      border-color: #333;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 요약 카드 - 개선된 디자인 */
     .summary {
       background: white;
       margin: 0;
-      padding: 8px 16px;
+      padding: 10px 16px;
       box-shadow: none;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid #e8e8e8;
     }
 
     .summary-row {
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      gap: 24px;
+      gap: 28px;
     }
 
     .summary-item {
       text-align: left;
-      padding: 2px 0;
+      padding: 3px 0;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
 
     .summary-item.balance-item {
@@ -194,16 +230,17 @@
     }
 
     .summary-label {
-      color: #888;
+      color: #999;
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
       margin-bottom: 0;
+      letter-spacing: -0.2px;
     }
 
     .summary-value {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
     }
 
     .summary-value.income {
@@ -211,11 +248,11 @@
     }
 
     .summary-value.expense {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .summary-value.balance {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     /* 콘텐츠 영역 */
@@ -223,6 +260,14 @@
       flex: 1;
       overflow-y: auto;
       padding: 0;
+    }
+
+    /* 달력 탭일 때 content의 overflow 숨김 */
+    body[data-active-tab="calendar"] .content {
+      overflow: hidden !important;
+      overflow-y: hidden !important;
+      display: flex;
+      flex-direction: column;
     }
 
     /* 달력 탭 제외한 탭들의 패딩 */
@@ -241,48 +286,60 @@
       display: block;
     }
 
-    /* 카드 공통 스타일 */
+    /* 달력 탭 레이아웃 - 달력 고정, 거래내역만 스크롤 */
+    #calendar-content.active {
+      display: flex !important;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 카드 공통 스타일 - 세련된 디자인 */
     .card {
       background: white;
-      border-radius: 4px;
+      border-radius: 8px;
       padding: 16px;
-      margin-bottom: 8px;
-      box-shadow: none;
-      transition: background 0.15s;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
       border: 1px solid #f0f0f0;
     }
 
     .card:hover {
       background: #fafafa;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      border-color: #e8e8e8;
     }
 
-    /* 달력 */
+    /* 달력 - 개선된 디자인 */
     .calendar {
       background: white;
       border-radius: 0;
-      padding: 8px 4px;
+      padding: 10px 6px 8px;
       margin-bottom: 0;
       box-shadow: none;
       overflow: hidden;
+      flex-shrink: 0; /* 달력 고정 */
     }
 
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 0;
+      gap: 1px;
       max-width: 100%;
     }
 
     .calendar-day-header {
       text-align: center;
-      padding: 6px 0;
+      padding: 8px 0 6px;
       font-size: 10px;
-      color: #aaa;
-      font-weight: 500;
+      color: #999;
+      font-weight: 600;
+      letter-spacing: -0.2px;
     }
 
     .calendar-day-header.sun {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .calendar-day-header.sat {
@@ -290,18 +347,19 @@
     }
 
     .calendar-day {
-      aspect-ratio: 0.85;
+      aspect-ratio: 0.88;
       border-radius: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding-top: 6px;
+      padding: 6px 2px 4px;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all 0.2s ease;
       position: relative;
       background: transparent;
       min-height: 0;
+      overflow: hidden;
     }
 
     .calendar-day:hover {
@@ -310,10 +368,11 @@
 
     .calendar-day:active {
       background: #f0f0f0;
+      transform: scale(0.98);
     }
 
     .calendar-day.other-month {
-      opacity: 0.25;
+      opacity: 0.28;
     }
 
     .calendar-day.today {
@@ -321,10 +380,10 @@
     }
 
     .calendar-day.today .calendar-day-number {
-      background: #e8e8e8;
+      background: #c0c0c0;
       border-radius: 50%;
-      width: 22px;
-      height: 22px;
+      width: 23px;
+      height: 23px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -336,27 +395,30 @@
     }
 
     .calendar-day.selected {
-      background: #f0f0f0;
+      background: #e8e8e8;
       border-radius: 8px;
     }
 
+    /* 선택된 날짜에는 작은 원 제거 */
     .calendar-day.selected .calendar-day-number {
-      background: #ddd;
+      background: transparent;
+      border-radius: 0;
     }
 
     .calendar-day-number {
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       color: #333;
-      width: 22px;
-      height: 22px;
+      width: 23px;
+      height: 23px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .calendar-day.sun .calendar-day-number {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .calendar-day.sat .calendar-day-number {
@@ -367,21 +429,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0;
-      margin-top: 1px;
+      gap: 1px;
+      margin-top: 2px;
       width: 100%;
-      padding: 0 1px;
+      padding: 0 2px;
+      flex: 1;
+      overflow: hidden;
+      justify-content: flex-start;
     }
 
     .calendar-day-amount {
-      font-size: 9px;
-      font-weight: 500;
+      font-size: 9.5px;
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+      text-overflow: clip;
       max-width: 100%;
+      width: 100%;
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.3;
+      letter-spacing: -0.3px;
     }
 
     .calendar-day-amount.income {
@@ -389,16 +456,25 @@
     }
 
     .calendar-day-amount.expense {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
-    /* 금액이 클 경우 더 작은 폰트 */
+    /* 금액 길이에 따른 폰트 크기 - 항상 보이도록 */
     .calendar-day-amount.small-font {
       font-size: 8px;
+      letter-spacing: -0.4px;
     }
 
     .calendar-day-amount.tiny-font {
-      font-size: 7px;
+      font-size: 6.5px;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+    }
+
+    .calendar-day-amount.micro-font {
+      font-size: 5.5px;
+      letter-spacing: -0.5px;
+      font-weight: 700;
     }
 
     /* 기존 dots 스타일 - 사용하지 않지만 호환성 유지 */
@@ -420,6 +496,10 @@
       box-shadow: none;
       border-top: 1px solid #f0f0f0;
       min-height: 80px;
+      flex: 1; /* 남은 공간 차지 */
+      overflow-y: auto; /* 세로 스크롤 활성화 */
+      display: flex;
+      flex-direction: column;
     }
 
     .calendar-selected-date {
@@ -430,8 +510,7 @@
     }
 
     .calendar-transaction-list {
-      max-height: 300px;
-      overflow-y: auto;
+      flex: 1; /* 부모 컨테이너 내에서 확장 */
     }
 
     .calendar-transaction-card {
@@ -467,6 +546,12 @@
       flex: 1;
     }
 
+    .calendar-transaction-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .transaction-memo {
       font-size: 11px;
       color: #888;
@@ -479,34 +564,36 @@
       gap: 10px;
     }
 
-    /* 날짜별 그룹 카드 */
+    /* 날짜별 그룹 카드 - 세련된 디자인 */
     .date-group-card {
       background: white;
-      border-radius: 4px;
+      border-radius: 8px;
       border: 1px solid #f0f0f0;
       overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
     .date-group-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 12px;
+      padding: 12px 14px;
       background: #fafafa;
       border-bottom: 1px solid #f0f0f0;
     }
 
     .date-group-date {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: #333;
+      letter-spacing: -0.3px;
     }
 
     .date-group-summary {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       font-size: 11px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .date-group-summary .income {
@@ -514,7 +601,7 @@
     }
 
     .date-group-summary .expense {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .date-group-items {
@@ -558,23 +645,26 @@
 
     .transaction-item {
       background: white;
-      border-radius: 4px;
-      padding: 12px 14px;
+      border-radius: 8px;
+      padding: 14px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
-      transition: background 0.15s;
-      box-shadow: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
       border: 1px solid #f0f0f0;
     }
 
     .transaction-item:hover {
       background: #fafafa;
+      border-color: #e8e8e8;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .transaction-item:active {
       background: #f5f5f5;
+      transform: scale(0.99);
     }
 
     .transaction-left {
@@ -635,20 +725,21 @@
     }
 
     .transaction-amount.expense {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .transaction-amount.transfer {
       color: #888;
     }
 
-    /* 예산 요약 카드 */
+    /* 예산 요약 카드 - 세련된 디자인 */
     .budget-summary-card {
       background: white;
-      border-radius: 4px;
-      padding: 16px;
-      margin-bottom: 12px;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 14px;
       border: 1px solid #f0f0f0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     }
 
     .budget-summary-header {
@@ -709,7 +800,7 @@
     }
 
     .budget-summary-value.expense {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .budget-progress-bar {
@@ -736,7 +827,7 @@
     }
 
     .budget-progress-fill.bad {
-      background: #D97B7B;
+      background: #DC143C;
     }
 
     .budget-progress-marker {
@@ -762,24 +853,27 @@
       color: #aaa;
     }
 
-    /* 자산 카드 */
+    /* 자산 카드 - 세련된 디자인 */
     .asset-card {
       background: white;
-      border-radius: 4px;
-      padding: 12px;
-      margin-bottom: 8px;
-      box-shadow: none;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       border: 1px solid #f0f0f0;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: all 0.2s ease;
     }
 
     .asset-card:hover {
       background: #fafafa;
+      border-color: #e8e8e8;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
     }
 
     .asset-card:active {
       background: #f5f5f5;
+      transform: scale(0.99);
     }
 
     .asset-header {
@@ -802,7 +896,7 @@
     }
 
     .asset-budget-remaining.expense {
-      color: #D97B7B;
+      color: #DC143C;
     }
 
     .asset-budget-bar {
@@ -828,7 +922,7 @@
     }
 
     .budget-progress.bad {
-      background: #D97B7B;
+      background: #DC143C;
     }
 
     .asset-budget-info {
@@ -913,7 +1007,7 @@
     }
 
     .bar-fill.danger {
-      background: #D97B7B;
+      background: #DC143C;
     }
 
     /* 검색바 */
@@ -1470,9 +1564,9 @@
     }
 
     .icon-btn.delete {
-      color: #D97B7B;
-      border-color: #D97B7B;
-      background: rgba(217, 123, 123, 0.05);
+      color: #DC143C;
+      border-color: #DC143C;
+      background: rgba(220, 20, 60, 0.05);
     }
 
     .icon-btn.delete:hover {
@@ -1563,7 +1657,7 @@
     }
 
     .btn-danger {
-      background: #D97B7B;
+      background: #DC143C;
       color: white;
     }
 
@@ -1619,6 +1713,11 @@
           <button id="prevMonth">◀</button>
           <span id="currentMonth"></span>
           <button id="nextMonth">▶</button>
+        </div>
+        <div class="user-filter" id="userFilter">
+          <button class="user-filter-btn" data-user="1">국환</button>
+          <button class="user-filter-btn" data-user="2">혜지</button>
+          <button class="user-filter-btn active" data-user="all">전체</button>
         </div>
         <button class="header-add-btn" id="headerAddBtn">+</button>
       </div>
@@ -1962,6 +2061,7 @@
       selectedFromAsset: null,
       selectedToAsset: null,
       logFilter: 'all',
+      calendarUserFilter: 'all',
       editingTransactionId: null,
 
       users: [
@@ -2160,7 +2260,7 @@
       }
     }
 
-    const debouncedSyncToSupabase = debounce(saveToSupabase, 5000);
+    const debouncedSyncToSupabase = debounce(saveToSupabase, 1000);
 
     function saveData() {
       saveLocalData();
@@ -2224,6 +2324,17 @@
     // ============================================
     // 렌더링 함수
     // ============================================
+
+    // Lookup 맵 생성 함수 (성능 최적화)
+    function createLookupMaps() {
+      return {
+        users: new Map(state.users.map(u => [u.id, u])),
+        categories: new Map(state.categories.map(c => [c.id, c])),
+        assets: new Map(state.assets.map(a => [a.id, a])),
+        paymentMethods: new Map(state.paymentMethods.map(p => [p.id, p]))
+      };
+    }
+
     function updateMonthDisplay() {
       const month = state.currentDate.getMonth() + 1;
       document.getElementById('currentMonth').textContent = `${month}월`;
@@ -2231,10 +2342,15 @@
 
     function updateSummary() {
       const { start, end } = getMonthRange(state.currentDate);
-      const monthTransactions = state.transactions.filter(t => {
+      let monthTransactions = state.transactions.filter(t => {
         const tDate = new Date(t.transactionDate);
         return tDate >= start && tDate <= end;
       });
+
+      // 사용자 필터 적용
+      if (state.calendarUserFilter !== 'all') {
+        monthTransactions = monthTransactions.filter(t => t.userId === state.calendarUserFilter);
+      }
 
       const income = monthTransactions
         .filter(t => t.type === 'income')
@@ -2251,17 +2367,20 @@
       document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + formatMoney(balance);
     }
 
-    // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 조정
+    // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 자동 조정
     function formatCalendarAmount(amount) {
       const text = amount.toLocaleString();
       const len = text.length;
 
-      if (len >= 9) {
-        return { text, fontClass: 'tiny-font' };
+      // 더 세밀한 폰트 크기 조정으로 항상 보이도록
+      if (len >= 11) {
+        return { text, fontClass: 'micro-font' };  // 6자리 이상 (예: 1,000,000+)
+      } else if (len >= 9) {
+        return { text, fontClass: 'tiny-font' };   // 9-10자리 (예: 100,000+)
       } else if (len >= 7) {
-        return { text, fontClass: 'small-font' };
+        return { text, fontClass: 'small-font' };  // 7-8자리 (예: 10,000+)
       } else {
-        return { text, fontClass: '' };
+        return { text, fontClass: '' };            // 6자리 이하
       }
     }
 
@@ -2298,7 +2417,13 @@
         const isSelected = state.selectedDate === dateStr;
         const dayOfWeek = current.getDay();
 
-        const dayTransactions = state.transactions.filter(t => t.transactionDate === dateStr);
+        let dayTransactions = state.transactions.filter(t => t.transactionDate === dateStr);
+
+        // 사용자 필터 적용
+        if (state.calendarUserFilter !== 'all') {
+          dayTransactions = dayTransactions.filter(t => t.userId === state.calendarUserFilter);
+        }
+
         const income = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
         const expense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
 
@@ -2345,7 +2470,12 @@
     }
 
     function renderSelectedDateTransactions(dateStr) {
-      const dayTransactions = state.transactions.filter(t => t.transactionDate === dateStr);
+      let dayTransactions = state.transactions.filter(t => t.transactionDate === dateStr);
+
+      // 사용자 필터 적용
+      if (state.calendarUserFilter !== 'all') {
+        dayTransactions = dayTransactions.filter(t => t.userId === state.calendarUserFilter);
+      }
 
       document.getElementById('calendarSelectedDate').textContent = formatDateKo(dateStr);
 
@@ -2358,15 +2488,19 @@
         return;
       }
 
+      // Lookup 맵 생성 (성능 최적화)
+      const lookups = createLookupMaps();
+
       // 모든 거래를 하나의 카드에 리스트로 표시
       let html = '<div class="calendar-transaction-card">';
-      html += dayTransactions.map(t => renderCalendarTransactionItem(t)).join('');
+      html += dayTransactions.map(t => renderCalendarTransactionItem(t, lookups)).join('');
       html += '</div>';
       document.getElementById('calendarTransactionList').innerHTML = html;
     }
 
-    function renderCalendarTransactionItem(t) {
-      const category = state.categories.find(c => c.id === t.categoryId);
+    function renderCalendarTransactionItem(t, lookups) {
+      const user = lookups.users.get(t.userId);
+      const category = lookups.categories.get(t.categoryId);
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
@@ -2376,7 +2510,10 @@
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
           <div class="calendar-transaction-info">
-            <div class="transaction-category">${categoryDisplay}</div>
+            <div class="calendar-transaction-main">
+              ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+              <div class="transaction-category">${categoryDisplay}</div>
+            </div>
             ${t.memo ? `<div class="transaction-memo">${t.memo}</div>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
@@ -2393,16 +2530,24 @@
         return tDate >= start && tDate <= end;
       });
 
+      // 사용자 필터 적용
+      if (state.calendarUserFilter && state.calendarUserFilter !== 'all') {
+        transactions = transactions.filter(t => t.userId === state.calendarUserFilter);
+      }
+
       if (state.logFilter !== 'all') {
         transactions = transactions.filter(t => t.type === state.logFilter);
       }
 
+      // Lookup 맵 생성 (성능 최적화)
+      const lookups = createLookupMaps();
+
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase();
         transactions = transactions.filter(t => {
-          const category = state.categories.find(c => c.id === t.categoryId);
-          const paymentMethod = state.paymentMethods.find(p => p.id === t.paymentMethodId);
-          const user = state.users.find(u => u.id === t.userId);
+          const category = lookups.categories.get(t.categoryId);
+          const paymentMethod = lookups.paymentMethods.get(t.paymentMethodId);
+          const user = lookups.users.get(t.userId);
 
           return (
             (t.memo && t.memo.toLowerCase().includes(query)) ||
@@ -2443,7 +2588,7 @@
               </span>
             </div>
             <div class="date-group-items">
-              ${dayTransactions.map(t => renderTransactionItemCompact(t)).join('')}
+              ${dayTransactions.map(t => renderTransactionItemCompact(t, lookups)).join('')}
             </div>
           </div>`;
         });
@@ -2452,12 +2597,12 @@
       document.getElementById('transactionList').innerHTML = html;
     }
 
-    // 날짜 그룹 내에서 사용할 간단한 거래 아이템
-    function renderTransactionItemCompact(t) {
-      const user = state.users.find(u => u.id === t.userId);
-      const category = state.categories.find(c => c.id === t.categoryId);
-      const asset = state.assets.find(a => a.id === t.assetId);
-      const toAsset = t.toAssetId ? state.assets.find(a => a.id === t.toAssetId) : null;
+    // 날짜 그룹 내에서 사용할 간단한 거래 아이템 (성능 최적화 버전)
+    function renderTransactionItemCompact(t, lookups) {
+      const user = lookups.users.get(t.userId);
+      const category = lookups.categories.get(t.categoryId);
+      const asset = lookups.assets.get(t.assetId);
+      const toAsset = t.toAssetId ? lookups.assets.get(t.toAssetId) : null;
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
@@ -2543,7 +2688,8 @@
 
           const assetTransactions = state.transactions.filter(t => {
             const tDate = new Date(t.transactionDate);
-            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+            const matchesUser = !state.calendarUserFilter || state.calendarUserFilter === 'all' || t.userId === state.calendarUserFilter;
+            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense' && matchesUser;
           });
 
           totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -2615,7 +2761,8 @@
 
         const assetTransactions = state.transactions.filter(t => {
           const tDate = new Date(t.transactionDate);
-          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
+          const matchesUser = !state.calendarUserFilter || state.calendarUserFilter === 'all' || t.userId === state.calendarUserFilter;
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense' && matchesUser;
         });
 
         const spent = assetTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -2917,8 +3064,8 @@
             {
               label: '지출',
               data: expenseData,
-              borderColor: '#D97B7B',
-              backgroundColor: 'rgba(217, 123, 123, 0.1)',
+              borderColor: '#DC143C',
+              backgroundColor: 'rgba(220, 20, 60, 0.1)',
               tension: 0.4,
               fill: true
             }
@@ -2951,9 +3098,14 @@
       if (!container) return;
 
       const isExpanded = state.expandedSections[containerId];
-      const displayItems = (allowExpand && !isExpanded)
+      let displayItems = (allowExpand && !isExpanded)
         ? items.filter(item => item.isFavorite)
         : items;
+
+      // displayOrder로 정렬 (카테고리는 이미 updateTransactionModalForType에서 정렬됨)
+      if (displayItems.length > 0 && displayItems[0].displayOrder !== undefined) {
+        displayItems = [...displayItems].sort((a, b) => a.displayOrder - b.displayOrder);
+      }
 
       let html = displayItems.map(item => {
         const selected = item.id === selectedId ? 'selected' : '';
@@ -3064,10 +3216,15 @@
     }
 
     function updateTransactionModalForType() {
-      const categories = state.categories.filter(c => c.type === state.selectedType);
+      const categories = state.categories
+        .filter(c => c.type === state.selectedType)
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+      const paymentMethods = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
+      const assets = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
+
       renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
-      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod, null, true);
-      renderSelectGrid('assetSelect', state.assets, state.selectedAsset, null, true);
+      renderSelectGrid('paymentMethodSelect', paymentMethods, state.selectedPaymentMethod, null, true);
+      renderSelectGrid('assetSelect', assets, state.selectedAsset, null, true);
     }
 
     function selectItem(containerId, itemId) {
@@ -3656,6 +3813,14 @@
         console.error('Supabase 자동 연결 실패:', error);
       }
 
+      // 페이지 닫기 전 데이터 저장 (데이터 유실 방지)
+      window.addEventListener('beforeunload', () => {
+        if (!state.useLocalStorage && state.supabaseClient) {
+          // debounce를 거치지 않고 즉시 저장
+          saveToSupabase();
+        }
+      });
+
       // 월 변경
       document.getElementById('prevMonth').addEventListener('click', () => {
         state.currentDate.setMonth(state.currentDate.getMonth() - 1);
@@ -3665,6 +3830,31 @@
       document.getElementById('nextMonth').addEventListener('click', () => {
         state.currentDate.setMonth(state.currentDate.getMonth() + 1);
         renderAll();
+      });
+
+      // 사용자 필터
+      document.querySelectorAll('.user-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const selectedUser = btn.dataset.user;
+
+          // 토글 기능: 이미 선택된 버튼을 다시 클릭하면 전체로 변경
+          if (btn.classList.contains('active') && selectedUser !== 'all') {
+            document.querySelectorAll('.user-filter-btn').forEach(b => b.classList.remove('active'));
+            const allBtn = document.querySelector('.user-filter-btn[data-user="all"]');
+            if (allBtn) allBtn.classList.add('active');
+            state.calendarUserFilter = 'all';
+          } else {
+            document.querySelectorAll('.user-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.calendarUserFilter = selectedUser;
+          }
+
+          updateSummary();
+          renderCalendar();
+          renderSelectedDateTransactions(state.selectedDate);
+          renderTransactionList();
+          renderAssetsList();
+        });
       });
 
       // 탭 전환
