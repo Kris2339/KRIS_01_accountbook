@@ -38,6 +38,13 @@ self.addEventListener('activate', (event) => {
 
 // Fetch 이벤트: 네트워크 우선, 실패 시 캐시 사용 (Network First)
 self.addEventListener('fetch', (event) => {
+  const requestUrl = new URL(event.request.url);
+  const isStaticGet = event.request.method === 'GET' && requestUrl.origin === self.location.origin;
+
+  if (!isStaticGet) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {

@@ -1702,6 +1702,38 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
+
+    .sync-status-card {
+      background: white;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #555;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sync-status-card.warning {
+      border-color: #FFB84D;
+      background: #FFF8ED;
+    }
+
+    .data-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .data-actions .btn {
+      margin-top: 0;
+    }
+
+    .hidden-file-input {
+      display: none;
+    }
   </style>
 </head>
 <body data-active-tab="calendar">
@@ -1802,10 +1834,26 @@
       <!-- 설정 탭 -->
       <div class="tab-content" id="settings-content">
         <!-- 수동 동기화 버튼 -->
+        <div class="sync-status-card" id="syncStatusCard">
+          <div id="syncStatusText">동기화 상태를 확인 중입니다</div>
+          <div id="lastSavedText">마지막 저장: -</div>
+          <div id="pendingSyncText">대기 중인 변경: 0건</div>
+        </div>
         <button class="sync-button" id="syncData">
           <span>🔄</span>
           <span>수동 동기화</span>
         </button>
+
+        <div class="settings-section">
+          <div class="settings-title">데이터 관리</div>
+          <div class="data-actions">
+            <button class="btn btn-secondary" id="exportDataBtn">내보내기</button>
+            <button class="btn btn-secondary" id="importDataBtn">가져오기</button>
+            <button class="btn btn-secondary" id="undoDeleteBtn">삭제 취소</button>
+            <button class="btn btn-secondary" id="backupSnapshotBtn">월별 백업</button>
+          </div>
+          <input type="file" id="importDataInput" class="hidden-file-input" accept="application/json,.json">
+        </div>
 
         <div class="settings-section">
           <div class="settings-title">결제수단 관리</div>
@@ -1962,6 +2010,18 @@
         <input type="date" class="form-input" id="dateInput">
       </div>
 
+      <div class="form-group">
+        <label class="form-label">
+          <input type="checkbox" id="recurringInput">
+          매월 반복 등록
+        </label>
+        <select class="form-input" id="recurringCountInput">
+          <option value="3">3개월</option>
+          <option value="6">6개월</option>
+          <option value="12" selected>12개월</option>
+        </select>
+      </div>
+
       <button class="btn btn-primary" id="saveTransaction">저장</button>
     </div>
   </div>
@@ -2100,6 +2160,10 @@
       transactions: [],
       statsFilter: 'month',
       searchQuery: '',
+      lastDeleted: null,
+      pendingSyncCount: 0,
+      lastSavedAt: null,
+      lastSyncStatus: 'local',
       expandedSections: {
         category: false,
         paymentMethod: false
@@ -2129,6 +2193,30 @@
 
     function formatMoney(amount) {
       return new Intl.NumberFormat('ko-KR').format(amount) + '원';
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHTML(value);
+    }
+
+    function getSerializableData() {
+      return {
+        users: state.users,
+        paymentMethods: state.paymentMethods,
+        assets: state.assets,
+        categories: state.categories,
+        transactions: state.transactions,
+        lastSavedAt: state.lastSavedAt
+      };
     }
 
     function formatDate(date) {
@@ -2198,14 +2286,30 @@
     // ============================================
     // 데이터 저장/로드
     // ============================================
+    function updateSyncStatus() {
+      const statusCard = document.getElementById('syncStatusCard');
+      const statusText = document.getElementById('syncStatusText');
+      const lastSavedText = document.getElementById('lastSavedText');
+      const pendingSyncText = document.getElementById('pendingSyncText');
+      if (!statusCard || !statusText || !lastSavedText || !pendingSyncText) return;
+
+      const statusLabels = {
+        local: '로컬 저장 모드',
+        pending: 'Supabase 저장 대기 중',
+        synced: 'Supabase 동기화 완료',
+        failed: 'Supabase 저장 실패'
+      };
+
+      statusCard.classList.toggle('warning', state.lastSyncStatus === 'failed' || state.pendingSyncCount > 0);
+      statusText.textContent = statusLabels[state.lastSyncStatus] || statusLabels.local;
+      lastSavedText.textContent = `마지막 저장: ${state.lastSavedAt ? new Date(state.lastSavedAt).toLocaleString('ko-KR') : '-'}`;
+      pendingSyncText.textContent = `대기 중인 변경: ${state.pendingSyncCount}건`;
+    }
+
     function saveLocalData() {
-      localStorage.setItem('household_data', JSON.stringify({
-        users: state.users,
-        paymentMethods: state.paymentMethods,
-        assets: state.assets,
-        categories: state.categories,
-        transactions: state.transactions
-      }));
+      state.lastSavedAt = new Date().toISOString();
+      localStorage.setItem('household_data', JSON.stringify(getSerializableData()));
+      updateSyncStatus();
     }
 
     async function saveToSupabase() {
@@ -2230,6 +2334,8 @@
 
         if (selectError) {
           console.error('Supabase 조회 실패:', selectError);
+          state.lastSyncStatus = 'failed';
+          updateSyncStatus();
           return;
         }
 
@@ -2241,7 +2347,10 @@
 
           if (updateError) {
             console.error('Supabase 업데이트 실패:', updateError);
+            state.lastSyncStatus = 'failed';
           } else {
+            state.pendingSyncCount = 0;
+            state.lastSyncStatus = 'synced';
             console.log('✅ Supabase 자동 저장 완료');
           }
         } else {
@@ -2251,12 +2360,18 @@
 
           if (insertError) {
             console.error('Supabase 삽입 실패:', insertError);
+            state.lastSyncStatus = 'failed';
           } else {
+            state.pendingSyncCount = 0;
+            state.lastSyncStatus = 'synced';
             console.log('✅ Supabase 자동 저장 완료');
           }
         }
       } catch (error) {
+        state.lastSyncStatus = 'failed';
         console.error('Supabase 저장 실패:', error);
+      } finally {
+        updateSyncStatus();
       }
     }
 
@@ -2265,6 +2380,9 @@
     function saveData() {
       saveLocalData();
       if (!state.useLocalStorage && state.supabaseClient) {
+        state.pendingSyncCount += 1;
+        state.lastSyncStatus = 'pending';
+        updateSyncStatus();
         debouncedSyncToSupabase();
       }
     }
@@ -2272,12 +2390,19 @@
     function loadLocalData() {
       const saved = localStorage.getItem('household_data');
       if (saved) {
-        const data = JSON.parse(saved);
-        state.users = data.users || state.users;
-        state.paymentMethods = data.paymentMethods || state.paymentMethods;
-        state.assets = data.assets || state.assets;
-        state.categories = data.categories || state.categories;
-        state.transactions = data.transactions || [];
+        try {
+          const data = JSON.parse(saved);
+          state.users = data.users || state.users;
+          state.paymentMethods = data.paymentMethods || state.paymentMethods;
+          state.assets = data.assets || state.assets;
+          state.categories = data.categories || state.categories;
+          state.transactions = data.transactions || [];
+          state.lastSavedAt = data.lastSavedAt || state.lastSavedAt;
+        } catch (error) {
+          console.error('localStorage 데이터 복구 실패:', error);
+          localStorage.setItem(`household_data_corrupt_${Date.now()}`, saved);
+          localStorage.removeItem('household_data');
+        }
       }
     }
 
@@ -2305,6 +2430,9 @@
           state.transactions = loadedData.transactions || [];
           state.monthlyBudget = loadedData.monthly_budget || 0;
           state.categoryBudgets = loadedData.category_budgets || {};
+          state.lastSavedAt = loadedData.updated_at || state.lastSavedAt;
+          state.pendingSyncCount = 0;
+          state.lastSyncStatus = 'synced';
 
           saveLocalData();
           console.log('✅ Supabase 데이터 로드 완료');
@@ -2319,6 +2447,94 @@
       if (!state.useLocalStorage && state.supabaseClient) {
         await loadFromSupabase();
       }
+    }
+
+    function downloadJSON(filename, data) {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportData() {
+      downloadJSON(`household-data-${formatDate(new Date())}.json`, {
+        exportedAt: new Date().toISOString(),
+        data: getSerializableData()
+      });
+    }
+
+    function applyImportedData(data) {
+      const payload = data && data.data ? data.data : data;
+      if (!payload || !Array.isArray(payload.transactions)) {
+        alert('가져올 수 없는 데이터 형식입니다.');
+        return;
+      }
+
+      state.users = Array.isArray(payload.users) ? payload.users : state.users;
+      state.paymentMethods = Array.isArray(payload.paymentMethods) ? payload.paymentMethods : state.paymentMethods;
+      state.assets = Array.isArray(payload.assets) ? payload.assets : state.assets;
+      state.categories = Array.isArray(payload.categories) ? payload.categories : state.categories;
+      state.transactions = payload.transactions;
+      state.lastSavedAt = new Date().toISOString();
+      saveData();
+      renderAll();
+      alert('데이터를 가져왔습니다.');
+    }
+
+    function importDataFromFile(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          applyImportedData(JSON.parse(reader.result));
+        } catch (error) {
+          console.error('데이터 가져오기 실패:', error);
+          alert('JSON 파일을 읽을 수 없습니다.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function createMonthlyBackupSnapshot() {
+      const { start, end } = getMonthRange(state.currentDate);
+      const monthTransactions = state.transactions.filter(t => {
+        const tDate = new Date(t.transactionDate);
+        return tDate >= start && tDate <= end;
+      });
+      const monthKey = `${state.currentDate.getFullYear()}-${String(state.currentDate.getMonth() + 1).padStart(2, '0')}`;
+      const snapshot = {
+        month: monthKey,
+        createdAt: new Date().toISOString(),
+        data: {
+          ...getSerializableData(),
+          transactions: monthTransactions
+        }
+      };
+
+      localStorage.setItem(`household_backup_${monthKey}`, JSON.stringify(snapshot));
+      downloadJSON(`household-backup-${monthKey}.json`, snapshot);
+    }
+
+    function undoLastDelete() {
+      if (!state.lastDeleted) {
+        alert('되돌릴 삭제 내역이 없습니다.');
+        return;
+      }
+
+      const { type, item, index } = state.lastDeleted;
+      if (type === 'transactions') {
+        state.transactions.splice(Math.min(index, state.transactions.length), 0, item);
+      } else if (state[type]) {
+        state[type].splice(Math.min(index, state[type].length), 0, item);
+      }
+
+      state.lastDeleted = null;
+      saveData();
+      renderAll();
     }
 
     // ============================================
@@ -2505,16 +2721,16 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
 
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
           <div class="calendar-transaction-info">
             <div class="calendar-transaction-main">
-              ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+              ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
               <div class="transaction-category">${categoryDisplay}</div>
             </div>
-            ${t.memo ? `<div class="transaction-memo">${t.memo}</div>` : ''}
+            ${t.memo ? `<div class="transaction-memo">${escapeHTML(t.memo)}</div>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
@@ -2606,14 +2822,14 @@
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
-      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
 
       return `
         <div class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
           <div class="date-group-item-left">
-            ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+            ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
             <span class="transaction-category">${categoryDisplay}</span>
-            ${t.memo ? `<span class="transaction-memo-inline">${t.memo}</span>` : ''}
+            ${t.memo ? `<span class="transaction-memo-inline">${escapeHTML(t.memo)}</span>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
@@ -2631,7 +2847,7 @@
 
       let methodText = '';
       if (t.type === 'transfer') {
-        methodText = `${asset?.name || ''} → ${toAsset?.name || ''}`;
+        methodText = `${asset?.name || ''} -> ${toAsset?.name || ''}`;
       } else {
         methodText = `${paymentMethod?.name || ''} · ${asset?.name || ''}`;
       }
@@ -2639,7 +2855,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
 
       const dateDisplay = showDate ? formatDateKo(t.transactionDate) : '';
 
@@ -2647,10 +2863,10 @@
         <div class="transaction-item" onclick="openTransactionDetailModal('${t.id}')">
           <div class="transaction-left">
             ${showDate ? `<span class="transaction-date-badge">${dateDisplay}</span>` : ''}
-            ${user ? `<span class="transaction-user">${user.name}</span>` : ''}
+            ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
             <div class="transaction-category">${categoryDisplay}</div>
-            ${methodText ? `<div class="transaction-method">${methodText}</div>` : ''}
-            ${t.memo ? `<div class="transaction-method">${t.memo}</div>` : ''}
+            ${methodText ? `<div class="transaction-method">${escapeHTML(methodText)}</div>` : ''}
+            ${t.memo ? `<div class="transaction-method">${escapeHTML(t.memo)}</div>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
@@ -2781,9 +2997,9 @@
         }
 
         return `
-          <div class="asset-card" onclick="showAssetTransactions('${asset.id}', '${asset.name}')">
+          <div class="asset-card" onclick="showAssetTransactions('${escapeAttr(asset.id)}')">
             <div class="asset-header">
-              <span class="asset-name">${asset.name}</span>
+              <span class="asset-name">${escapeHTML(asset.name)}</span>
               <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining >= 0 ? '+' : ''}${formatMoney(remaining)}</span>
             </div>
             ${budget > 0 ? `
@@ -2829,9 +3045,11 @@
       return balance;
     }
 
-    function showAssetTransactions(assetId, assetName) {
+    function showAssetTransactions(assetId) {
       const { start, end } = getMonthRange(state.currentDate);
       const currentMonth = state.currentDate.getMonth() + 1;
+      const asset = state.assets.find(a => a.id === assetId);
+      const assetName = asset ? asset.name : '자산';
 
       const assetTransactions = state.transactions.filter(t => {
         const tDate = new Date(t.transactionDate);
@@ -2916,7 +3134,7 @@
         html += `
           <div class="bar-item">
             <div class="bar-label">
-              <span>${user.name}</span>
+              <span>${escapeHTML(user.name)}</span>
               <span>${formatMoney(amount)}</span>
             </div>
             <div class="bar-bg">
@@ -2944,7 +3162,7 @@
         sortedCategories.forEach(([catId, amount]) => {
           const category = state.categories.find(c => c.id === catId);
           const percent = (amount / maxCategoryExpense) * 100;
-          const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${category.icon}</span>${category.name}` : category.name) : '기타';
+          const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : '기타';
           html += `
             <div class="bar-item">
               <div class="bar-label">
@@ -2979,7 +3197,7 @@
           html += `
             <div class="bar-item">
               <div class="bar-label">
-                <span>${method?.name || '기타'}</span>
+                <span>${escapeHTML(method?.name || '기타')}</span>
                 <span>${formatMoney(amount)}</span>
               </div>
               <div class="bar-bg">
@@ -3109,8 +3327,8 @@
 
       let html = displayItems.map(item => {
         const selected = item.id === selectedId ? 'selected' : '';
-        const displayName = item.icon ? `${item.icon} ${item.name}` : item.name;
-        return `<div class="select-item ${selected}" onclick="selectItem('${containerId}', '${item.id}')">${displayName}</div>`;
+        const displayName = item.icon ? `${escapeHTML(item.icon)} ${escapeHTML(item.name)}` : escapeHTML(item.name);
+        return `<div class="select-item ${selected}" onclick="selectItem('${escapeAttr(containerId)}', '${escapeAttr(item.id)}')">${displayName}</div>`;
       }).join('');
 
       if (allowExpand && items.length > displayItems.length) {
@@ -3127,7 +3345,7 @@
       const html = sorted.map(method => `
         <div class="settings-item-card">
           <div class="item-content">
-            <div class="item-name">${method.name}</div>
+            <div class="item-name">${escapeHTML(method.name)}</div>
             <div class="item-meta">${method.isFavorite ? '즐겨찾기 • ' : ''}순서 ${method.displayOrder}</div>
           </div>
           <div class="item-actions">
@@ -3147,7 +3365,7 @@
       const html = sorted.map(asset => `
         <div class="settings-item-card">
           <div class="item-content">
-            <div class="item-name">${asset.name}</div>
+            <div class="item-name">${escapeHTML(asset.name)}</div>
             <div class="item-meta">${asset.isFavorite ? '즐겨찾기 • ' : ''}순서 ${asset.displayOrder}</div>
           </div>
           <div class="item-actions">
@@ -3172,7 +3390,7 @@
         return `
         <div class="settings-item-card">
           <div class="item-content">
-            <div class="item-name">${cat.name}</div>
+            <div class="item-name">${escapeHTML(cat.name)}</div>
             <div class="item-meta">${cat.type === 'income' ? '수입' : '지출'} • ${cat.isFavorite ? '즐겨찾기 • ' : ''}순서 ${cat.displayOrder}</div>
           </div>
           <div class="item-actions">
@@ -3201,6 +3419,8 @@
       document.getElementById('amountInput').value = '';
       document.getElementById('dateInput').value = state.selectedDate || formatDate(new Date());
       document.getElementById('memoInput').value = '';
+      document.getElementById('recurringInput').checked = false;
+      document.getElementById('recurringCountInput').value = '12';
 
       renderSelectGrid('userSelect', state.users, state.selectedUser);
       updateTransactionModalForType();
@@ -3298,38 +3518,38 @@
       if (user) {
         html += `<div class="detail-row">
           <span class="detail-label">사용자</span>
-          <span class="detail-value">${user.name}</span>
+          <span class="detail-value">${escapeHTML(user.name)}</span>
         </div>`;
       }
 
       if (category) {
         html += `<div class="detail-row">
           <span class="detail-label">카테고리</span>
-          <span class="detail-value">${category.icon ? `<span class="category-icon">${category.icon}</span>` : ''}${category.name}</span>
+          <span class="detail-value">${category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>` : ''}${escapeHTML(category.name)}</span>
         </div>`;
       }
 
       if (transaction.type === 'transfer' && asset && toAsset) {
         html += `<div class="detail-row">
           <span class="detail-label">출발 자산</span>
-          <span class="detail-value">${asset.name}</span>
+          <span class="detail-value">${escapeHTML(asset.name)}</span>
         </div>`;
         html += `<div class="detail-row">
           <span class="detail-label">도착 자산</span>
-          <span class="detail-value">${toAsset.name}</span>
+          <span class="detail-value">${escapeHTML(toAsset.name)}</span>
         </div>`;
       } else {
         if (paymentMethod) {
           html += `<div class="detail-row">
             <span class="detail-label">결제수단</span>
-            <span class="detail-value">${paymentMethod.name}</span>
+            <span class="detail-value">${escapeHTML(paymentMethod.name)}</span>
           </div>`;
         }
 
         if (asset) {
           html += `<div class="detail-row">
             <span class="detail-label">자산</span>
-            <span class="detail-value">${asset.name}</span>
+            <span class="detail-value">${escapeHTML(asset.name)}</span>
           </div>`;
         }
       }
@@ -3337,7 +3557,7 @@
       if (transaction.memo && transaction.memo.trim() !== '') {
         html += `<div class="detail-row">
           <span class="detail-label">메모</span>
-          <span class="detail-value">${transaction.memo}</span>
+          <span class="detail-value">${escapeHTML(transaction.memo)}</span>
         </div>`;
       }
 
@@ -3367,6 +3587,8 @@
       const amount = parseFormattedNumber(document.getElementById('amountInput').value);
       const date = document.getElementById('dateInput').value;
       const memo = document.getElementById('memoInput').value;
+      const shouldRepeat = document.getElementById('recurringInput').checked;
+      const repeatCount = parseInt(document.getElementById('recurringCountInput').value, 10) || 1;
 
       if (!amount || amount <= 0) {
         alert('금액을 입력해주세요.');
@@ -3390,6 +3612,11 @@
 
       if (!state.selectedAsset) {
         alert('자산을 선택해주세요.');
+        return;
+      }
+
+      if (!date) {
+        alert('날짜를 선택해주세요.');
         return;
       }
 
@@ -3426,6 +3653,20 @@
           createdAt: new Date().toISOString()
         };
         state.transactions.push(transaction);
+
+        if (shouldRepeat) {
+          for (let i = 1; i < repeatCount; i++) {
+            const repeatDate = new Date(date);
+            repeatDate.setMonth(repeatDate.getMonth() + i);
+            state.transactions.push({
+              ...transaction,
+              id: generateId(),
+              transactionDate: formatDate(repeatDate),
+              recurringGroupId: transaction.id,
+              createdAt: new Date().toISOString()
+            });
+          }
+        }
       }
 
       saveData();
@@ -3454,6 +3695,11 @@
 
       if (state.selectedFromAsset === state.selectedToAsset) {
         alert('같은 자산으로는 이동할 수 없습니다.');
+        return;
+      }
+
+      if (!date) {
+        alert('날짜를 선택해주세요.');
         return;
       }
 
@@ -3498,6 +3744,8 @@
       document.getElementById('amountInput').value = formatNumber(transaction.amount);
       document.getElementById('dateInput').value = transaction.transactionDate;
       document.getElementById('memoInput').value = transaction.memo || '';
+      document.getElementById('recurringInput').checked = false;
+      document.getElementById('recurringCountInput').value = '12';
 
       // UI 업데이트 - 사용자 선택 활성화
       renderSelectGrid('userSelect', state.users, state.selectedUser);
@@ -3528,7 +3776,14 @@
     }
 
     function deleteTransaction(transactionId) {
-      state.transactions = state.transactions.filter(t => t.id !== transactionId);
+      const index = state.transactions.findIndex(t => t.id === transactionId);
+      if (index === -1) return;
+      state.lastDeleted = {
+        type: 'transactions',
+        item: { ...state.transactions[index] },
+        index
+      };
+      state.transactions.splice(index, 1);
       saveData();
       renderAll();
     }
@@ -3540,8 +3795,8 @@
         const currentBudget = asset.budget || 0;
         html += `
           <div class="form-group">
-            <label class="form-label">${asset.name} 예산</label>
-            <input type="text" inputmode="numeric" class="form-input" id="budget-${asset.id}" value="${currentBudget > 0 ? formatNumber(currentBudget) : ''}" placeholder="예산 입력">
+            <label class="form-label">${escapeHTML(asset.name)} 예산</label>
+            <input type="text" inputmode="numeric" class="form-input" id="budget-${escapeAttr(asset.id)}" value="${currentBudget > 0 ? formatNumber(currentBudget) : ''}" placeholder="예산 입력">
           </div>
         `;
       });
@@ -3673,6 +3928,23 @@
       const items = state[type];
       const index = items.findIndex(i => i.id === id);
       if (index > -1) {
+        const isUsed = state.transactions.some(t => {
+          if (type === 'paymentMethods') return t.paymentMethodId === id;
+          if (type === 'assets') return t.assetId === id || t.toAssetId === id;
+          if (type === 'categories') return t.categoryId === id;
+          return false;
+        });
+
+        if (isUsed) {
+          alert('기존 거래에서 사용 중인 항목은 삭제할 수 없습니다. 이름을 수정해서 보관해주세요.');
+          return;
+        }
+
+        state.lastDeleted = {
+          type,
+          item: { ...items[index] },
+          index
+        };
         items.splice(index, 1);
         saveData();
 
@@ -3786,6 +4058,7 @@
       renderPaymentMethodsSettings();
       renderAssetsSettings();
       renderCategoriesSettings();
+      updateSyncStatus();
     }
 
     // ============================================
@@ -3931,9 +4204,22 @@
 
       // 거래 저장
       document.getElementById('saveTransaction').addEventListener('click', saveTransaction);
+      document.getElementById('saveTransfer').addEventListener('click', saveTransfer);
 
       // 예산 설정
       document.getElementById('setBudgetBtn').addEventListener('click', openBudgetModal);
+
+      document.getElementById('exportDataBtn').addEventListener('click', exportData);
+      document.getElementById('importDataBtn').addEventListener('click', () => {
+        document.getElementById('importDataInput').click();
+      });
+      document.getElementById('importDataInput').addEventListener('change', (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (file) importDataFromFile(file);
+        event.target.value = '';
+      });
+      document.getElementById('undoDeleteBtn').addEventListener('click', undoLastDelete);
+      document.getElementById('backupSnapshotBtn').addEventListener('click', createMonthlyBackupSnapshot);
 
       // 필터 버튼
       document.querySelectorAll('#logFilters .filter-btn').forEach(btn => {
