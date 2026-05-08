@@ -1734,6 +1734,348 @@
     .hidden-file-input {
       display: none;
     }
+
+    /* Couple-first refresh */
+    :root {
+      --paper: #F7FAF8;
+      --surface: #FFFFFF;
+      --ink: #24211F;
+      --muted: #6F7B76;
+      --line: #E2E9E5;
+      --soft-coral: #E85D75;
+      --soft-blue: #3E7CB1;
+      --mint: #5BB99A;
+      --warm: #EAF6F0;
+      --warm-deep: #B8D8CC;
+    }
+
+    body,
+    .container {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .header {
+      background: var(--paper);
+      border-bottom: none;
+      padding-bottom: 10px;
+    }
+
+    .month-selector {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 6px;
+      box-shadow: 0 6px 18px rgba(38, 74, 61, 0.06);
+    }
+
+    .month-selector button {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border-radius: 50%;
+      color: var(--muted);
+    }
+
+    .month-selector span {
+      min-width: 48px;
+      text-align: center;
+      color: var(--ink);
+    }
+
+    .user-filter-btn {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      border-radius: 999px;
+    }
+
+    .user-filter-btn.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      box-shadow: none;
+    }
+
+    .header-add-btn {
+      background: var(--ink);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      padding: 0;
+      font-weight: 400;
+      box-shadow: 0 8px 18px rgba(36, 33, 31, 0.18);
+    }
+
+    .summary {
+      display: none;
+    }
+
+    .couple-home {
+      padding: 12px 14px 10px;
+      background: var(--paper);
+    }
+
+    .home-hero {
+      background: linear-gradient(135deg, #FFF4F2 0%, #FFFFFF 48%, #EEF8FF 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 14px 34px rgba(38, 74, 61, 0.08);
+    }
+
+    .home-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .home-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .home-title h2 {
+      font-size: 22px;
+      line-height: 1.2;
+      color: var(--ink);
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .home-pill {
+      flex-shrink: 0;
+      background: #EAF6F0;
+      color: #356F5B;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .home-metrics {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 10px;
+    }
+
+    .home-metric {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(226, 233, 229, 0.92);
+      border-radius: 14px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .home-metric.primary {
+      grid-row: span 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .home-metric.primary .metric-value {
+      color: var(--soft-coral);
+      font-size: 24px;
+      margin-top: 10px;
+    }
+
+    .home-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .home-add-btn,
+    .home-transfer-btn {
+      border: none;
+      border-radius: 12px;
+      height: 44px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .home-add-btn {
+      background: var(--ink);
+      color: white;
+    }
+
+    .home-transfer-btn {
+      background: #EAF6F0;
+      color: #356F5B;
+      padding: 0 14px;
+    }
+
+    .quick-category-panel {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .quick-category-chip {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 5px 14px rgba(38, 74, 61, 0.06);
+    }
+
+    .calendar {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      margin-top: 2px;
+      padding-top: 12px;
+    }
+
+    .calendar-day {
+      border-radius: 12px;
+    }
+
+    .calendar-day.selected {
+      background: #EAF6F0;
+    }
+
+    .calendar-day.today .calendar-day-number {
+      background: var(--ink);
+      color: white;
+    }
+
+    .calendar-selected-transactions,
+    .date-group-card,
+    .asset-card,
+    .chart,
+    .settings-section,
+    .sync-status-card {
+      border-color: var(--line);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(38, 74, 61, 0.05);
+    }
+
+    .bottom-nav {
+      max-width: 456px;
+      left: 12px;
+      right: 12px;
+      bottom: 10px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+      box-shadow: 0 14px 34px rgba(38, 74, 61, 0.14);
+    }
+
+    .nav-item {
+      border-radius: 18px;
+    }
+
+    .nav-item.active {
+      color: var(--ink);
+      background: var(--warm);
+    }
+
+    .fab {
+      background: var(--ink);
+      box-shadow: 0 12px 26px rgba(36, 33, 31, 0.22);
+    }
+
+    .modal-overlay {
+      background: rgba(36, 33, 31, 0.34);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      border-radius: 22px 22px 0 0;
+      padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+      background: var(--paper);
+      box-shadow: 0 -18px 40px rgba(36, 33, 31, 0.18);
+    }
+
+    .modal::before {
+      content: '';
+      display: block;
+      width: 42px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--warm-deep);
+      margin: 0 auto 14px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .form-input,
+    .select-item,
+    .quick-amount-btn,
+    .reset-amount-btn {
+      border-radius: 12px;
+      border-color: var(--line);
+      background: white;
+    }
+
+    .select-item.selected,
+    .filter-btn.active,
+    .btn-primary {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: white;
+    }
+
+    .quick-amount-buttons {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .transaction-amount.expense,
+    .summary-value.expense,
+    .summary-value.balance,
+    .calendar-day-amount.expense,
+    .date-group-summary .expense,
+    .budget-summary-value.expense,
+    .asset-budget-remaining.expense {
+      color: var(--soft-coral);
+    }
+
+    .transaction-amount.income,
+    .summary-value.income,
+    .calendar-day-amount.income,
+    .date-group-summary .income {
+      color: var(--soft-blue);
+    }
   </style>
 </head>
 <body data-active-tab="calendar">
@@ -1777,6 +2119,35 @@
     <div class="content">
       <!-- 달력 탭 -->
       <div class="tab-content active" id="calendar-content">
+        <section class="couple-home">
+          <div class="home-hero">
+            <div class="home-eyebrow" id="homeMonthLabel">우리 이번 달</div>
+            <div class="home-title">
+              <h2>국환 & 혜지의<br>생활 가계부</h2>
+              <span class="home-pill" id="homePaceLabel">함께 쓰는 중</span>
+            </div>
+            <div class="home-metrics">
+              <div class="home-metric primary">
+                <div class="metric-label">이번 달 지출</div>
+                <div class="metric-value" id="homeExpense">0원</div>
+              </div>
+              <div class="home-metric">
+                <div class="metric-label">남은 금액</div>
+                <div class="metric-value" id="homeBalance">0원</div>
+              </div>
+              <div class="home-metric">
+                <div class="metric-label">오늘 지출</div>
+                <div class="metric-value" id="homeTodaySpent">0원</div>
+              </div>
+            </div>
+            <div class="home-actions">
+              <button class="home-add-btn" id="homeQuickAdd">지출 바로 입력</button>
+              <button class="home-transfer-btn" id="homeTransferBtn">이동</button>
+            </div>
+          </div>
+          <div class="quick-category-panel" id="homeQuickCategories"></div>
+        </section>
+
         <!-- 달력 -->
         <div class="calendar">
           <div class="calendar-grid" id="calendarGrid"></div>
@@ -2581,6 +2952,55 @@
       document.getElementById('totalIncome').textContent = '+' + formatMoney(income);
       document.getElementById('totalExpense').textContent = '-' + formatMoney(expense);
       document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + formatMoney(balance);
+    }
+
+    function renderCoupleHome() {
+      const { start, end } = getMonthRange(state.currentDate);
+      const todayStr = formatDate(new Date());
+      let monthTransactions = state.transactions.filter(t => {
+        const tDate = new Date(t.transactionDate);
+        return tDate >= start && tDate <= end;
+      });
+
+      if (state.calendarUserFilter !== 'all') {
+        monthTransactions = monthTransactions.filter(t => t.userId === state.calendarUserFilter);
+      }
+
+      const income = monthTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+      const expense = monthTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+      const todayExpense = monthTransactions
+        .filter(t => t.type === 'expense' && t.transactionDate === todayStr)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const balance = income - expense;
+
+      document.getElementById('homeMonthLabel').textContent = `${state.currentDate.getMonth() + 1}월 우리 돈 흐름`;
+      document.getElementById('homeExpense').textContent = formatMoney(expense);
+      document.getElementById('homeBalance').textContent = `${balance >= 0 ? '+' : ''}${formatMoney(balance)}`;
+      document.getElementById('homeTodaySpent').textContent = formatMoney(todayExpense);
+
+      const paceLabel = document.getElementById('homePaceLabel');
+      if (expense === 0) {
+        paceLabel.textContent = '아직 산뜻해요';
+      } else if (balance >= 0) {
+        paceLabel.textContent = '잘 맞춰가는 중';
+      } else {
+        paceLabel.textContent = '살짝 조절해요';
+      }
+
+      const favoriteExpenses = state.categories
+        .filter(c => c.type === 'expense' && c.isFavorite)
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .slice(0, 6);
+
+      document.getElementById('homeQuickCategories').innerHTML = favoriteExpenses.map(category => `
+        <button class="quick-category-chip" onclick="openQuickExpense('${escapeAttr(category.id)}')">
+          ${category.icon ? `${escapeHTML(category.icon)} ` : ''}${escapeHTML(category.name)}
+        </button>
+      `).join('');
     }
 
     // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 자동 조정
@@ -3409,12 +3829,22 @@
     // ============================================
     // 이벤트 핸들러
     // ============================================
-    function openTransactionModal() {
+    function getDefaultItemId(items) {
+      const sorted = [...items].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+      const favorite = sorted.find(item => item.isFavorite);
+      return (favorite || sorted[0] || {}).id || null;
+    }
+
+    function openTransactionModal(defaults = {}) {
+      if (!defaults || defaults instanceof Event) {
+        defaults = {};
+      }
+
       state.selectedUser = state.users[0].id;
-      state.selectedType = 'expense';
-      state.selectedCategory = null;
-      state.selectedPaymentMethod = null;
-      state.selectedAsset = null;
+      state.selectedType = defaults.type || 'expense';
+      state.selectedCategory = defaults.categoryId || getDefaultItemId(state.categories.filter(c => c.type === state.selectedType));
+      state.selectedPaymentMethod = defaults.paymentMethodId || getDefaultItemId(state.paymentMethods);
+      state.selectedAsset = defaults.assetId || getDefaultItemId(state.assets);
 
       document.getElementById('amountInput').value = '';
       document.getElementById('dateInput').value = state.selectedDate || formatDate(new Date());
@@ -3432,6 +3862,25 @@
       if (modalContent) {
         modalContent.scrollTop = 0;
       }
+      document.body.classList.add('modal-open');
+    }
+
+    function openQuickExpense(categoryId) {
+      openTransactionModal({ type: 'expense', categoryId });
+      setTimeout(() => {
+        const amountInput = document.getElementById('amountInput');
+        if (amountInput) amountInput.focus();
+      }, 50);
+    }
+
+    function openTransferModal() {
+      state.selectedFromAsset = getDefaultItemId(state.assets);
+      state.selectedToAsset = null;
+      document.getElementById('transferAmountInput').value = '';
+      document.getElementById('transferDateInput').value = state.selectedDate || formatDate(new Date());
+      renderSelectGrid('fromAssetSelect', state.assets, state.selectedFromAsset);
+      renderSelectGrid('toAssetSelect', state.assets, state.selectedToAsset);
+      document.getElementById('transferModal').classList.add('active');
       document.body.classList.add('modal-open');
     }
 
@@ -4050,6 +4499,7 @@
     function renderAll() {
       updateMonthDisplay();
       updateSummary();
+      renderCoupleHome();
       renderCalendar();
       renderSelectedDateTransactions(state.selectedDate);
       renderTransactionList();
@@ -4123,6 +4573,7 @@
           }
 
           updateSummary();
+          renderCoupleHome();
           renderCalendar();
           renderSelectedDateTransactions(state.selectedDate);
           renderTransactionList();
@@ -4141,6 +4592,8 @@
       // 거래 추가 버튼
       document.getElementById('addTransactionBtn').addEventListener('click', openTransactionModal);
       document.getElementById('headerAddBtn').addEventListener('click', openTransactionModal);
+      document.getElementById('homeQuickAdd').addEventListener('click', openTransactionModal);
+      document.getElementById('homeTransferBtn').addEventListener('click', openTransferModal);
 
       // 거래 타입 선택
       document.querySelectorAll('[data-type]').forEach(item => {
