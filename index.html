@@ -2076,6 +2076,124 @@
     .date-group-summary .income {
       color: var(--soft-blue);
     }
+
+    /* Toss-like polish */
+    :root {
+      --paper: #F7F8FA;
+      --surface: #FFFFFF;
+      --ink: #191F28;
+      --muted: #8B95A1;
+      --line: #E5E8EB;
+      --soft-coral: #F04452;
+      --soft-blue: #3182F6;
+      --mint: #00A887;
+      --warm: #EEF6FF;
+      --warm-deep: #D6E8FF;
+    }
+
+    .container {
+      max-width: 480px;
+      background: var(--paper);
+    }
+
+    .header {
+      background: var(--paper);
+      padding-top: max(14px, env(safe-area-inset-top));
+    }
+
+    .summary {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      margin: 8px 14px 12px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 24px rgba(25, 31, 40, 0.04);
+    }
+
+    .summary-row {
+      gap: 16px;
+    }
+
+    .summary-item {
+      display: block;
+      min-width: 0;
+    }
+
+    .summary-item.balance-item {
+      margin-left: 0;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      font-size: 15px;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .calendar {
+      margin: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(25, 31, 40, 0.04);
+    }
+
+    .calendar-selected-transactions {
+      margin: 12px 14px 0;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+    }
+
+    .filter-btn,
+    .user-filter-btn,
+    .select-item,
+    .quick-amount-btn,
+    .form-input {
+      border-radius: 14px;
+    }
+
+    .btn-primary,
+    .home-add-btn,
+    .header-add-btn,
+    .sync-button {
+      background: var(--soft-blue);
+      box-shadow: none;
+    }
+
+    .select-item.selected,
+    .filter-btn.active,
+    .user-filter-btn.active {
+      background: var(--soft-blue);
+      border-color: var(--soft-blue);
+      color: #FFFFFF;
+    }
+
+    .bottom-nav {
+      border-radius: 26px;
+      box-shadow: 0 12px 32px rgba(25, 31, 40, 0.12);
+    }
+
+    .nav-item.active {
+      background: #EEF6FF;
+      color: var(--soft-blue);
+    }
+
+    .modal {
+      border-radius: 24px 24px 0 0;
+      background: #FFFFFF;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom) + var(--keyboard-inset, 0px));
+      transition: transform 0.18s ease;
+    }
+
+    .modal.dragging {
+      transition: none;
+    }
   </style>
 </head>
 <body data-active-tab="calendar">
@@ -2119,35 +2237,6 @@
     <div class="content">
       <!-- 달력 탭 -->
       <div class="tab-content active" id="calendar-content">
-        <section class="couple-home">
-          <div class="home-hero">
-            <div class="home-eyebrow" id="homeMonthLabel">우리 이번 달</div>
-            <div class="home-title">
-              <h2>국환 & 혜지의<br>생활 가계부</h2>
-              <span class="home-pill" id="homePaceLabel">함께 쓰는 중</span>
-            </div>
-            <div class="home-metrics">
-              <div class="home-metric primary">
-                <div class="metric-label">이번 달 지출</div>
-                <div class="metric-value" id="homeExpense">0원</div>
-              </div>
-              <div class="home-metric">
-                <div class="metric-label">남은 금액</div>
-                <div class="metric-value" id="homeBalance">0원</div>
-              </div>
-              <div class="home-metric">
-                <div class="metric-label">오늘 지출</div>
-                <div class="metric-value" id="homeTodaySpent">0원</div>
-              </div>
-            </div>
-            <div class="home-actions">
-              <button class="home-add-btn" id="homeQuickAdd">지출 바로 입력</button>
-              <button class="home-transfer-btn" id="homeTransferBtn">이동</button>
-            </div>
-          </div>
-          <div class="quick-category-panel" id="homeQuickCategories"></div>
-        </section>
-
         <!-- 달력 -->
         <div class="calendar">
           <div class="calendar-grid" id="calendarGrid"></div>
@@ -2535,6 +2624,7 @@
       pendingSyncCount: 0,
       lastSavedAt: null,
       lastSyncStatus: 'local',
+      lastCalendarTap: null,
       expandedSections: {
         category: false,
         paymentMethod: false
@@ -2954,55 +3044,6 @@
       document.getElementById('totalBalance').textContent = (balance >= 0 ? '+' : '') + formatMoney(balance);
     }
 
-    function renderCoupleHome() {
-      const { start, end } = getMonthRange(state.currentDate);
-      const todayStr = formatDate(new Date());
-      let monthTransactions = state.transactions.filter(t => {
-        const tDate = new Date(t.transactionDate);
-        return tDate >= start && tDate <= end;
-      });
-
-      if (state.calendarUserFilter !== 'all') {
-        monthTransactions = monthTransactions.filter(t => t.userId === state.calendarUserFilter);
-      }
-
-      const income = monthTransactions
-        .filter(t => t.type === 'income')
-        .reduce((sum, t) => sum + t.amount, 0);
-      const expense = monthTransactions
-        .filter(t => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0);
-      const todayExpense = monthTransactions
-        .filter(t => t.type === 'expense' && t.transactionDate === todayStr)
-        .reduce((sum, t) => sum + t.amount, 0);
-      const balance = income - expense;
-
-      document.getElementById('homeMonthLabel').textContent = `${state.currentDate.getMonth() + 1}월 우리 돈 흐름`;
-      document.getElementById('homeExpense').textContent = formatMoney(expense);
-      document.getElementById('homeBalance').textContent = `${balance >= 0 ? '+' : ''}${formatMoney(balance)}`;
-      document.getElementById('homeTodaySpent').textContent = formatMoney(todayExpense);
-
-      const paceLabel = document.getElementById('homePaceLabel');
-      if (expense === 0) {
-        paceLabel.textContent = '아직 산뜻해요';
-      } else if (balance >= 0) {
-        paceLabel.textContent = '잘 맞춰가는 중';
-      } else {
-        paceLabel.textContent = '살짝 조절해요';
-      }
-
-      const favoriteExpenses = state.categories
-        .filter(c => c.type === 'expense' && c.isFavorite)
-        .sort((a, b) => a.displayOrder - b.displayOrder)
-        .slice(0, 6);
-
-      document.getElementById('homeQuickCategories').innerHTML = favoriteExpenses.map(category => `
-        <button class="quick-category-chip" onclick="openQuickExpense('${escapeAttr(category.id)}')">
-          ${category.icon ? `${escapeHTML(category.icon)} ` : ''}${escapeHTML(category.name)}
-        </button>
-      `).join('');
-    }
-
     // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 자동 조정
     function formatCalendarAmount(amount) {
       const text = amount.toLocaleString();
@@ -3092,17 +3133,27 @@
     }
 
     function onCalendarDayClick(dateStr) {
+      const now = Date.now();
+      const isDoubleTap = state.lastCalendarTap &&
+        state.lastCalendarTap.dateStr === dateStr &&
+        now - state.lastCalendarTap.time < 350;
+      state.lastCalendarTap = { dateStr, time: now };
+
       state.selectedDate = dateStr;
       const todayStr = formatDate(new Date());
       // 오늘이 아닌 다른 날짜를 선택했을 때 body에 표시
       document.body.setAttribute('data-has-selected', dateStr !== todayStr ? 'true' : 'false');
       renderCalendar();
       renderSelectedDateTransactions(dateStr);
+
+      if (isDoubleTap) {
+        openTransactionModal({ type: 'expense', date: dateStr });
+      }
     }
 
     function onCalendarDayDoubleClick(dateStr) {
-      openTransactionModal();
-      document.getElementById('dateInput').value = dateStr;
+      state.selectedDate = dateStr;
+      openTransactionModal({ type: 'expense', date: dateStr });
     }
 
     function renderSelectedDateTransactions(dateStr) {
@@ -3847,7 +3898,7 @@
       state.selectedAsset = defaults.assetId || getDefaultItemId(state.assets);
 
       document.getElementById('amountInput').value = '';
-      document.getElementById('dateInput').value = state.selectedDate || formatDate(new Date());
+      document.getElementById('dateInput').value = defaults.date || state.selectedDate || formatDate(new Date());
       document.getElementById('memoInput').value = '';
       document.getElementById('recurringInput').checked = false;
       document.getElementById('recurringCountInput').value = '12';
@@ -3935,6 +3986,79 @@
     function closeModal(modalId) {
       document.getElementById(modalId).classList.remove('active');
       document.body.classList.remove('modal-open');
+    }
+
+    function setupBottomSheetDismissal() {
+      document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        const modal = overlay.querySelector('.modal');
+        if (!modal) return;
+
+        let startY = 0;
+        let currentY = 0;
+        let dragging = false;
+
+        modal.addEventListener('pointerdown', (event) => {
+          const rect = modal.getBoundingClientRect();
+          const isHandleArea = event.clientY - rect.top < 76;
+          const targetElement = event.target instanceof Element ? event.target : null;
+          if (targetElement && targetElement.closest('button, input, select, textarea')) return;
+          if (!isHandleArea || modal.scrollTop > 0) return;
+
+          startY = event.clientY;
+          currentY = startY;
+          dragging = true;
+          modal.classList.add('dragging');
+          modal.setPointerCapture(event.pointerId);
+        });
+
+        modal.addEventListener('pointermove', (event) => {
+          if (!dragging) return;
+          currentY = event.clientY;
+          const delta = Math.max(0, currentY - startY);
+          modal.style.transform = `translateY(${delta}px)`;
+        });
+
+        const finishDrag = (event) => {
+          if (!dragging) return;
+          dragging = false;
+          modal.classList.remove('dragging');
+          const delta = Math.max(0, currentY - startY);
+          modal.style.transform = '';
+          if (modal.hasPointerCapture(event.pointerId)) {
+            modal.releasePointerCapture(event.pointerId);
+          }
+          if (delta > 90) {
+            closeModal(overlay.id);
+          }
+        };
+
+        modal.addEventListener('pointerup', finishDrag);
+        modal.addEventListener('pointercancel', finishDrag);
+      });
+    }
+
+    function setupKeyboardAvoidance() {
+      const updateKeyboardInset = () => {
+        if (!window.visualViewport) return;
+        const inset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+        document.documentElement.style.setProperty('--keyboard-inset', `${Math.round(inset)}px`);
+      };
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', updateKeyboardInset);
+        window.visualViewport.addEventListener('scroll', updateKeyboardInset);
+      }
+
+      document.addEventListener('focusin', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (!target.closest('.modal')) return;
+
+        setTimeout(() => {
+          updateKeyboardInset();
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 120);
+      });
     }
 
     function openTransactionDetailModal(transactionId) {
@@ -4499,7 +4623,6 @@
     function renderAll() {
       updateMonthDisplay();
       updateSummary();
-      renderCoupleHome();
       renderCalendar();
       renderSelectedDateTransactions(state.selectedDate);
       renderTransactionList();
@@ -4517,6 +4640,8 @@
     document.addEventListener('DOMContentLoaded', async () => {
       loadData();
       renderAll();
+      setupBottomSheetDismissal();
+      setupKeyboardAvoidance();
 
       // Supabase 자동 연결 (하드코딩)
       try {
@@ -4573,7 +4698,6 @@
           }
 
           updateSummary();
-          renderCoupleHome();
           renderCalendar();
           renderSelectedDateTransactions(state.selectedDate);
           renderTransactionList();
@@ -4592,8 +4716,6 @@
       // 거래 추가 버튼
       document.getElementById('addTransactionBtn').addEventListener('click', openTransactionModal);
       document.getElementById('headerAddBtn').addEventListener('click', openTransactionModal);
-      document.getElementById('homeQuickAdd').addEventListener('click', openTransactionModal);
-      document.getElementById('homeTransferBtn').addEventListener('click', openTransferModal);
 
       // 거래 타입 선택
       document.querySelectorAll('[data-type]').forEach(item => {
