@@ -2287,123 +2287,6 @@
       color: var(--muted);
     }
 
-    .calendar-transaction-card,
-    .date-group-card {
-      border: 0;
-      box-shadow: none;
-      background: transparent;
-    }
-
-    .calendar-transaction-row,
-    .date-group-item {
-      min-height: 58px;
-      margin-bottom: 8px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #FFFFFF;
-      box-shadow: 0 6px 18px rgba(25, 31, 40, 0.035);
-    }
-
-    .date-group-item:last-child,
-    .calendar-transaction-row:last-child {
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 0;
-    }
-
-    .transaction-person {
-      width: 30px;
-      height: 30px;
-      flex: 0 0 30px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFFFFF;
-      font-size: 12px;
-      font-weight: 900;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-    }
-
-    .transaction-person.tone-0 {
-      background: #3182F6;
-    }
-
-    .transaction-person.tone-1 {
-      background: #F04452;
-    }
-
-    .transaction-person.tone-2 {
-      background: #00A887;
-    }
-
-    .transaction-main-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
-    .transaction-category {
-      margin-top: 0;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .transaction-subline {
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .budget-summary-card {
-      border: 0;
-      border-radius: 22px;
-      background: linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%);
-      box-shadow: 0 10px 28px rgba(25, 31, 40, 0.06);
-    }
-
-    .budget-hero-label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 800;
-      margin-bottom: 4px;
-    }
-
-    .budget-hero-value {
-      font-size: 30px;
-      line-height: 1.15;
-      font-weight: 900;
-      letter-spacing: 0;
-      color: var(--ink);
-    }
-
-    .budget-hero-value.expense {
-      color: var(--soft-coral);
-    }
-
-    .budget-summary-amounts {
-      background: #F2F4F6;
-      border-radius: 16px;
-      padding: 12px;
-      margin-top: 16px;
-      margin-bottom: 12px;
-    }
-
-    .asset-card {
-      border: 0;
-      border-radius: 18px;
-      box-shadow: 0 8px 22px rgba(25, 31, 40, 0.045);
-    }
-
-    .asset-budget-remaining {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--ink);
-    }
-
     .settings-section {
       border: 0;
       border-radius: 20px;
@@ -3421,29 +3304,6 @@
       openTransactionModal({ type: 'expense', date: dateStr });
     }
 
-    function getUserTone(userId) {
-      const index = Math.max(0, state.users.findIndex(user => user.id === userId));
-      return index % 3;
-    }
-
-    function renderPersonMarker(user) {
-      if (!user) return '<span class="transaction-person tone-2">?</span>';
-      const initial = (user.name || '?').trim().charAt(0) || '?';
-      return `<span class="transaction-person tone-${getUserTone(user.id)}" title="${escapeAttr(user.name)}">${escapeHTML(initial)}</span>`;
-    }
-
-    function renderTransactionSubline(t, lookups) {
-      const paymentMethod = lookups.paymentMethods?.get(t.paymentMethodId);
-      const asset = lookups.assets?.get(t.assetId);
-      const toAsset = t.toAssetId ? lookups.assets?.get(t.toAssetId) : null;
-
-      if (t.type === 'transfer') {
-        return [asset?.name, toAsset?.name].filter(Boolean).join(' -> ');
-      }
-
-      return [paymentMethod?.name, asset?.name, t.memo].filter(Boolean).join(' · ');
-    }
-
     function renderQuickEntryPanel() {
       const panel = document.getElementById('quickEntryPanel');
       if (!panel) return;
@@ -3504,7 +3364,6 @@
     function renderCalendarTransactionItem(t, lookups) {
       const user = lookups.users.get(t.userId);
       const category = lookups.categories.get(t.categoryId);
-      const subline = renderTransactionSubline(t, lookups);
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
@@ -3513,12 +3372,12 @@
 
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
-          ${renderPersonMarker(user)}
           <div class="calendar-transaction-info">
-            <div class="transaction-main-text">
+            <div class="calendar-transaction-main">
+              ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
               <div class="transaction-category">${categoryDisplay}</div>
-              ${subline ? `<div class="transaction-subline">${escapeHTML(subline)}</div>` : ''}
             </div>
+            ${t.memo ? `<div class="transaction-memo">${escapeHTML(t.memo)}</div>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
@@ -3607,7 +3466,6 @@
       const category = lookups.categories.get(t.categoryId);
       const asset = lookups.assets.get(t.assetId);
       const toAsset = t.toAssetId ? lookups.assets.get(t.toAssetId) : null;
-      const subline = renderTransactionSubline(t, lookups);
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
@@ -3615,12 +3473,10 @@
 
       return `
         <div class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
-          ${renderPersonMarker(user)}
           <div class="date-group-item-left">
-            <div class="transaction-main-text">
-              <span class="transaction-category">${categoryDisplay}</span>
-              ${subline ? `<span class="transaction-subline">${escapeHTML(subline)}</span>` : ''}
-            </div>
+            ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
+            <span class="transaction-category">${categoryDisplay}</span>
+            ${t.memo ? `<span class="transaction-memo-inline">${escapeHTML(t.memo)}</span>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
@@ -3652,9 +3508,9 @@
 
       return `
         <div class="transaction-item" onclick="openTransactionDetailModal('${t.id}')">
-          ${renderPersonMarker(user)}
           <div class="transaction-left">
             ${showDate ? `<span class="transaction-date-badge">${dateDisplay}</span>` : ''}
+            ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
             <div class="transaction-category">${categoryDisplay}</div>
             ${methodText ? `<div class="transaction-method">${escapeHTML(methodText)}</div>` : ''}
             ${t.memo ? `<div class="transaction-method">${escapeHTML(t.memo)}</div>` : ''}
@@ -3705,24 +3561,23 @@
 
       const spentPercent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
       const remainingBudget = totalBudget - totalSpent;
-      const dailyAvailable = daysRemaining > 0 ? Math.floor(remainingBudget / daysRemaining) : remainingBudget;
 
       // 예산 소진 상태 판단
       let statusClass = 'good';
-      let statusText = '좋아요';
+      let statusText = '양호';
       let statusDesc = '';
 
       if (totalBudget > 0) {
         if (spentPercent > daysPassedPercent + 10) {
           statusClass = 'bad';
-          statusText = '조절 필요';
-          statusDesc = `날짜는 ${Math.round(daysPassedPercent)}%, 예산은 ${Math.round(spentPercent)}% 사용했어요`;
+          statusText = '주의';
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
         } else if (spentPercent > daysPassedPercent) {
           statusClass = 'warning';
-          statusText = '조금 빠름';
-          statusDesc = `날짜는 ${Math.round(daysPassedPercent)}%, 예산은 ${Math.round(spentPercent)}% 사용했어요`;
+          statusText = '보통';
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
         } else {
-          statusDesc = `날짜는 ${Math.round(daysPassedPercent)}%, 예산은 ${Math.round(spentPercent)}% 사용했어요`;
+          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
         }
       }
 
@@ -3730,11 +3585,9 @@
       let summaryHtml = `
         <div class="budget-summary-card">
           <div class="budget-summary-header">
-            <span class="budget-month">${currentMonth + 1}월 남은 예산</span>
+            <span class="budget-month">${currentMonth + 1}월 예산 현황</span>
             ${totalBudget > 0 ? `<span class="budget-status ${statusClass}">${statusText}</span>` : ''}
           </div>
-          <div class="budget-hero-label">이번 달 더 쓸 수 있는 돈</div>
-          <div class="budget-hero-value ${remainingBudget < 0 ? 'expense' : ''}">${remainingBudget < 0 ? '-' : ''}${formatMoney(Math.abs(remainingBudget))}</div>
           <div class="budget-summary-amounts">
             <div class="budget-summary-item">
               <span class="budget-summary-label">예산</span>
@@ -3745,8 +3598,8 @@
               <span class="budget-summary-value expense">${formatMoney(totalSpent)}</span>
             </div>
             <div class="budget-summary-item">
-              <span class="budget-summary-label">하루 가능</span>
-              <span class="budget-summary-value ${dailyAvailable < 0 ? 'expense' : ''}">${formatMoney(dailyAvailable)}</span>
+              <span class="budget-summary-label">남음</span>
+              <span class="budget-summary-value ${remainingBudget < 0 ? 'expense' : ''}">${formatMoney(remainingBudget)}</span>
             </div>
           </div>
           ${totalBudget > 0 ? `
@@ -3756,10 +3609,10 @@
             </div>
             <div class="budget-summary-desc">${statusDesc}</div>
             <div class="budget-days-info">
-              <span>지난 날 ${daysPassed}일</span>
-              <span>남은 날 ${daysRemaining}일</span>
+              <span>경과: ${daysPassed}일</span>
+              <span>남음: ${daysRemaining}일</span>
             </div>
-          ` : '<div class="budget-summary-desc">예산을 설정하면 남은 돈을 중심으로 볼 수 있어요</div>'}
+          ` : '<div class="budget-summary-desc">예산을 설정해주세요</div>'}
         </div>
       `;
 
@@ -3794,7 +3647,7 @@
           <div class="asset-card" onclick="showAssetTransactions('${escapeAttr(asset.id)}')">
             <div class="asset-header">
               <span class="asset-name">${escapeHTML(asset.name)}</span>
-              <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${budget > 0 ? `${remaining < 0 ? '-' : ''}${formatMoney(Math.abs(remaining))}` : '예산 없음'}</span>
+              <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining >= 0 ? '+' : ''}${formatMoney(remaining)}</span>
             </div>
             ${budget > 0 ? `
               <div class="asset-budget-bar">
@@ -3806,8 +3659,8 @@
               </div>
             ` : `
               <div class="asset-budget-info">
-                <span>이번 달 지출 ${formatMoney(spent)}</span>
-                <span class="no-budget">설정 탭에서 예산을 정해보세요</span>
+                <span>지출 ${formatMoney(spent)}</span>
+                <span class="no-budget">예산 미설정</span>
               </div>
             `}
           </div>
