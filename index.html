@@ -3994,46 +3994,109 @@
         if (!modal) return;
 
         let startY = 0;
+        let startX = 0;
         let currentY = 0;
+        let startScrollTop = 0;
+        let tracking = false;
         let dragging = false;
+        let activePointerId = null;
 
-        modal.addEventListener('pointerdown', (event) => {
+        const canStartFromTarget = (target) => {
+          const targetElement = target instanceof Element ? target : null;
+          return !(targetElement && targetElement.closest('button, input, select, textarea'));
+        };
+
+        const beginTracking = (clientX, clientY, target, pointerId = null) => {
           const rect = modal.getBoundingClientRect();
-          const isHandleArea = event.clientY - rect.top < 76;
-          const targetElement = event.target instanceof Element ? event.target : null;
-          if (targetElement && targetElement.closest('button, input, select, textarea')) return;
-          if (!isHandleArea || modal.scrollTop > 0) return;
+          const isHandleArea = clientY - rect.top < 88;
+          if (!canStartFromTarget(target)) return false;
+          if (!isHandleArea && modal.scrollTop > 2) return false;
 
-          startY = event.clientY;
+          startX = clientX;
+          startY = clientY;
           currentY = startY;
-          dragging = true;
+          startScrollTop = modal.scrollTop;
+          tracking = true;
+          dragging = false;
+          activePointerId = pointerId;
+          return true;
+        };
+
+        const updateDrag = (clientX, clientY) => {
+          if (!tracking) return false;
+
+          currentY = clientY;
+          const deltaY = currentY - startY;
+          const deltaX = Math.abs(clientX - startX);
+          const canDragDown = startScrollTop <= 2 && deltaY > 0 && deltaY > deltaX;
+          if (!canDragDown) return false;
+
+          if (!dragging && deltaY > 8) {
+            dragging = true;
+            modal.scrollTop = 0;
+          }
+
+          if (!dragging) return false;
+
           modal.classList.add('dragging');
-          modal.setPointerCapture(event.pointerId);
-        });
+          modal.style.transform = `translateY(${Math.max(0, deltaY)}px)`;
+          return true;
+        };
 
-        modal.addEventListener('pointermove', (event) => {
-          if (!dragging) return;
-          currentY = event.clientY;
+        const endTracking = () => {
+          if (!tracking) return;
           const delta = Math.max(0, currentY - startY);
-          modal.style.transform = `translateY(${delta}px)`;
-        });
-
-        const finishDrag = (event) => {
-          if (!dragging) return;
+          const shouldClose = dragging && delta > 64;
+          tracking = false;
           dragging = false;
           modal.classList.remove('dragging');
-          const delta = Math.max(0, currentY - startY);
           modal.style.transform = '';
-          if (modal.hasPointerCapture(event.pointerId)) {
-            modal.releasePointerCapture(event.pointerId);
-          }
-          if (delta > 90) {
+          if (shouldClose) {
             closeModal(overlay.id);
           }
         };
 
-        modal.addEventListener('pointerup', finishDrag);
-        modal.addEventListener('pointercancel', finishDrag);
+        modal.addEventListener('pointerdown', (event) => {
+          if (beginTracking(event.clientX, event.clientY, event.target, event.pointerId)) {
+            modal.setPointerCapture(event.pointerId);
+          }
+        });
+
+        modal.addEventListener('pointermove', (event) => {
+          if (activePointerId !== null && event.pointerId !== activePointerId) return;
+          if (updateDrag(event.clientX, event.clientY)) {
+            event.preventDefault();
+          }
+        });
+
+        const finishPointerDrag = (event) => {
+          if (activePointerId !== null && event.pointerId !== activePointerId) return;
+          if (modal.hasPointerCapture(event.pointerId)) {
+            modal.releasePointerCapture(event.pointerId);
+          }
+          activePointerId = null;
+          endTracking();
+        };
+
+        modal.addEventListener('pointerup', finishPointerDrag);
+        modal.addEventListener('pointercancel', finishPointerDrag);
+
+        modal.addEventListener('touchstart', (event) => {
+          if (event.touches.length !== 1) return;
+          const touch = event.touches[0];
+          beginTracking(touch.clientX, touch.clientY, event.target);
+        }, { passive: true });
+
+        modal.addEventListener('touchmove', (event) => {
+          if (event.touches.length !== 1) return;
+          const touch = event.touches[0];
+          if (updateDrag(touch.clientX, touch.clientY)) {
+            event.preventDefault();
+          }
+        }, { passive: false });
+
+        modal.addEventListener('touchend', endTracking);
+        modal.addEventListener('touchcancel', endTracking);
       });
     }
 
