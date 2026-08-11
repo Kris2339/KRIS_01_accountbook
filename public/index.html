@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="생활 가계부">
@@ -2338,26 +2338,563 @@
     .icon-btn.delete {
       color: var(--soft-coral);
     }
+
+    /* 2026 household UX overhaul */
+    body {
+      user-select: text;
+    }
+
+    button,
+    .calendar-day,
+    .select-item {
+      user-select: none;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    .select-item:focus-visible {
+      outline: 3px solid rgba(49, 130, 246, 0.28);
+      outline-offset: 2px;
+    }
+
+    .container {
+      max-width: 520px;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: max(12px, env(safe-area-inset-top)) 14px 10px;
+      background: rgba(247, 248, 250, 0.94);
+      backdrop-filter: blur(16px);
+    }
+
+    body[data-active-tab="settings"] .header {
+      display: none;
+    }
+
+    .header-topline,
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .header-topline {
+      margin-bottom: 9px;
+    }
+
+    .month-selector {
+      flex: 1;
+      justify-content: space-between;
+      max-width: 220px;
+    }
+
+    .month-selector span {
+      min-width: 104px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .today-button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 14px;
+      background: var(--surface);
+      color: var(--soft-blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .user-filter {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .user-filter::-webkit-scrollbar {
+      display: none;
+    }
+
+    .user-filter-btn {
+      min-height: 36px;
+      padding: 7px 14px;
+    }
+
+    .global-sync-pill {
+      margin-left: auto;
+      color: #4E5968;
+      background: #FFFFFF;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .transaction-context-inline {
+      font-size: 11px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .global-sync-pill.pending {
+      color: #B45309;
+      background: #FFF7E6;
+    }
+
+    .global-sync-pill.failed,
+    .global-sync-pill.conflict {
+      color: #C93643;
+      background: #FFF0F1;
+    }
+
+    .header-add-btn {
+      display: none !important;
+    }
+
+    .summary {
+      margin-top: 2px;
+      padding: 16px;
+    }
+
+    .summary-label {
+      font-size: 12px;
+    }
+
+    .summary-value {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .calendar-day {
+      min-height: 68px;
+      padding: 5px 2px;
+      cursor: pointer;
+      border: 0;
+      font-family: inherit;
+    }
+
+    .calendar-day-amount {
+      font-size: 8px;
+      letter-spacing: -0.42px;
+      line-height: 1.18;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .calendar-day-amount.small-font,
+    .calendar-day-amount.tiny-font,
+    .calendar-day-amount.micro-font {
+      font-size: 7px;
+    }
+
+    .calendar-day-dots {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .calendar-day-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .calendar-day-dot.income { background: var(--soft-blue); }
+    .calendar-day-dot.expense { background: var(--soft-coral); }
+
+    .quick-entry-panel {
+      padding: 16px;
+    }
+
+    .quick-entry-title {
+      font-size: 15px;
+    }
+
+    .quick-entry-person {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .quick-entry-actions {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .quick-entry-chip {
+      min-height: 48px;
+      font-size: 13px;
+    }
+
+    .quick-entry-chip.primary {
+      grid-column: 1 / -1;
+      font-size: 14px;
+    }
+
+    .section-heading-row,
+    .settings-page-heading {
+      margin: 6px 14px 14px;
+    }
+
+    .section-heading-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .section-heading-row h2,
+    .settings-page-heading h2 {
+      margin: 2px 0 0;
+      font-size: 22px;
+      line-height: 1.25;
+      color: var(--ink);
+    }
+
+    .section-eyebrow {
+      color: var(--soft-blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .section-total {
+      color: var(--soft-coral);
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .search-input {
+      min-height: 48px;
+      font-size: 14px;
+      padding-left: 42px;
+      background: #FFFFFF;
+    }
+
+    .report-switch,
+    .preference-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      padding: 5px;
+      border-radius: 16px;
+      background: #EDEFF2;
+    }
+
+    .report-switch {
+      margin: 0 14px 14px;
+    }
+
+    .report-switch-btn,
+    .preference-options button {
+      min-height: 42px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: #6B7684;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .report-switch-btn.active,
+    .preference-options button.active {
+      background: #FFFFFF;
+      color: var(--soft-blue);
+      box-shadow: 0 4px 12px rgba(25, 31, 40, 0.08);
+    }
+
+    .report-pane {
+      display: none;
+    }
+
+    .report-pane.active {
+      display: block;
+    }
+
+    .report-period-filters {
+      margin-top: 0;
+    }
+
+    .budget-breakdown {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .budget-breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .budget-breakdown-row strong {
+      color: var(--ink);
+    }
+
+    .budget-breakdown-row.unbudgeted strong {
+      color: #B45309;
+    }
+
+    .comparison-total {
+      margin-top: 8px;
+      color: var(--ink);
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+    }
+
+    .comparison-delta {
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .comparison-delta.expense { color: var(--soft-coral); }
+    .comparison-delta.income { color: var(--mint); }
+
+    .sticky-action {
+      position: sticky;
+      bottom: calc(92px + env(safe-area-inset-bottom));
+      z-index: 8;
+      min-height: 50px;
+      margin: 14px;
+      width: calc(100% - 28px);
+      border-radius: 15px;
+    }
+
+    .settings-page-heading {
+      padding-top: max(24px, env(safe-area-inset-top));
+    }
+
+    .preference-section .settings-description,
+    .settings-description {
+      margin: 5px 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    #calendarAmountModeSettings {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .settings-section {
+      margin-bottom: 12px;
+    }
+
+    .settings-disclosure > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .settings-disclosure > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .settings-disclosure > summary::after {
+      content: '열기';
+      color: var(--soft-blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .settings-disclosure[open] > summary {
+      margin-bottom: 14px;
+    }
+
+    .settings-disclosure[open] > summary::after {
+      content: '접기';
+    }
+
+    .settings-item-card {
+      min-height: 58px;
+    }
+
+    .logout-button {
+      width: calc(100% - 28px);
+      min-height: 48px;
+      margin: 4px 14px 24px;
+      border: 1px solid #F7C5CA;
+      border-radius: 14px;
+      background: #FFF5F6;
+      color: #C93643;
+      font-weight: 800;
+    }
+
+    .icon-btn {
+      min-width: 38px;
+      height: 38px;
+      font-size: 12px;
+    }
+
+    .bottom-nav {
+      max-width: 492px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 70px 1fr 1fr;
+    }
+
+    .nav-item {
+      min-height: 54px;
+    }
+
+    .nav-spacer {
+      min-width: 70px;
+    }
+
+    .fab,
+    body[data-active-tab="calendar"] .fab,
+    body[data-active-tab="log"] .fab,
+    body[data-active-tab="assets"] .fab,
+    body[data-active-tab="settings"] .fab {
+      display: flex;
+      position: fixed;
+      left: 50%;
+      right: auto;
+      bottom: calc(25px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      z-index: 120;
+      width: 58px;
+      height: 58px;
+      border: 5px solid var(--paper);
+      background: var(--soft-blue);
+      color: #FFFFFF;
+    }
+
+    .fab:active {
+      transform: translateX(-50%) scale(0.94);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(104px + env(safe-area-inset-bottom));
+      z-index: 300;
+      max-width: min(420px, calc(100vw - 32px));
+      transform: translate(-50%, 16px);
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: #191F28;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      box-shadow: 0 10px 30px rgba(25, 31, 40, 0.22);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .modal-close {
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .form-label {
+      font-size: 13px;
+    }
+
+    .select-item {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (min-width: 900px) {
+      .container {
+        max-width: 920px;
+      }
+
+      .header,
+      .summary,
+      #log-content,
+      #assets-content,
+      #settings-content {
+        max-width: 680px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      #calendar-content.active {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+        align-items: start;
+        gap: 14px;
+        padding: 0 14px;
+      }
+
+      #calendar-content .calendar {
+        grid-row: 1 / span 2;
+        margin: 0;
+      }
+
+      #calendar-content .quick-entry-panel,
+      #calendar-content .calendar-selected-transactions {
+        margin: 0;
+      }
+
+      .bottom-nav {
+        left: 50%;
+        right: auto;
+        width: 500px;
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body data-active-tab="calendar">
   <div class="container">
     <!-- 헤더 -->
-    <div class="header">
-      <div class="header-row">
+    <header class="header">
+      <div class="header-topline">
         <div class="month-selector">
-          <button id="prevMonth">◀</button>
+          <button id="prevMonth" aria-label="이전 달">◀</button>
           <span id="currentMonth"></span>
-          <button id="nextMonth">▶</button>
+          <button id="nextMonth" aria-label="다음 달">▶</button>
         </div>
+        <button class="today-button" id="todayButton">오늘</button>
+      </div>
+      <div class="header-row">
         <div class="user-filter" id="userFilter">
           <button class="user-filter-btn" data-user="1">국환</button>
           <button class="user-filter-btn" data-user="2">혜지</button>
           <button class="user-filter-btn active" data-user="all">전체</button>
         </div>
-        <button class="header-add-btn" id="headerAddBtn">+</button>
+        <div class="global-sync-pill" id="globalSyncPill" aria-live="polite">저장 확인 중</div>
+        <button class="header-add-btn" id="headerAddBtn" aria-label="거래 추가">+</button>
       </div>
-    </div>
+    </header>
 
     <!-- 요약 -->
     <div class="summary">
@@ -2401,8 +2938,15 @@
 
       <!-- 내역 탭 -->
       <div class="tab-content" id="log-content">
+        <div class="section-heading-row">
+          <div>
+            <div class="section-eyebrow">거래 내역</div>
+            <h2 id="logMonthTitle">이번 달 기록</h2>
+          </div>
+          <div class="section-total" id="logMonthTotal">0원</div>
+        </div>
         <div class="search-bar">
-          <input type="text" class="search-input" id="searchInput" placeholder="거래 내역 검색">
+          <input type="search" class="search-input" id="searchInput" placeholder="메모·금액·카테고리·결제수단 검색" aria-label="거래 내역 검색">
         </div>
         <div class="filter-buttons" id="logFilters">
           <button class="filter-btn active" data-filter="all">전체</button>
@@ -2415,30 +2959,61 @@
 
       <!-- 예산 탭 -->
       <div class="tab-content" id="assets-content">
-        <div id="budgetSummary"></div>
-        <div id="assetsList"></div>
-        <button class="btn btn-secondary" id="setBudgetBtn">예산 설정</button>
-      </div>
-
-      <!-- 통계 탭 -->
-      <div class="tab-content" id="stats-content">
-        <div class="filter-buttons">
-          <button class="filter-btn" data-period="week">주간</button>
-          <button class="filter-btn active" data-period="month">월간</button>
-          <button class="filter-btn" data-period="year">연간</button>
+        <div class="section-heading-row report-heading">
+          <div>
+            <div class="section-eyebrow">우리집 리포트</div>
+            <h2 id="reportPeriodTitle">이번 달 살림</h2>
+          </div>
+        </div>
+        <div class="report-switch" role="tablist" aria-label="리포트 화면 선택">
+          <button class="report-switch-btn active" data-report-pane="budget" role="tab" aria-selected="true">예산</button>
+          <button class="report-switch-btn" data-report-pane="stats" role="tab" aria-selected="false">분석</button>
         </div>
 
-        <!-- 라인 차트 -->
-        <div class="chart">
-          <div class="chart-title">트렌드</div>
-          <canvas id="trendChart" class="chart-canvas"></canvas>
+        <div id="report-budget-pane" class="report-pane active">
+          <div id="budgetSummary"></div>
+          <div id="assetsList"></div>
+          <button class="btn btn-primary sticky-action" id="setBudgetBtn">예산 설정하기</button>
         </div>
 
-        <div id="statsCharts"></div>
+        <div id="report-stats-pane" class="report-pane">
+          <div class="filter-buttons report-period-filters">
+            <button class="filter-btn" data-period="week">주간</button>
+            <button class="filter-btn active" data-period="month">월간</button>
+            <button class="filter-btn" data-period="year">연간</button>
+          </div>
+
+          <div class="chart">
+            <div class="chart-title">지출 흐름</div>
+            <canvas id="trendChart" class="chart-canvas"></canvas>
+          </div>
+
+          <div id="statsCharts"></div>
+        </div>
       </div>
 
       <!-- 설정 탭 -->
       <div class="tab-content" id="settings-content">
+        <div class="settings-page-heading">
+          <div class="section-eyebrow">설정</div>
+          <h2>우리에게 맞게 사용하기</h2>
+        </div>
+        <div class="settings-section preference-section">
+          <div class="settings-title">이 기기에서 사용할 사람</div>
+          <p class="settings-description">새 지출을 입력할 때 자동으로 선택됩니다.</p>
+          <div class="preference-options" id="deviceUserSettings"></div>
+        </div>
+
+        <div class="settings-section preference-section">
+          <div class="settings-title">달력 금액 표시</div>
+          <p class="settings-description">기본값은 지금처럼 금액 전체 표시입니다.</p>
+          <div class="preference-options" id="calendarAmountModeSettings">
+            <button data-calendar-mode="full">전체 금액</button>
+            <button data-calendar-mode="compact">축약 금액</button>
+            <button data-calendar-mode="dots">점만 표시</button>
+          </div>
+        </div>
+
         <!-- 수동 동기화 버튼 -->
         <div class="sync-status-card" id="syncStatusCard">
           <div id="syncStatusText">동기화 상태를 확인 중입니다</div>
@@ -2450,8 +3025,8 @@
           <span>수동 동기화</span>
         </button>
 
-        <div class="settings-section">
-          <div class="settings-title">데이터 관리</div>
+        <details class="settings-section settings-disclosure">
+          <summary class="settings-title">데이터 및 백업</summary>
           <div class="data-actions">
             <button class="btn btn-secondary" id="exportDataBtn">내보내기</button>
             <button class="btn btn-secondary" id="importDataBtn">가져오기</button>
@@ -2460,25 +3035,27 @@
             <button class="btn btn-secondary" id="recoveryBackupBtn">이전 로컬 사본</button>
           </div>
           <input type="file" id="importDataInput" class="hidden-file-input" accept="application/json,.json">
-        </div>
+        </details>
 
-        <div class="settings-section">
-          <div class="settings-title">결제수단 관리</div>
+        <details class="settings-section settings-disclosure">
+          <summary class="settings-title">결제수단 관리</summary>
           <div id="paymentMethodsList"></div>
           <button class="btn btn-secondary" id="addPaymentMethod">+ 결제수단 추가</button>
-        </div>
+        </details>
 
-        <div class="settings-section">
-          <div class="settings-title">자산 관리</div>
+        <details class="settings-section settings-disclosure">
+          <summary class="settings-title">자산 관리</summary>
           <div id="assetsSettingsList"></div>
           <button class="btn btn-secondary" id="addAsset">+ 자산 추가</button>
-        </div>
+        </details>
 
-        <div class="settings-section">
-          <div class="settings-title">카테고리 관리</div>
+        <details class="settings-section settings-disclosure">
+          <summary class="settings-title">카테고리 관리</summary>
           <div id="categoriesList"></div>
           <button class="btn btn-secondary" id="addCategory">+ 카테고리 추가</button>
-        </div>
+        </details>
+
+        <button class="btn logout-button" id="logoutDeviceBtn">이 기기 인증 해제</button>
       </div>
     </div>
 
@@ -2506,6 +3083,7 @@
         </div>
         <div class="nav-label">내역</div>
       </button>
+      <div class="nav-spacer" aria-hidden="true"></div>
       <button class="nav-item" data-tab="assets">
         <div class="nav-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2513,17 +3091,7 @@
             <line x1="2" y1="10" x2="22" y2="10"></line>
           </svg>
         </div>
-        <div class="nav-label">예산</div>
-      </button>
-      <button class="nav-item" data-tab="stats">
-        <div class="nav-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-        </div>
-        <div class="nav-label">통계</div>
+        <div class="nav-label">리포트</div>
       </button>
       <button class="nav-item" data-tab="settings">
         <div class="nav-icon">
@@ -2537,12 +3105,13 @@
     </nav>
 
     <!-- 플로팅 버튼 -->
-    <button class="fab" id="addTransactionBtn">
+    <button class="fab" id="addTransactionBtn" aria-label="거래 추가">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
       </svg>
     </button>
+    <div class="toast" id="appToast" role="status" aria-live="polite"></div>
   </div>
 
   <!-- 거래 추가 모달 -->
@@ -2550,7 +3119,7 @@
     <div class="modal" id="transactionModalContent">
       <div class="modal-header">
         <h2 class="modal-title">거래 추가</h2>
-        <button class="modal-close" onclick="closeModal('transactionModal')">&times;</button>
+        <button class="modal-close" aria-label="거래 입력 닫기" onclick="closeModal('transactionModal')">&times;</button>
       </div>
 
       <div class="form-group">
@@ -2561,8 +3130,8 @@
       <div class="form-group">
         <label class="form-label">유형</label>
         <div class="select-grid">
-          <div class="select-item selected" data-type="expense">지출</div>
-          <div class="select-item" data-type="income">수입</div>
+          <button type="button" class="select-item selected" data-type="expense">지출</button>
+          <button type="button" class="select-item" data-type="income">수입</button>
         </div>
       </div>
 
@@ -2638,7 +3207,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2 class="modal-title">자산 이동</h2>
-        <button class="modal-close" onclick="closeModal('transferModal')">&times;</button>
+        <button class="modal-close" aria-label="자산 이동 닫기" onclick="closeModal('transferModal')">&times;</button>
       </div>
 
       <div class="form-group">
@@ -2681,7 +3250,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2 class="modal-title" id="assetModalTitle">자산 내역</h2>
-        <button class="modal-close" onclick="closeModal('assetTransactionsModal')">&times;</button>
+        <button class="modal-close" aria-label="자산 내역 닫기" onclick="closeModal('assetTransactionsModal')">&times;</button>
       </div>
       <div class="transaction-list" id="assetTransactionsList"></div>
     </div>
@@ -2692,7 +3261,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2 class="modal-title" id="budgetModalTitle">예산 설정</h2>
-        <button class="modal-close" onclick="closeModal('budgetModal')">&times;</button>
+        <button class="modal-close" aria-label="예산 설정 닫기" onclick="closeModal('budgetModal')">&times;</button>
       </div>
       <div id="budgetFormContent"></div>
     </div>
@@ -2703,7 +3272,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2 class="modal-title">거래 상세</h2>
-        <button class="modal-close" onclick="closeModal('transactionDetailModal')">&times;</button>
+        <button class="modal-close" aria-label="거래 상세 닫기" onclick="closeModal('transactionDetailModal')">&times;</button>
       </div>
       <div id="transactionDetailContent"></div>
       <div style="display: flex; gap: 8px; margin-top: 16px;">
@@ -2765,6 +3334,8 @@
       ],
 
       transactions: [],
+      monthlyBudget: 0,
+      categoryBudgets: {},
       statsFilter: 'month',
       searchQuery: '',
       lastDeleted: null,
@@ -2781,8 +3352,17 @@
       cloudAvailable: false,
       remoteRevision: 0,
       syncConflict: null,
-      trendChart: null
+      trendChart: null,
+      activeReportPane: 'budget',
+      uiPreferences: {
+        deviceUserId: null,
+        calendarAmountMode: 'full',
+        lastPaymentMethodId: null,
+        lastAssetId: null
+      }
     };
+
+    let toastTimer = null;
 
     // ============================================
     // 유틸리티 함수
@@ -2803,6 +3383,64 @@
 
     function formatMoney(amount) {
       return new Intl.NumberFormat('ko-KR').format(amount) + '원';
+    }
+
+    function formatCompactMoney(amount) {
+      if (amount >= 100000000) return `${(amount / 100000000).toFixed(amount % 100000000 ? 1 : 0)}억`;
+      if (amount >= 10000) return `${(amount / 10000).toFixed(amount % 10000 ? 1 : 0)}만`;
+      return new Intl.NumberFormat('ko-KR').format(amount);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('appToast');
+      if (!toast) return;
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function loadUiPreferences() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('household_ui_preferences_v1') || '{}');
+        state.uiPreferences = { ...state.uiPreferences, ...saved };
+      } catch (error) {
+        console.warn('화면 설정을 불러오지 못했습니다.', error);
+      }
+    }
+
+    function saveUiPreferences() {
+      localStorage.setItem('household_ui_preferences_v1', JSON.stringify(state.uiPreferences));
+      renderUiPreferencesSettings();
+    }
+
+    function getDeviceUser() {
+      return state.users.find(user => user.id === state.uiPreferences.deviceUserId) || state.users[0] || null;
+    }
+
+    function getMonthSelectionDate(date) {
+      const today = new Date();
+      if (date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth()) {
+        return formatDate(today);
+      }
+      return formatDate(new Date(date.getFullYear(), date.getMonth(), 1));
+    }
+
+    function setCurrentMonth(date) {
+      state.currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      state.selectedDate = getMonthSelectionDate(state.currentDate);
+      document.body.setAttribute('data-has-selected', state.selectedDate === formatDate(new Date()) ? 'false' : 'true');
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function addMonthsClamped(dateValue, months) {
+      const source = new Date(`${dateValue}T12:00:00`);
+      const day = source.getDate();
+      const target = new Date(source.getFullYear(), source.getMonth() + months, 1, 12);
+      const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+      target.setDate(Math.min(day, lastDay));
+      return formatDate(target);
     }
 
     function escapeHTML(value) {
@@ -2870,13 +3508,24 @@
 
     function getStatsPeriodRange() {
       if (state.statsFilter === 'week') {
-        // 주간은 오늘 기준으로 현재 주
-        return getWeekRange(new Date());
+        return getWeekRange(state.currentDate);
       } else if (state.statsFilter === 'year') {
         return getYearRange(state.currentDate);
       } else {
         return getMonthRange(state.currentDate);
       }
+    }
+
+    function getPreviousStatsPeriodRange() {
+      if (state.statsFilter === 'week') {
+        const previousWeek = new Date(state.currentDate);
+        previousWeek.setDate(previousWeek.getDate() - 7);
+        return getWeekRange(previousWeek);
+      }
+      if (state.statsFilter === 'year') {
+        return getYearRange(new Date(state.currentDate.getFullYear() - 1, 0, 1));
+      }
+      return getMonthRange(new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() - 1, 1));
     }
 
     function generateId() {
@@ -2903,6 +3552,7 @@
       const statusText = document.getElementById('syncStatusText');
       const lastSavedText = document.getElementById('lastSavedText');
       const pendingSyncText = document.getElementById('pendingSyncText');
+      const globalSyncPill = document.getElementById('globalSyncPill');
       if (!statusCard || !statusText || !lastSavedText || !pendingSyncText) return;
 
       const statusLabels = {
@@ -2920,6 +3570,17 @@
       statusText.textContent = statusLabels[state.lastSyncStatus] || statusLabels.local;
       lastSavedText.textContent = `마지막 저장: ${state.lastSavedAt ? new Date(state.lastSavedAt).toLocaleString('ko-KR') : '-'}`;
       pendingSyncText.textContent = `대기 중인 변경: ${state.pendingSyncCount}건`;
+      if (globalSyncPill) {
+        const shortLabels = {
+          local: '이 기기에 저장됨',
+          pending: '저장 중…',
+          synced: '저장 완료',
+          failed: '저장 실패',
+          conflict: '변경 확인 필요'
+        };
+        globalSyncPill.textContent = shortLabels[state.lastSyncStatus] || shortLabels.local;
+        globalSyncPill.className = `global-sync-pill ${state.lastSyncStatus}`;
+      }
     }
 
     function saveLocalData() {
@@ -2945,6 +3606,7 @@
         if (response.status === 409) {
           state.syncConflict = result.server || null;
           state.lastSyncStatus = 'conflict';
+          showToast('다른 기기의 변경이 있어 확인이 필요합니다.');
           throw new Error('다른 기기에서 먼저 저장했습니다. 수동 동기화로 최신 데이터를 확인해 주세요.');
         }
         if (!response.ok) throw new Error(result.error || '클라우드 저장에 실패했습니다.');
@@ -2956,6 +3618,7 @@
         return true;
       } catch (error) {
         if (state.lastSyncStatus !== 'conflict') state.lastSyncStatus = 'failed';
+        if (state.lastSyncStatus === 'failed') showToast('클라우드 저장에 실패했습니다. 로컬 사본은 보관됐어요.');
         console.error('클라우드 저장 실패:', error);
         return false;
       } finally {
@@ -3108,7 +3771,7 @@
     function applyImportedData(data) {
       const payload = data && data.data ? data.data : data;
       if (!payload || !Array.isArray(payload.transactions)) {
-        alert('가져올 수 없는 데이터 형식입니다.');
+        showToast('가져올 수 없는 데이터 형식입니다.');
         return;
       }
 
@@ -3117,10 +3780,12 @@
       state.assets = Array.isArray(payload.assets) ? payload.assets : state.assets;
       state.categories = Array.isArray(payload.categories) ? payload.categories : state.categories;
       state.transactions = payload.transactions;
+      state.monthlyBudget = Number(payload.monthlyBudget || 0);
+      state.categoryBudgets = payload.categoryBudgets || {};
       state.lastSavedAt = new Date().toISOString();
       saveData();
       renderAll();
-      alert('데이터를 가져왔습니다.');
+      showToast(`거래 ${state.transactions.length}건을 가져왔어요.`);
     }
 
     function importDataFromFile(file) {
@@ -3130,7 +3795,7 @@
           applyImportedData(JSON.parse(reader.result));
         } catch (error) {
           console.error('데이터 가져오기 실패:', error);
-          alert('JSON 파일을 읽을 수 없습니다.');
+          showToast('JSON 파일을 읽을 수 없습니다.');
         }
       };
       reader.readAsText(file);
@@ -3158,7 +3823,7 @@
 
     function undoLastDelete() {
       if (!state.lastDeleted) {
-        alert('되돌릴 삭제 내역이 없습니다.');
+        showToast('되돌릴 삭제 내역이 없습니다.');
         return;
       }
 
@@ -3189,8 +3854,11 @@
     }
 
     function updateMonthDisplay() {
+      const year = state.currentDate.getFullYear();
       const month = state.currentDate.getMonth() + 1;
-      document.getElementById('currentMonth').textContent = `${month}월`;
+      document.getElementById('currentMonth').textContent = `${year}년 ${month}월`;
+      const reportPeriodTitle = document.getElementById('reportPeriodTitle');
+      if (reportPeriodTitle) reportPeriodTitle.textContent = `${year}년 ${month}월 살림`;
     }
 
     function updateSummary() {
@@ -3222,6 +3890,9 @@
 
     // 금액을 포맷팅 (달력용) - 전체 숫자 표시, 길이에 따라 폰트 크기 자동 조정
     function formatCalendarAmount(amount) {
+      if (state.uiPreferences.calendarAmountMode === 'compact') {
+        return { text: formatCompactMoney(amount), fontClass: '' };
+      }
       const text = amount.toLocaleString();
       const len = text.length;
 
@@ -3289,17 +3960,26 @@
 
         const incomeFormatted = income > 0 ? formatCalendarAmount(income) : null;
         const expenseFormatted = expense > 0 ? formatCalendarAmount(expense) : null;
+        const amountMode = state.uiPreferences.calendarAmountMode || 'full';
+        const amountMarkup = amountMode === 'dots'
+          ? `<div class="calendar-day-dots">
+              ${income > 0 ? '<span class="calendar-day-dot income"></span>' : ''}
+              ${expense > 0 ? '<span class="calendar-day-dot expense"></span>' : ''}
+            </div>`
+          : `<div class="calendar-day-amounts">
+              ${income > 0 ? `<div class="calendar-day-amount income ${incomeFormatted.fontClass}">+${incomeFormatted.text}</div>` : ''}
+              ${expense > 0 ? `<div class="calendar-day-amount expense ${expenseFormatted.fontClass}">-${expenseFormatted.text}</div>` : ''}
+            </div>`;
+        const amountLabel = [
+          income > 0 ? `수입 ${formatMoney(income)}` : '',
+          expense > 0 ? `지출 ${formatMoney(expense)}` : ''
+        ].filter(Boolean).join(', ');
 
         html += `
-          <div class="${className}" onclick="onCalendarDayClick('${dateStr}')" ondblclick="onCalendarDayDoubleClick('${dateStr}')">
+          <button type="button" class="${className}" aria-label="${current.getMonth() + 1}월 ${current.getDate()}일${amountLabel ? `, ${amountLabel}` : ''}" onclick="onCalendarDayClick('${dateStr}')" ondblclick="onCalendarDayDoubleClick('${dateStr}')">
             <div class="calendar-day-number">${current.getDate()}</div>
-            ${(income > 0 || expense > 0) ? `
-              <div class="calendar-day-amounts">
-                ${income > 0 ? `<div class="calendar-day-amount income ${incomeFormatted.fontClass}">+${incomeFormatted.text}</div>` : ''}
-                ${expense > 0 ? `<div class="calendar-day-amount expense ${expenseFormatted.fontClass}">-${expenseFormatted.text}</div>` : ''}
-              </div>
-            ` : ''}
-          </div>
+            ${(income > 0 || expense > 0) ? amountMarkup : ''}
+          </button>
         `;
 
         current.setDate(current.getDate() + 1);
@@ -3340,7 +4020,9 @@
       const favoriteExpenses = state.categories
         .filter(category => category.type === 'expense' && category.isFavorite)
         .sort((a, b) => a.displayOrder - b.displayOrder)
-        .slice(0, 5);
+        .slice(0, 4);
+
+      const deviceUser = getDeviceUser();
 
       const chips = favoriteExpenses.map(category => `
         <button class="quick-entry-chip" onclick="openQuickExpense('${escapeAttr(category.id)}')">
@@ -3351,11 +4033,14 @@
 
       panel.innerHTML = `
         <div class="quick-entry-header">
-          <div class="quick-entry-title">빠른 입력</div>
+          <div>
+            <div class="quick-entry-title">빠른 지출 입력</div>
+            <div class="quick-entry-person">${deviceUser ? `${escapeHTML(deviceUser.name)}으로 입력` : '사용자를 선택해 주세요'}</div>
+          </div>
           <div class="quick-entry-date">${state.selectedDate ? formatDateKo(state.selectedDate) : '오늘'}</div>
         </div>
         <div class="quick-entry-actions">
-          <button class="quick-entry-chip primary" onclick="openTransactionModal({ type: 'expense', date: state.selectedDate })">+ 지출</button>
+          <button class="quick-entry-chip primary" onclick="openTransactionModal({ type: 'expense', date: state.selectedDate })">+ 새 지출 입력</button>
           ${chips}
         </div>
       `;
@@ -3427,6 +4112,17 @@
         transactions = transactions.filter(t => t.userId === state.calendarUserFilter);
       }
 
+      const monthExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      const monthIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const logMonthTitle = document.getElementById('logMonthTitle');
+      const logMonthTotal = document.getElementById('logMonthTotal');
+      if (logMonthTitle) logMonthTitle.textContent = `${state.currentDate.getFullYear()}년 ${state.currentDate.getMonth() + 1}월`;
+      if (logMonthTotal) {
+        logMonthTotal.textContent = monthIncome > 0
+          ? `수입 ${formatCompactMoney(monthIncome)} · 지출 ${formatCompactMoney(monthExpense)}`
+          : `지출 ${formatMoney(monthExpense)}`;
+      }
+
       if (state.logFilter !== 'all') {
         transactions = transactions.filter(t => t.type === state.logFilter);
       }
@@ -3436,16 +4132,21 @@
 
       if (state.searchQuery) {
         const query = state.searchQuery.toLowerCase();
+        const numericQuery = query.replace(/[^\d]/g, '');
         transactions = transactions.filter(t => {
           const category = lookups.categories.get(t.categoryId);
           const paymentMethod = lookups.paymentMethods.get(t.paymentMethodId);
           const user = lookups.users.get(t.userId);
+          const asset = lookups.assets.get(t.assetId);
 
           return (
             (t.memo && t.memo.toLowerCase().includes(query)) ||
             (category && category.name.toLowerCase().includes(query)) ||
             (paymentMethod && paymentMethod.name.toLowerCase().includes(query)) ||
-            (user && user.name.toLowerCase().includes(query))
+            (user && user.name.toLowerCase().includes(query)) ||
+            (asset && asset.name.toLowerCase().includes(query)) ||
+            (numericQuery && String(t.amount).includes(numericQuery)) ||
+            String(t.transactionDate || '').includes(query)
           );
         });
       }
@@ -3493,12 +4194,16 @@
     function renderTransactionItemCompact(t, lookups) {
       const user = lookups.users.get(t.userId);
       const category = lookups.categories.get(t.categoryId);
+      const paymentMethod = lookups.paymentMethods.get(t.paymentMethodId);
       const asset = lookups.assets.get(t.assetId);
       const toAsset = t.toAssetId ? lookups.assets.get(t.toAssetId) : null;
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
       const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
+      const contextDisplay = t.type === 'transfer'
+        ? `${asset?.name || ''} → ${toAsset?.name || ''}`
+        : [paymentMethod?.name, asset?.name].filter(Boolean).join(' · ');
 
       return `
         <div class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
@@ -3506,6 +4211,7 @@
             ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
             <span class="transaction-category">${categoryDisplay}</span>
             ${t.memo ? `<span class="transaction-memo-inline">${escapeHTML(t.memo)}</span>` : ''}
+            ${contextDisplay ? `<span class="transaction-context-inline">${escapeHTML(contextDisplay)}</span>` : ''}
           </div>
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
@@ -3570,6 +4276,15 @@
       let totalSpent = 0;
 
       const sortedAssets = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
+      const budgetedAssetIds = new Set(sortedAssets.filter(asset => Number(asset.budget || 0) > 0).map(asset => asset.id));
+      const allExpenseTransactions = state.transactions.filter(transaction => {
+        const transactionDate = new Date(transaction.transactionDate);
+        return transactionDate >= start && transactionDate <= end && transaction.type === 'expense';
+      });
+      const totalActualSpent = allExpenseTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+      const unbudgetedSpent = allExpenseTransactions
+        .filter(transaction => !budgetedAssetIds.has(transaction.assetId))
+        .reduce((sum, transaction) => sum + transaction.amount, 0);
 
       sortedAssets.forEach(asset => {
         const budget = asset.budget || 0;
@@ -3580,8 +4295,7 @@
 
           const assetTransactions = state.transactions.filter(t => {
             const tDate = new Date(t.transactionDate);
-            const matchesUser = !state.calendarUserFilter || state.calendarUserFilter === 'all' || t.userId === state.calendarUserFilter;
-            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense' && matchesUser;
+            return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
           });
 
           totalSpent += assetTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -3597,17 +4311,19 @@
       let statusDesc = '';
 
       if (totalBudget > 0) {
-        if (spentPercent > daysPassedPercent + 10) {
+        if (spentPercent > 100) {
           statusClass = 'bad';
-          statusText = '주의';
-          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
-        } else if (spentPercent > daysPassedPercent) {
+          statusText = '예산 초과';
+        } else if (daysPassedPercent < 100 && spentPercent > daysPassedPercent + 10) {
+          statusClass = 'bad';
+          statusText = '빠른 지출';
+        } else if (daysPassedPercent < 100 && spentPercent > daysPassedPercent) {
           statusClass = 'warning';
-          statusText = '보통';
-          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
-        } else {
-          statusDesc = `날짜 ${Math.round(daysPassedPercent)}% 경과, 예산 ${Math.round(spentPercent)}% 소진`;
+          statusText = '살펴보기';
         }
+        statusDesc = daysPassedPercent >= 100
+          ? `예산의 ${Math.round(spentPercent)}%를 사용했어요`
+          : `날짜 ${Math.round(daysPassedPercent)}% 경과 · 예산 ${Math.round(spentPercent)}% 사용`;
       }
 
       // 월 요약 표시
@@ -3623,12 +4339,12 @@
               <span class="budget-summary-value">${formatMoney(totalBudget)}</span>
             </div>
             <div class="budget-summary-item">
-              <span class="budget-summary-label">지출</span>
+              <span class="budget-summary-label">예산 대상</span>
               <span class="budget-summary-value expense">${formatMoney(totalSpent)}</span>
             </div>
             <div class="budget-summary-item">
               <span class="budget-summary-label">남음</span>
-              <span class="budget-summary-value ${remainingBudget < 0 ? 'expense' : ''}">${formatMoney(remainingBudget)}</span>
+              <span class="budget-summary-value ${remainingBudget < 0 ? 'expense' : ''}">${remainingBudget < 0 ? `${formatMoney(Math.abs(remainingBudget))} 초과` : formatMoney(remainingBudget)}</span>
             </div>
           </div>
           ${totalBudget > 0 ? `
@@ -3640,6 +4356,11 @@
             <div class="budget-days-info">
               <span>경과: ${daysPassed}일</span>
               <span>남음: ${daysRemaining}일</span>
+            </div>
+            <div class="budget-breakdown">
+              <div class="budget-breakdown-row"><span>이번 달 전체 지출</span><strong>${formatMoney(totalActualSpent)}</strong></div>
+              <div class="budget-breakdown-row"><span>예산 대상 지출</span><strong>${formatMoney(totalSpent)}</strong></div>
+              <div class="budget-breakdown-row unbudgeted"><span>예산 미설정 지출</span><strong>${formatMoney(unbudgetedSpent)}</strong></div>
             </div>
           ` : '<div class="budget-summary-desc">예산을 설정해주세요</div>'}
         </div>
@@ -3653,8 +4374,7 @@
 
         const assetTransactions = state.transactions.filter(t => {
           const tDate = new Date(t.transactionDate);
-          const matchesUser = !state.calendarUserFilter || state.calendarUserFilter === 'all' || t.userId === state.calendarUserFilter;
-          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense' && matchesUser;
+          return tDate >= start && tDate <= end && t.assetId === asset.id && t.type === 'expense';
         });
 
         const spent = assetTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -3664,10 +4384,11 @@
         let progressClass = 'good';
 
         if (budget > 0) {
-          progressPercent = Math.min((spent / budget) * 100, 100);
-          if (progressPercent > daysPassedPercent + 10) {
+          const rawProgressPercent = (spent / budget) * 100;
+          progressPercent = Math.min(rawProgressPercent, 100);
+          if (rawProgressPercent > 100 || (daysPassedPercent < 100 && rawProgressPercent > daysPassedPercent + 10)) {
             progressClass = 'bad';
-          } else if (progressPercent > daysPassedPercent) {
+          } else if (daysPassedPercent < 100 && rawProgressPercent > daysPassedPercent) {
             progressClass = 'warning';
           }
         }
@@ -3676,7 +4397,7 @@
           <div class="asset-card" onclick="showAssetTransactions('${escapeAttr(asset.id)}')">
             <div class="asset-header">
               <span class="asset-name">${escapeHTML(asset.name)}</span>
-              <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining >= 0 ? '+' : ''}${formatMoney(remaining)}</span>
+              <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining < 0 ? `${formatMoney(Math.abs(remaining))} 초과` : `${formatMoney(remaining)} 남음`}</span>
             </div>
             ${budget > 0 ? `
               <div class="asset-budget-bar">
@@ -3786,12 +4507,29 @@
 
     function renderStats() {
       const { start, end } = getStatsPeriodRange();
+      const previousRange = getPreviousStatsPeriodRange();
       const monthTransactions = state.transactions.filter(t => {
         const tDate = new Date(t.transactionDate);
         return tDate >= start && tDate <= end && t.type === 'expense';
       });
 
-      let html = '';
+      const previousTransactions = state.transactions.filter(t => {
+        const tDate = new Date(t.transactionDate);
+        return tDate >= previousRange.start && tDate <= previousRange.end && t.type === 'expense';
+      });
+      const currentTotal = monthTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+      const previousTotal = previousTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+      const difference = currentTotal - previousTotal;
+      const comparisonLabel = state.statsFilter === 'year' ? '전년보다' : state.statsFilter === 'week' ? '지난주보다' : '지난달보다';
+
+      let html = `
+        <div class="chart comparison-card">
+          <div class="chart-title">선택 기간 지출</div>
+          <div class="comparison-total">${formatMoney(currentTotal)}</div>
+          <div class="comparison-delta ${difference > 0 ? 'expense' : 'income'}">
+            ${comparisonLabel} ${difference === 0 ? '같아요' : `${formatMoney(Math.abs(difference))} ${difference > 0 ? '더 썼어요' : '덜 썼어요'}`}
+          </div>
+        </div>`;
 
       // 사용자별 지출
       const userExpenses = {};
@@ -3902,10 +4640,10 @@
       let expenseData = [];
 
       if (state.statsFilter === 'week') {
-        // 주간: 최근 7일
+        const anchorDate = new Date(state.currentDate);
         for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
+          const date = new Date(anchorDate);
+          date.setDate(anchorDate.getDate() - i);
           const dateStr = formatDate(date);
 
           const dayTransactions = state.transactions.filter(t => t.transactionDate === dateStr);
@@ -4004,7 +4742,7 @@
       let html = displayItems.map(item => {
         const selected = item.id === selectedId ? 'selected' : '';
         const displayName = item.icon ? `${escapeHTML(item.icon)} ${escapeHTML(item.name)}` : escapeHTML(item.name);
-        return `<div class="select-item ${selected}" onclick="selectItem('${escapeAttr(containerId)}', '${escapeAttr(item.id)}')">${displayName}</div>`;
+        return `<button type="button" class="select-item ${selected}" aria-pressed="${item.id === selectedId}" onclick="selectItem('${escapeAttr(containerId)}', '${escapeAttr(item.id)}')">${displayName}</button>`;
       }).join('');
 
       if (allowExpand && items.length > displayItems.length) {
@@ -4016,6 +4754,22 @@
       container.innerHTML = html;
     }
 
+    function renderUiPreferencesSettings() {
+      const userContainer = document.getElementById('deviceUserSettings');
+      if (userContainer) {
+        userContainer.style.gridTemplateColumns = `repeat(${Math.max(state.users.length, 1)}, minmax(0, 1fr))`;
+        userContainer.innerHTML = state.users.map(user => `
+          <button type="button" class="${state.uiPreferences.deviceUserId === user.id ? 'active' : ''}" data-device-user="${escapeAttr(user.id)}">
+            ${escapeHTML(user.name)}
+          </button>
+        `).join('');
+      }
+
+      document.querySelectorAll('[data-calendar-mode]').forEach(button => {
+        button.classList.toggle('active', button.dataset.calendarMode === state.uiPreferences.calendarAmountMode);
+      });
+    }
+
     function renderPaymentMethodsSettings() {
       const sorted = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
       const html = sorted.map(method => `
@@ -4025,9 +4779,9 @@
             <div class="item-meta">${method.isFavorite ? '즐겨찾기 • ' : ''}순서 ${method.displayOrder}</div>
           </div>
           <div class="item-actions">
-            <button class="icon-btn reorder" onclick="moveItemUp('paymentMethods', '${method.id}')">↑</button>
-            <button class="icon-btn reorder" onclick="moveItemDown('paymentMethods', '${method.id}')">↓</button>
-            <button class="icon-btn ${method.isFavorite ? 'favorite' : ''}" onclick="toggleFavorite('paymentMethods', '${method.id}')">★</button>
+            <button class="icon-btn reorder" aria-label="${escapeAttr(method.name)} 위로 이동" onclick="moveItemUp('paymentMethods', '${method.id}')">↑</button>
+            <button class="icon-btn reorder" aria-label="${escapeAttr(method.name)} 아래로 이동" onclick="moveItemDown('paymentMethods', '${method.id}')">↓</button>
+            <button class="icon-btn ${method.isFavorite ? 'favorite' : ''}" aria-label="${escapeAttr(method.name)} 즐겨찾기 ${method.isFavorite ? '해제' : '설정'}" aria-pressed="${method.isFavorite}" onclick="toggleFavorite('paymentMethods', '${method.id}')">★</button>
             <button class="icon-btn edit" onclick="editItem('paymentMethods', '${method.id}')">수정</button>
             <button class="icon-btn delete" onclick="deleteItem('paymentMethods', '${method.id}')">삭제</button>
           </div>
@@ -4045,9 +4799,9 @@
             <div class="item-meta">${asset.isFavorite ? '즐겨찾기 • ' : ''}순서 ${asset.displayOrder}</div>
           </div>
           <div class="item-actions">
-            <button class="icon-btn reorder" onclick="moveItemUp('assets', '${asset.id}')">↑</button>
-            <button class="icon-btn reorder" onclick="moveItemDown('assets', '${asset.id}')">↓</button>
-            <button class="icon-btn ${asset.isFavorite ? 'favorite' : ''}" onclick="toggleFavorite('assets', '${asset.id}')">★</button>
+            <button class="icon-btn reorder" aria-label="${escapeAttr(asset.name)} 위로 이동" onclick="moveItemUp('assets', '${asset.id}')">↑</button>
+            <button class="icon-btn reorder" aria-label="${escapeAttr(asset.name)} 아래로 이동" onclick="moveItemDown('assets', '${asset.id}')">↓</button>
+            <button class="icon-btn ${asset.isFavorite ? 'favorite' : ''}" aria-label="${escapeAttr(asset.name)} 즐겨찾기 ${asset.isFavorite ? '해제' : '설정'}" aria-pressed="${asset.isFavorite}" onclick="toggleFavorite('assets', '${asset.id}')">★</button>
             <button class="icon-btn edit" onclick="editItem('assets', '${asset.id}')">수정</button>
             <button class="icon-btn delete" onclick="deleteItem('assets', '${asset.id}')">삭제</button>
           </div>
@@ -4070,9 +4824,9 @@
             <div class="item-meta">${cat.type === 'income' ? '수입' : '지출'} • ${cat.isFavorite ? '즐겨찾기 • ' : ''}순서 ${cat.displayOrder}</div>
           </div>
           <div class="item-actions">
-            <button class="icon-btn reorder" onclick="moveItemUp('categories', '${cat.id}')">↑</button>
-            <button class="icon-btn reorder" onclick="moveItemDown('categories', '${cat.id}')">↓</button>
-            <button class="icon-btn ${cat.isFavorite ? 'favorite' : ''}" onclick="toggleFavorite('categories', '${cat.id}')">★</button>
+            <button class="icon-btn reorder" aria-label="${escapeAttr(cat.name)} 위로 이동" onclick="moveItemUp('categories', '${cat.id}')">↑</button>
+            <button class="icon-btn reorder" aria-label="${escapeAttr(cat.name)} 아래로 이동" onclick="moveItemDown('categories', '${cat.id}')">↓</button>
+            <button class="icon-btn ${cat.isFavorite ? 'favorite' : ''}" aria-label="${escapeAttr(cat.name)} 즐겨찾기 ${cat.isFavorite ? '해제' : '설정'}" aria-pressed="${cat.isFavorite}" onclick="toggleFavorite('categories', '${cat.id}')">★</button>
             <button class="icon-btn edit" onclick="editItem('categories', '${cat.id}')">수정</button>
             <button class="icon-btn delete" onclick="deleteItem('categories', '${cat.id}')">삭제</button>
           </div>
@@ -4096,11 +4850,14 @@
         defaults = {};
       }
 
-      state.selectedUser = state.users[0].id;
+      const deviceUser = getDeviceUser();
+      state.selectedUser = defaults.userId || deviceUser?.id || state.users[0]?.id || null;
       state.selectedType = defaults.type || 'expense';
       state.selectedCategory = defaults.categoryId || getDefaultItemId(state.categories.filter(c => c.type === state.selectedType));
-      state.selectedPaymentMethod = defaults.paymentMethodId || getDefaultItemId(state.paymentMethods);
-      state.selectedAsset = defaults.assetId || getDefaultItemId(state.assets);
+      state.selectedPaymentMethod = defaults.paymentMethodId ||
+        (state.paymentMethods.some(item => item.id === state.uiPreferences.lastPaymentMethodId) ? state.uiPreferences.lastPaymentMethodId : getDefaultItemId(state.paymentMethods));
+      state.selectedAsset = defaults.assetId ||
+        (state.assets.some(item => item.id === state.uiPreferences.lastAssetId) ? state.uiPreferences.lastAssetId : getDefaultItemId(state.assets));
 
       document.getElementById('amountInput').value = '';
       document.getElementById('dateInput').value = defaults.date || state.selectedDate || formatDate(new Date());
@@ -4425,6 +5182,7 @@
     }
 
     function saveTransaction() {
+      const wasEditing = Boolean(state.editingTransactionId);
       const amount = parseFormattedNumber(document.getElementById('amountInput').value);
       const date = document.getElementById('dateInput').value;
       const memo = document.getElementById('memoInput').value;
@@ -4432,32 +5190,32 @@
       const repeatCount = parseInt(document.getElementById('recurringCountInput').value, 10) || 1;
 
       if (!amount || amount <= 0) {
-        alert('금액을 입력해주세요.');
+        showToast('금액을 입력해 주세요.');
         return;
       }
 
       if (!state.selectedUser) {
-        alert('사용자를 선택해주세요.');
+        showToast('사용자를 선택해 주세요.');
         return;
       }
 
       if (!state.selectedCategory) {
-        alert('카테고리를 선택해주세요.');
+        showToast('카테고리를 선택해 주세요.');
         return;
       }
 
       if (!state.selectedPaymentMethod) {
-        alert('결제수단을 선택해주세요.');
+        showToast('결제수단을 선택해 주세요.');
         return;
       }
 
       if (!state.selectedAsset) {
-        alert('자산을 선택해주세요.');
+        showToast('자산을 선택해 주세요.');
         return;
       }
 
       if (!date) {
-        alert('날짜를 선택해주세요.');
+        showToast('날짜를 선택해 주세요.');
         return;
       }
 
@@ -4497,12 +5255,10 @@
 
         if (shouldRepeat) {
           for (let i = 1; i < repeatCount; i++) {
-            const repeatDate = new Date(date);
-            repeatDate.setMonth(repeatDate.getMonth() + i);
             state.transactions.push({
               ...transaction,
               id: generateId(),
-              transactionDate: formatDate(repeatDate),
+              transactionDate: addMonthsClamped(date, i),
               recurringGroupId: transaction.id,
               createdAt: new Date().toISOString()
             });
@@ -4510,9 +5266,16 @@
         }
       }
 
+      state.uiPreferences.deviceUserId = state.selectedUser;
+      state.uiPreferences.lastPaymentMethodId = state.selectedPaymentMethod;
+      state.uiPreferences.lastAssetId = state.selectedAsset;
+      saveUiPreferences();
+
       saveData();
       renderAll();
+      showToast('삭제를 되돌렸어요.');
       closeModal('transactionModal');
+      showToast(wasEditing ? '거래를 수정했어요.' : (shouldRepeat ? `${repeatCount}개월 반복 거래를 저장했어요.` : '거래를 저장했어요.'));
     }
 
     function saveTransfer() {
@@ -4520,34 +5283,34 @@
       const date = document.getElementById('transferDateInput').value;
 
       if (!amount || amount <= 0) {
-        alert('금액을 입력해주세요.');
+        showToast('금액을 입력해 주세요.');
         return;
       }
 
       if (!state.selectedFromAsset) {
-        alert('출발 자산을 선택해주세요.');
+        showToast('출발 자산을 선택해 주세요.');
         return;
       }
 
       if (!state.selectedToAsset) {
-        alert('도착 자산을 선택해주세요.');
+        showToast('도착 자산을 선택해 주세요.');
         return;
       }
 
       if (state.selectedFromAsset === state.selectedToAsset) {
-        alert('같은 자산으로는 이동할 수 없습니다.');
+        showToast('같은 자산으로는 이동할 수 없습니다.');
         return;
       }
 
       if (!date) {
-        alert('날짜를 선택해주세요.');
+        showToast('날짜를 선택해 주세요.');
         return;
       }
 
       const transaction = {
         id: generateId(),
         type: 'transfer',
-        userId: state.users[0].id,
+        userId: getDeviceUser()?.id || state.users[0]?.id,
         amount: amount,
         assetId: state.selectedFromAsset,
         toAssetId: state.selectedToAsset,
@@ -4560,6 +5323,7 @@
       saveData();
       renderAll();
       closeModal('transferModal');
+      showToast('자산이동을 저장했어요.');
     }
 
     function editTransaction(transactionId) {
@@ -4627,22 +5391,44 @@
       state.transactions.splice(index, 1);
       saveData();
       renderAll();
+      showToast('거래를 삭제했어요. 설정에서 되돌릴 수 있어요.');
     }
 
     function openBudgetModal() {
-      let html = '';
+      const { start, end } = getMonthRange(state.currentDate);
+      let html = `
+        <div class="settings-hint" style="margin-bottom: 14px;">
+          자산별 월 예산을 입력하세요. 아래 금액 버튼으로 빠르게 조정할 수 있어요.
+        </div>
+      `;
 
       state.assets.forEach(asset => {
         const currentBudget = asset.budget || 0;
+        const currentSpent = state.transactions
+          .filter(transaction => {
+            const transactionDate = new Date(transaction.transactionDate);
+            return transaction.type === 'expense'
+              && transaction.assetId === asset.id
+              && transactionDate >= start
+              && transactionDate <= end;
+          })
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
         html += `
           <div class="form-group">
-            <label class="form-label">${escapeHTML(asset.name)} 예산</label>
+            <label class="form-label" for="budget-${escapeAttr(asset.id)}">${escapeHTML(asset.name)}</label>
+            <div class="item-meta" style="margin-bottom: 7px;">${state.currentDate.getMonth() + 1}월 지출 ${formatMoney(currentSpent)}</div>
             <input type="text" inputmode="numeric" class="form-input" id="budget-${escapeAttr(asset.id)}" value="${currentBudget > 0 ? formatNumber(currentBudget) : ''}" placeholder="예산 입력">
+            <div class="quick-amount-buttons" style="margin-top: 8px;">
+              <button type="button" class="quick-amount-btn" data-budget-target="${escapeAttr(asset.id)}" data-budget-amount="50000">+5만</button>
+              <button type="button" class="quick-amount-btn" data-budget-target="${escapeAttr(asset.id)}" data-budget-amount="100000">+10만</button>
+              <button type="button" class="quick-amount-btn" data-budget-target="${escapeAttr(asset.id)}" data-budget-amount="500000">+50만</button>
+              <button type="button" class="quick-amount-btn" data-budget-target="${escapeAttr(asset.id)}" data-budget-reset="true">0원</button>
+            </div>
           </div>
         `;
       });
 
-      html += '<button class="btn btn-primary" onclick="saveBudgets()">저장</button>';
+      html += '<button class="btn btn-primary" onclick="saveBudgets()">월 예산 저장</button>';
 
       document.getElementById('budgetFormContent').innerHTML = html;
       document.getElementById('budgetModal').classList.add('active');
@@ -4656,6 +5442,19 @@
           e.target.value = formatted;
         });
       });
+
+      document.querySelectorAll('[data-budget-target]').forEach(button => {
+        button.addEventListener('click', () => {
+          const input = document.getElementById(`budget-${button.dataset.budgetTarget}`);
+          if (!input) return;
+          if (button.dataset.budgetReset === 'true') {
+            input.value = '';
+          } else {
+            input.value = formatNumber(parseFormattedNumber(input.value) + Number(button.dataset.budgetAmount || 0));
+          }
+          input.focus();
+        });
+      });
     }
 
     function saveBudgets() {
@@ -4667,7 +5466,7 @@
       saveData();
       renderAssetsList();
       closeModal('budgetModal');
-      alert('예산이 저장되었습니다.');
+      showToast('예산을 저장했어요.');
     }
 
     function toggleFavorite(type, id) {
@@ -4777,7 +5576,7 @@
         });
 
         if (isUsed) {
-          alert('기존 거래에서 사용 중인 항목은 삭제할 수 없습니다. 이름을 수정해서 보관해주세요.');
+          showToast('기존 거래에서 사용 중이라 삭제할 수 없습니다. 이름을 수정해 보관해 주세요.');
           return;
         }
 
@@ -4798,6 +5597,7 @@
         }
 
         renderAll();
+        showToast('항목을 삭제했어요.');
       }
     }
 
@@ -4857,12 +5657,14 @@
       const summaryElement = document.querySelector('.summary');
       const monthSelectorElement = document.querySelector('.month-selector');
       const headerAddBtn = document.getElementById('headerAddBtn');
+      const userFilterElement = document.getElementById('userFilter');
 
       // 달력 탭
       if (tabName === 'calendar') {
         summaryElement.style.display = 'block';
         monthSelectorElement.style.display = 'flex';
-        headerAddBtn.style.display = 'flex';
+        userFilterElement.style.display = 'flex';
+        headerAddBtn.style.display = 'none';
         renderCalendar();
         renderSelectedDateTransactions(state.selectedDate);
       }
@@ -4872,20 +5674,34 @@
         monthSelectorElement.style.display = 'flex';
         headerAddBtn.style.display = 'none';
         if (tabName === 'log') {
+          userFilterElement.style.display = 'flex';
           renderTransactionList();
         } else {
+          userFilterElement.style.display = 'none';
           renderAssetsList();
+          if (state.activeReportPane === 'stats') requestAnimationFrame(renderStats);
         }
       }
-      // 통계, 설정 탭 - 모두 숨김
+      // 설정 탭
       else {
         summaryElement.style.display = 'none';
         monthSelectorElement.style.display = 'none';
+        userFilterElement.style.display = 'none';
         headerAddBtn.style.display = 'none';
-        if (tabName === 'stats') {
-          renderStats();
-        }
+        renderUiPreferencesSettings();
       }
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function switchReportPane(paneName) {
+      state.activeReportPane = paneName;
+      document.querySelectorAll('.report-pane').forEach(pane => pane.classList.toggle('active', pane.id === `report-${paneName}-pane`));
+      document.querySelectorAll('.report-switch-btn').forEach(button => {
+        const active = button.dataset.reportPane === paneName;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-selected', String(active));
+      });
+      if (paneName === 'stats') requestAnimationFrame(renderStats);
     }
 
     function renderAll() {
@@ -4897,6 +5713,7 @@
       renderTransactionList();
       renderAssetsList();
       renderStats();
+      renderUiPreferencesSettings();
       renderPaymentMethodsSettings();
       renderAssetsSettings();
       renderCategoriesSettings();
@@ -4907,6 +5724,7 @@
     // 초기화
     // ============================================
     document.addEventListener('DOMContentLoaded', async () => {
+      loadUiPreferences();
       loadData();
       renderAll();
       setupBottomSheetDismissal();
@@ -4914,6 +5732,10 @@
 
       // Cloudflare D1 연결. 실패해도 먼저 읽은 로컬 사본은 그대로 유지합니다.
       await loadFromCloud();
+      if (!state.users.some(user => user.id === state.uiPreferences.deviceUserId)) {
+        state.uiPreferences.deviceUserId = state.users[0]?.id || null;
+        saveUiPreferences();
+      }
       renderAll();
 
       // 앱으로 돌아왔을 때 다른 기기에서 저장한 내용을 새로 확인합니다.
@@ -4926,14 +5748,14 @@
 
       // 월 변경
       document.getElementById('prevMonth').addEventListener('click', () => {
-        state.currentDate.setMonth(state.currentDate.getMonth() - 1);
-        renderAll();
+        setCurrentMonth(new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() - 1, 1));
       });
 
       document.getElementById('nextMonth').addEventListener('click', () => {
-        state.currentDate.setMonth(state.currentDate.getMonth() + 1);
-        renderAll();
+        setCurrentMonth(new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + 1, 1));
       });
+
+      document.getElementById('todayButton').addEventListener('click', () => setCurrentMonth(new Date()));
 
       // 사용자 필터
       document.querySelectorAll('.user-filter-btn').forEach(btn => {
@@ -4966,6 +5788,34 @@
           const tab = item.dataset.tab;
           switchTab(tab);
         });
+      });
+
+      document.querySelectorAll('.report-switch-btn').forEach(button => {
+        button.addEventListener('click', () => switchReportPane(button.dataset.reportPane));
+      });
+
+      document.getElementById('deviceUserSettings').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-device-user]');
+        if (!button) return;
+        state.uiPreferences.deviceUserId = button.dataset.deviceUser;
+        saveUiPreferences();
+        renderQuickEntryPanel();
+        showToast(`${state.users.find(user => user.id === button.dataset.deviceUser)?.name || '선택한 사용자'}으로 입력할게요.`);
+      });
+
+      document.getElementById('calendarAmountModeSettings').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-calendar-mode]');
+        if (!button) return;
+        state.uiPreferences.calendarAmountMode = button.dataset.calendarMode;
+        saveUiPreferences();
+        renderCalendar();
+        showToast('달력 금액 표시를 변경했어요.');
+      });
+
+      document.getElementById('logoutDeviceBtn').addEventListener('click', async () => {
+        if (!confirm('이 기기의 인증을 해제할까요? 가계부 데이터는 삭제되지 않습니다.')) return;
+        await fetch('/api/auth/logout', { method: 'POST' });
+        location.replace('/login.html');
       });
 
       // 거래 추가 버튼
