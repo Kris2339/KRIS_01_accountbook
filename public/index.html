@@ -1319,30 +1319,6 @@
       background: #eee;
     }
 
-    /* 숫자패드 */
-    .numpad-buttons {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .numpad-btn {
-      padding: 12px 8px;
-      background: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      font-size: 16px;
-      font-weight: 500;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .numpad-btn:active {
-      background: #f0f0f0;
-    }
-
     /* 선택 그리드 */
     .select-grid {
       display: grid;
@@ -2057,6 +2033,104 @@
 
     .quick-amount-buttons {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    #transactionModal .modal {
+      max-height: min(86vh, 760px);
+    }
+
+    #transactionModal .modal-header {
+      margin-bottom: 14px;
+    }
+
+    .transaction-entry-type .select-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .transaction-amount-field .form-input {
+      min-height: 58px;
+      padding: 10px 14px;
+      font-size: 26px;
+      font-weight: 800;
+      text-align: right;
+      letter-spacing: -0.03em;
+    }
+
+    .transaction-amount-field .form-input::placeholder {
+      color: #C4C9CF;
+      font-weight: 600;
+    }
+
+    .transaction-amount-field .reset-amount-btn {
+      min-width: 58px;
+    }
+
+    .entry-options {
+      margin: 2px 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .entry-options summary {
+      min-height: 58px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .entry-options summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .entry-options summary span {
+      flex: 0 0 auto;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .entry-options summary strong {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: right;
+    }
+
+    .entry-options summary::after {
+      content: '⌄';
+      color: var(--muted);
+      font-size: 18px;
+      transition: transform 0.18s ease;
+    }
+
+    .entry-options[open] summary {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .entry-options[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .entry-options-body {
+      padding: 14px 14px 2px;
+    }
+
+    #saveTransaction {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      min-height: 52px;
+      box-shadow: 0 -8px 18px var(--paper);
     }
 
     .transaction-amount.expense,
@@ -3122,12 +3196,7 @@
         <button class="modal-close" aria-label="거래 입력 닫기" onclick="closeModal('transactionModal')">&times;</button>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">사용자</label>
-        <div class="select-grid" id="userSelect"></div>
-      </div>
-
-      <div class="form-group">
+      <div class="form-group transaction-entry-type">
         <label class="form-label">유형</label>
         <div class="select-grid">
           <button type="button" class="select-item selected" data-type="expense">지출</button>
@@ -3135,10 +3204,10 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group transaction-amount-field">
         <label class="form-label">금액</label>
         <div class="amount-input-wrapper">
-          <input type="text" inputmode="numeric" class="form-input" id="amountInput" placeholder="금액 입력">
+          <input type="text" inputmode="numeric" enterkeyhint="next" autocomplete="off" class="form-input" id="amountInput" placeholder="0원">
           <button class="reset-amount-btn" id="resetAmountBtn">초기화</button>
         </div>
         <div class="quick-amount-buttons">
@@ -3147,18 +3216,6 @@
           <button class="quick-amount-btn" data-amount="1000">+1천</button>
           <button class="quick-amount-btn" data-amount="100">+1백</button>
         </div>
-        <div class="numpad-buttons">
-          <button class="numpad-btn" data-num="1">1</button>
-          <button class="numpad-btn" data-num="2">2</button>
-          <button class="numpad-btn" data-num="3">3</button>
-          <button class="numpad-btn" data-num="4">4</button>
-          <button class="numpad-btn" data-num="5">5</button>
-          <button class="numpad-btn" data-num="6">6</button>
-          <button class="numpad-btn" data-num="7">7</button>
-          <button class="numpad-btn" data-num="8">8</button>
-          <button class="numpad-btn" data-num="9">9</button>
-          <button class="numpad-btn" data-num="0">0</button>
-        </div>
       </div>
 
       <div class="form-group">
@@ -3166,37 +3223,38 @@
         <div class="select-grid" id="categorySelect"></div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">메모 (선택)</label>
-        <input type="text" class="form-input" id="memoInput" placeholder="메모">
-      </div>
+      <details class="entry-options" id="transactionOptions">
+        <summary>
+          <span>상세 정보</span>
+          <strong id="entryOptionsSummary"></strong>
+        </summary>
+        <div class="entry-options-body">
+          <div class="form-group">
+            <label class="form-label">사용자</label>
+            <div class="select-grid" id="userSelect"></div>
+          </div>
 
-      <div class="form-group">
-        <label class="form-label">결제수단</label>
-        <div class="select-grid" id="paymentMethodSelect"></div>
-      </div>
+          <div class="form-group">
+            <label class="form-label">결제수단</label>
+            <div class="select-grid" id="paymentMethodSelect"></div>
+          </div>
 
-      <div class="form-group">
-        <label class="form-label">자산</label>
-        <div class="select-grid" id="assetSelect"></div>
-      </div>
+          <div class="form-group">
+            <label class="form-label">자산</label>
+            <div class="select-grid" id="assetSelect"></div>
+          </div>
 
-      <div class="form-group">
-        <label class="form-label">날짜</label>
-        <input type="date" class="form-input" id="dateInput">
-      </div>
+          <div class="form-group">
+            <label class="form-label" for="dateInput">날짜</label>
+            <input type="date" class="form-input" id="dateInput">
+          </div>
 
-      <div class="form-group">
-        <label class="form-label">
-          <input type="checkbox" id="recurringInput">
-          매월 반복 등록
-        </label>
-        <select class="form-input" id="recurringCountInput">
-          <option value="3">3개월</option>
-          <option value="6">6개월</option>
-          <option value="12" selected>12개월</option>
-        </select>
-      </div>
+          <div class="form-group">
+            <label class="form-label" for="memoInput">메모 (선택)</label>
+            <input type="text" class="form-input" id="memoInput" placeholder="필요할 때만 입력하세요">
+          </div>
+        </div>
+      </details>
 
       <button class="btn btn-primary" id="saveTransaction">저장</button>
     </div>
@@ -3432,15 +3490,6 @@
       document.body.setAttribute('data-has-selected', state.selectedDate === formatDate(new Date()) ? 'false' : 'true');
       renderAll();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function addMonthsClamped(dateValue, months) {
-      const source = new Date(`${dateValue}T12:00:00`);
-      const day = source.getDate();
-      const target = new Date(source.getFullYear(), source.getMonth() + months, 1, 12);
-      const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
-      target.setDate(Math.min(day, lastDay));
-      return formatDate(target);
     }
 
     function escapeHTML(value) {
@@ -4862,11 +4911,10 @@
       document.getElementById('amountInput').value = '';
       document.getElementById('dateInput').value = defaults.date || state.selectedDate || formatDate(new Date());
       document.getElementById('memoInput').value = '';
-      document.getElementById('recurringInput').checked = false;
-      document.getElementById('recurringCountInput').value = '12';
 
       renderSelectGrid('userSelect', state.users, state.selectedUser);
       updateTransactionModalForType();
+      document.getElementById('transactionOptions').open = false;
 
       const modal = document.getElementById('transactionModal');
       modal.classList.add('active');
@@ -4907,6 +4955,19 @@
       renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
       renderSelectGrid('paymentMethodSelect', paymentMethods, state.selectedPaymentMethod, null, true);
       renderSelectGrid('assetSelect', assets, state.selectedAsset, null, true);
+      updateEntryOptionsSummary();
+    }
+
+    function updateEntryOptionsSummary() {
+      const summary = document.getElementById('entryOptionsSummary');
+      if (!summary) return;
+      const user = state.users.find(item => item.id === state.selectedUser);
+      const paymentMethod = state.paymentMethods.find(item => item.id === state.selectedPaymentMethod);
+      const asset = state.assets.find(item => item.id === state.selectedAsset);
+      const dateValue = document.getElementById('dateInput')?.value;
+      const date = dateValue ? new Date(`${dateValue}T12:00:00`) : null;
+      const dateText = date && !Number.isNaN(date.getTime()) ? `${date.getMonth() + 1}/${date.getDate()}` : '날짜 선택';
+      summary.textContent = [user?.name, paymentMethod?.name, asset?.name, dateText].filter(Boolean).join(' · ');
     }
 
     function selectItem(containerId, itemId) {
@@ -4930,6 +4991,7 @@
         state.selectedToAsset = itemId;
         renderSelectGrid('toAssetSelect', state.assets, state.selectedToAsset);
       }
+      updateEntryOptionsSummary();
     }
 
     function toggleExpand(containerId) {
@@ -5186,8 +5248,6 @@
       const amount = parseFormattedNumber(document.getElementById('amountInput').value);
       const date = document.getElementById('dateInput').value;
       const memo = document.getElementById('memoInput').value;
-      const shouldRepeat = document.getElementById('recurringInput').checked;
-      const repeatCount = parseInt(document.getElementById('recurringCountInput').value, 10) || 1;
 
       if (!amount || amount <= 0) {
         showToast('금액을 입력해 주세요.');
@@ -5252,18 +5312,6 @@
           createdAt: new Date().toISOString()
         };
         state.transactions.push(transaction);
-
-        if (shouldRepeat) {
-          for (let i = 1; i < repeatCount; i++) {
-            state.transactions.push({
-              ...transaction,
-              id: generateId(),
-              transactionDate: addMonthsClamped(date, i),
-              recurringGroupId: transaction.id,
-              createdAt: new Date().toISOString()
-            });
-          }
-        }
       }
 
       state.uiPreferences.deviceUserId = state.selectedUser;
@@ -5273,9 +5321,8 @@
 
       saveData();
       renderAll();
-      showToast('삭제를 되돌렸어요.');
       closeModal('transactionModal');
-      showToast(wasEditing ? '거래를 수정했어요.' : (shouldRepeat ? `${repeatCount}개월 반복 거래를 저장했어요.` : '거래를 저장했어요.'));
+      showToast(wasEditing ? '거래를 수정했어요.' : '거래를 저장했어요.');
     }
 
     function saveTransfer() {
@@ -5349,8 +5396,6 @@
       document.getElementById('amountInput').value = formatNumber(transaction.amount);
       document.getElementById('dateInput').value = transaction.transactionDate;
       document.getElementById('memoInput').value = transaction.memo || '';
-      document.getElementById('recurringInput').checked = false;
-      document.getElementById('recurringCountInput').value = '12';
 
       // UI 업데이트 - 사용자 선택 활성화
       renderSelectGrid('userSelect', state.users, state.selectedUser);
@@ -5363,9 +5408,8 @@
         }
       });
 
-      renderSelectGrid('categorySelect', state.categories.filter(c => c.type === transaction.type), state.selectedCategory);
-      renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod);
-      renderSelectGrid('assetSelect', state.assets, state.selectedAsset);
+      updateTransactionModalForType();
+      document.getElementById('transactionOptions').open = true;
 
       // 모달 제목 변경
       document.querySelector('#transactionModal .modal-title').textContent = '거래 수정';
@@ -5843,6 +5887,8 @@
         e.target.value = formatted;
       });
 
+      document.getElementById('dateInput').addEventListener('change', updateEntryOptionsSummary);
+
       // 금액 초기화
       document.getElementById('resetAmountBtn').addEventListener('click', () => {
         document.getElementById('amountInput').value = '';
@@ -5868,17 +5914,6 @@
           const currentAmount = parseFormattedNumber(input.value);
           const newAmount = currentAmount + amount;
           input.value = formatNumber(newAmount);
-        });
-      });
-
-      // 숫자패드 버튼
-      document.querySelectorAll('.numpad-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const num = btn.dataset.num;
-          const input = document.getElementById('amountInput');
-          const rawValue = input.value.replace(/,/g, '');
-          const newValue = rawValue + num;
-          input.value = formatNumber(parseInt(newValue) || 0);
         });
       });
 
