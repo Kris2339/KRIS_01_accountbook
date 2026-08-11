@@ -2531,6 +2531,11 @@
 
     .container {
       max-width: 520px;
+      padding-bottom: calc(112px + env(safe-area-inset-bottom));
+    }
+
+    .content {
+      scroll-padding-bottom: calc(112px + env(safe-area-inset-bottom));
     }
 
     .header {
@@ -2570,8 +2575,13 @@
       font-weight: 800;
     }
 
+    .month-selector button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+
     .today-button {
-      min-height: 38px;
+      min-height: 44px;
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 0 14px;
@@ -2591,7 +2601,7 @@
     }
 
     .user-filter-btn {
-      min-height: 36px;
+      min-height: 44px;
       padding: 7px 14px;
     }
 
@@ -2653,7 +2663,7 @@
     }
 
     .calendar-day-amount {
-      font-size: 8px;
+      font-size: 9px;
       letter-spacing: -0.42px;
       line-height: 1.18;
       font-variant-numeric: tabular-nums;
@@ -2662,7 +2672,7 @@
     .calendar-day-amount.small-font,
     .calendar-day-amount.tiny-font,
     .calendar-day-amount.micro-font {
-      font-size: 7px;
+      font-size: 8px;
     }
 
     .calendar-day-dots {
@@ -2768,7 +2778,7 @@
 
     .report-switch-btn,
     .preference-options button {
-      min-height: 42px;
+      min-height: 44px;
       border: 0;
       border-radius: 12px;
       background: transparent;
@@ -2911,9 +2921,60 @@
     }
 
     .icon-btn {
-      min-width: 38px;
-      height: 38px;
+      min-width: 44px;
+      height: 44px;
       font-size: 12px;
+    }
+
+    .filter-btn,
+    .data-actions .btn {
+      min-height: 44px;
+    }
+
+    .calendar-transaction-row,
+    .date-group-item,
+    .transaction-item,
+    .asset-card {
+      appearance: none;
+      width: 100%;
+      border-left: 0;
+      border-right: 0;
+      background: #FFFFFF;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+    }
+
+    .calendar-transaction-row,
+    .date-group-item {
+      border-top: 0;
+    }
+
+    .transaction-item {
+      border: 1px solid var(--line);
+    }
+
+    .calendar-side-column {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .calendar-day-header {
+      font-size: 12px;
+    }
+
+    .asset-card {
+      border: 1px solid var(--line);
+    }
+
+    .entry-options summary:focus-visible,
+    .settings-disclosure > summary:focus-visible {
+      outline: 3px solid rgba(49, 130, 246, 0.28);
+      outline-offset: 2px;
+      border-radius: 12px;
     }
 
     .bottom-nav {
@@ -3004,7 +3065,7 @@
       #assets-content,
       #settings-content {
         max-width: 960px;
-        width: 100%;
+        width: calc(100% - 200px);
         margin-left: auto;
         margin-right: auto;
       }
@@ -3034,12 +3095,20 @@
         align-items: start;
         align-content: start;
         gap: 18px;
-        width: 100%;
+        width: calc(100% - 200px);
         max-width: 960px;
         height: auto;
         margin: 0 auto;
         padding: 18px 0 120px;
         overflow: visible;
+      }
+
+      #calendar-content .calendar-side-column {
+        grid-column: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        min-width: 0;
       }
 
       #calendar-content .calendar {
@@ -3065,11 +3134,47 @@
         padding: 18px;
       }
 
+      #calendar-content .calendar-selected-transactions {
+        flex: 0 0 auto;
+      }
+
+      #calendar-content .calendar-day-amount {
+        font-size: 10px;
+      }
+
+      #calendar-content .calendar-day-amount.small-font,
+      #calendar-content .calendar-day-amount.tiny-font,
+      #calendar-content .calendar-day-amount.micro-font {
+        font-size: 9px;
+      }
+
       .bottom-nav {
-        left: 50%;
+        top: 50%;
+        left: max(16px, calc(50% - 600px));
         right: auto;
-        width: 500px;
-        transform: translateX(-50%);
+        bottom: auto;
+        width: 72px;
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 8px;
+        transform: translateY(-50%);
+      }
+
+      .bottom-nav .nav-spacer {
+        display: none;
+      }
+
+      .bottom-nav .nav-item {
+        min-height: 60px;
+      }
+
+      .fab,
+      body[data-active-tab="calendar"] .fab,
+      body[data-active-tab="log"] .fab,
+      body[data-active-tab="assets"] .fab,
+      body[data-active-tab="settings"] .fab {
+        left: max(52px, calc(50% - 564px));
+        bottom: 24px;
       }
     }
 
@@ -3144,14 +3249,16 @@
           <div class="calendar-grid" id="calendarGrid"></div>
         </div>
 
-        <div class="quick-entry-panel" id="quickEntryPanel"></div>
+        <div class="calendar-side-column">
+          <div class="quick-entry-panel" id="quickEntryPanel"></div>
 
-        <!-- 선택된 날짜의 거래 내역 -->
-        <div class="calendar-selected-transactions" id="calendarSelectedTransactions">
-          <div class="calendar-selected-date" id="calendarSelectedDate">오늘</div>
-          <div class="calendar-transaction-list" id="calendarTransactionList">
-            <div class="empty-state">
-              <div class="empty-state-text">날짜를 선택하면 거래 내역이 표시됩니다</div>
+          <!-- 선택된 날짜의 거래 내역 -->
+          <div class="calendar-selected-transactions" id="calendarSelectedTransactions">
+            <div class="calendar-selected-date" id="calendarSelectedDate">오늘</div>
+            <div class="calendar-transaction-list" id="calendarTransactionList">
+              <div class="empty-state">
+                <div class="empty-state-text">날짜를 선택하면 거래 내역이 표시됩니다</div>
+              </div>
             </div>
           </div>
         </div>
@@ -4377,7 +4484,7 @@
       const categoryDisplay = renderCategoryDisplay(category, t.type);
 
       return `
-        <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
+        <button type="button" class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
           <div class="calendar-transaction-info">
             <div class="calendar-transaction-main">
               ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
@@ -4388,7 +4495,7 @@
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
           </div>
-        </div>
+        </button>
       `;
     }
 
@@ -4498,7 +4605,7 @@
         : [paymentMethod?.name, asset?.name].filter(Boolean).join(' · ');
 
       return `
-        <div class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
+        <button type="button" class="date-group-item" onclick="openTransactionDetailModal('${t.id}')">
           <div class="date-group-item-left">
             ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
             <span class="transaction-category">${categoryDisplay}</span>
@@ -4508,7 +4615,7 @@
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
           </div>
-        </div>
+        </button>
       `;
     }
 
@@ -4534,7 +4641,7 @@
       const dateDisplay = showDate ? formatDateKo(t.transactionDate) : '';
 
       return `
-        <div class="transaction-item" onclick="openTransactionDetailModal('${t.id}')">
+        <button type="button" class="transaction-item" onclick="openTransactionDetailModal('${t.id}')">
           <div class="transaction-left">
             ${showDate ? `<span class="transaction-date-badge">${dateDisplay}</span>` : ''}
             ${user ? `<span class="transaction-user">${escapeHTML(user.name)}</span>` : ''}
@@ -4545,7 +4652,7 @@
           <div class="transaction-amount ${amountClass}">
             ${amountPrefix}${formatMoney(t.amount)}
           </div>
-        </div>
+        </button>
       `;
     }
 
@@ -4686,7 +4793,7 @@
         }
 
         return `
-          <div class="asset-card" onclick="showAssetTransactions('${escapeAttr(asset.id)}')">
+          <button type="button" class="asset-card" onclick="showAssetTransactions('${escapeAttr(asset.id)}')">
             <div class="asset-header">
               <span class="asset-name">${escapeHTML(asset.name)}</span>
               <span class="asset-budget-remaining ${remaining < 0 ? 'expense' : ''}">${remaining < 0 ? `${formatMoney(Math.abs(remaining))} 초과` : `${formatMoney(remaining)} 남음`}</span>
@@ -4705,7 +4812,7 @@
                 <span class="no-budget">예산 미설정</span>
               </div>
             `}
-          </div>
+          </button>
         `;
       }).join('');
 
@@ -5306,7 +5413,7 @@
           const rect = modal.getBoundingClientRect();
           const isHandleArea = clientY - rect.top < 88;
           if (!canStartFromTarget(target)) return false;
-          if (!isHandleArea && modal.scrollTop > 2) return false;
+          if (!isHandleArea) return false;
 
           startX = clientX;
           startY = clientY;
