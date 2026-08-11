@@ -24,10 +24,10 @@ wrangler d1 export hkaccount-production --remote --output=hkaccount-backup.sql
 
 ## 보안 점검
 
-- Cloudflare Access 정책은 두 이메일만 `Allow`하고 그 외는 기본 거부합니다.
-- `workers.dev` 우회 주소가 Access 밖에 남아 있지 않은지 확인합니다.
-- `ALLOWED_EMAILS`는 Worker 비밀 변수로 설정하고 저장소에 이메일을 커밋하지 않습니다.
-- `/api/data`와 `/api/health`가 미인증 상태에서 401 또는 Access 로그인 화면을 반환하는지 확인합니다.
+- `APP_PIN`과 `SESSION_SECRET`은 Worker 비밀 변수로 설정하고 저장소에 커밋하지 않습니다.
+- 로그인하지 않은 상태에서 `/api/data`와 `/api/health`가 401을 반환하는지 확인합니다.
+- 잘못된 번호를 5회 입력하면 10분 동안 429로 차단되는지 확인합니다.
+- 로그인 쿠키는 `HttpOnly`, `Secure`, `SameSite=Strict` 속성을 유지합니다.
 - 저장소의 문서, SQL, `.git` 파일이 웹에서 404인지 확인합니다.
 
 ## 장애 대응

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saenghwal-gagyebu-v2';
+const CACHE_NAME = 'saenghwal-gagyebu-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -50,7 +50,8 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((response) => {
         // 응답이 유효하면 캐시에도 저장
-        if (response && response.status === 200) {
+        const cacheControl = response.headers.get('cache-control') || '';
+        if (response && response.status === 200 && !response.redirected && !cacheControl.includes('no-store')) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
