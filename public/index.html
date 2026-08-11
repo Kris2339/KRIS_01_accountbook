@@ -3185,17 +3185,42 @@
 
     @media (max-width: 899px) {
       .modal-overlay {
-        top: var(--visual-viewport-top, 0px);
-        left: var(--visual-viewport-left, 0px);
-        right: auto;
-        bottom: auto;
-        width: var(--visual-viewport-width, 100vw);
-        height: var(--visual-viewport-height, 100dvh);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        height: auto;
+        padding-bottom: var(--keyboard-inset, 0px);
       }
 
-      .modal,
-      #transactionModal .modal {
+      .modal {
         max-height: calc(var(--visual-viewport-height, 100dvh) - 8px);
+      }
+
+      #transactionModal.modal-overlay.active {
+        align-items: stretch;
+        background: #FFFFFF;
+        backdrop-filter: none;
+      }
+
+      #transactionModal .modal {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        border-radius: 0;
+        padding-top: max(14px, env(safe-area-inset-top));
+        box-shadow: none;
+        animation: none;
+      }
+
+      #transactionModal .modal::before {
+        display: none;
+      }
+
+      body.keyboard-open #transactionModal .modal {
+        padding-bottom: 8px;
       }
 
       input,
@@ -5523,16 +5548,29 @@
     }
 
     function setupKeyboardAvoidance() {
+      let layoutViewportHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
+
       const updateVisualViewport = () => {
         const viewport = window.visualViewport;
         const viewportHeight = viewport?.height || window.innerHeight;
         const viewportWidth = viewport?.width || window.innerWidth;
         const viewportTop = viewport?.offsetTop || 0;
         const viewportLeft = viewport?.offsetLeft || 0;
+        const viewportBottom = viewportTop + viewportHeight;
+        const currentLayoutHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
+        const rawKeyboardInset = Math.max(0, layoutViewportHeight - viewportBottom);
+        const keyboardOpen = rawKeyboardInset > 80;
+
+        if (!keyboardOpen && currentLayoutHeight > layoutViewportHeight - 80) {
+          layoutViewportHeight = currentLayoutHeight;
+        }
+
         document.documentElement.style.setProperty('--visual-viewport-height', `${Math.round(viewportHeight)}px`);
         document.documentElement.style.setProperty('--visual-viewport-width', `${Math.round(viewportWidth)}px`);
         document.documentElement.style.setProperty('--visual-viewport-top', `${Math.round(viewportTop)}px`);
         document.documentElement.style.setProperty('--visual-viewport-left', `${Math.round(viewportLeft)}px`);
+        document.documentElement.style.setProperty('--keyboard-inset', `${Math.round(keyboardOpen ? rawKeyboardInset : 0)}px`);
+        document.body.classList.toggle('keyboard-open', keyboardOpen);
 
         const activeInput = document.activeElement;
         if (activeInput instanceof HTMLElement && activeInput.closest('.modal')) {
@@ -5560,7 +5598,12 @@
         window.visualViewport.addEventListener('resize', updateVisualViewport);
         window.visualViewport.addEventListener('scroll', updateVisualViewport);
       }
-      window.addEventListener('orientationchange', updateVisualViewport);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          layoutViewportHeight = Math.max(window.innerHeight, document.documentElement.clientHeight);
+          updateVisualViewport();
+        }, 280);
+      });
       updateVisualViewport();
 
       document.addEventListener('focusin', (event) => {
