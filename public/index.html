@@ -2949,7 +2949,7 @@
 
     @media (min-width: 900px) {
       .container {
-        max-width: 920px;
+        max-width: 1040px;
       }
 
       .header,
@@ -2957,28 +2957,51 @@
       #log-content,
       #assets-content,
       #settings-content {
-        max-width: 680px;
+        max-width: 960px;
         width: 100%;
         margin-left: auto;
         margin-right: auto;
       }
 
+      body[data-active-tab="calendar"] .content {
+        overflow-y: auto !important;
+      }
+
       #calendar-content.active {
-        display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+        display: grid !important;
+        grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr);
         align-items: start;
-        gap: 14px;
-        padding: 0 14px;
+        align-content: start;
+        gap: 18px;
+        width: 100%;
+        max-width: 960px;
+        height: auto;
+        margin: 0 auto;
+        padding: 18px 0 120px;
+        overflow: visible;
       }
 
       #calendar-content .calendar {
         grid-row: 1 / span 2;
         margin: 0;
+        padding: 16px 12px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(25, 31, 40, 0.05);
+      }
+
+      #calendar-content .calendar-day {
+        min-height: 82px;
+        aspect-ratio: auto;
       }
 
       #calendar-content .quick-entry-panel,
       #calendar-content .calendar-selected-transactions {
         margin: 0;
+      }
+
+      #calendar-content .quick-entry-panel {
+        padding: 18px;
       }
 
       .bottom-nav {
