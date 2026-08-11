@@ -1,7 +1,5 @@
-const CACHE_NAME = 'saenghwal-gagyebu-v3';
+const CACHE_NAME = 'saenghwal-gagyebu-v4';
 const urlsToCache = [
-  '/',
-  '/index.html',
   '/manifest.json'
 ];
 
@@ -65,10 +63,7 @@ self.addEventListener('fetch', (event) => {
           if (response) {
             return response;
           }
-          // HTML 요청이면 index.html 반환 (SPA 라우팅 지원)
-          if ((event.request.headers.get('accept') || '').includes('text/html')) {
-            return caches.match('/index.html');
-          }
+          return Response.error();
         });
       })
   );
