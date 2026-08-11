@@ -3344,6 +3344,26 @@
     // ============================================
     // 전역 상태
     // ============================================
+    const CATEGORY_ICON_MAP = {
+      '급여': '💰',
+      '부수입': '💵',
+      '식비': '🍚',
+      '카페': '☕',
+      '간식': '🍪',
+      '쿠키': '🐶',
+      '생활': '🏠',
+      '쇼핑': '🛒',
+      '교통': '🚌',
+      '결혼준비': '💍',
+      '취미': '🎮',
+      '의료': '🏥',
+      '경조사': '🎁',
+      '미용': '💇',
+      '청모': '🤝',
+      '구독': '🔄',
+      '기타': '📦'
+    };
+
     let state = {
       currentDate: new Date(),
       selectedDate: formatDate(new Date()),
@@ -3388,7 +3408,8 @@
         { id: '9', name: '의료', icon: '🏥', type: 'expense', displayOrder: 7, isFavorite: false },
         { id: '10', name: '경조사', icon: '🎁', type: 'expense', displayOrder: 8, isFavorite: false },
         { id: '11', name: '미용', icon: '💇', type: 'expense', displayOrder: 9, isFavorite: false },
-        { id: '12', name: '기타', icon: '📦', type: 'expense', displayOrder: 10, isFavorite: false }
+        { id: '12', name: '기타', icon: '📦', type: 'expense', displayOrder: 10, isFavorite: false },
+        { id: 'cookie-expense', name: '쿠키', icon: '🐶', type: 'expense', displayOrder: 11, isFavorite: true }
       ],
 
       transactions: [],
@@ -3449,6 +3470,26 @@
       return new Intl.NumberFormat('ko-KR').format(amount);
     }
 
+    function getCategoryIcon(name) {
+      const normalizedName = String(name || '').trim();
+      if (CATEGORY_ICON_MAP[normalizedName]) return CATEGORY_ICON_MAP[normalizedName];
+      if (normalizedName.includes('강아지') || normalizedName.includes('반려')) return '🐶';
+      if (normalizedName.includes('결혼')) return '💍';
+      if (normalizedName.includes('구독')) return '🔄';
+      if (normalizedName.includes('간식')) return '🍪';
+      if (normalizedName.includes('식')) return '🍚';
+      if (normalizedName.includes('카페') || normalizedName.includes('커피')) return '☕';
+      if (normalizedName.includes('교통') || normalizedName.includes('차량')) return '🚌';
+      if (normalizedName.includes('병원') || normalizedName.includes('의료')) return '🏥';
+      return '📁';
+    }
+
+    function normalizeCategoryIcons() {
+      state.categories.forEach(category => {
+        category.icon = getCategoryIcon(category.name);
+      });
+    }
+
     function showToast(message) {
       const toast = document.getElementById('appToast');
       if (!toast) return;
@@ -3503,6 +3544,14 @@
 
     function escapeAttr(value) {
       return escapeHTML(value);
+    }
+
+    function renderCategoryDisplay(category, transactionType = 'expense') {
+      if (transactionType === 'transfer') return '자산이동';
+      if (!category) return '<span class="category-icon">❔</span>미지정';
+      return category.icon
+        ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}`
+        : escapeHTML(category.name);
     }
 
     function getSerializableData() {
@@ -3702,6 +3751,7 @@
           state.monthlyBudget = data.monthlyBudget || 0;
           state.categoryBudgets = data.categoryBudgets || {};
           state.lastSavedAt = data.lastSavedAt || state.lastSavedAt;
+          normalizeCategoryIcons();
         } catch (error) {
           console.error('localStorage 데이터 복구 실패:', error);
           localStorage.setItem(`household_data_corrupt_${Date.now()}`, saved);
@@ -3719,6 +3769,7 @@
       state.monthlyBudget = payload.monthlyBudget || 0;
       state.categoryBudgets = payload.categoryBudgets || {};
       state.lastSavedAt = payload.lastSavedAt || state.lastSavedAt;
+      normalizeCategoryIcons();
     }
 
     async function loadFromCloud() {
@@ -3832,6 +3883,7 @@
       state.monthlyBudget = Number(payload.monthlyBudget || 0);
       state.categoryBudgets = payload.categoryBudgets || {};
       state.lastSavedAt = new Date().toISOString();
+      normalizeCategoryIcons();
       saveData();
       renderAll();
       showToast(`거래 ${state.transactions.length}건을 가져왔어요.`);
@@ -3876,11 +3928,18 @@
         return;
       }
 
-      const { type, item, index } = state.lastDeleted;
+      const { type, item, index, affectedTransactionIds = [], categoryBudget } = state.lastDeleted;
       if (type === 'transactions') {
         state.transactions.splice(Math.min(index, state.transactions.length), 0, item);
       } else if (state[type]) {
         state[type].splice(Math.min(index, state[type].length), 0, item);
+        if (type === 'categories') {
+          const affectedIds = new Set(affectedTransactionIds);
+          state.transactions.forEach(transaction => {
+            if (affectedIds.has(transaction.id)) transaction.categoryId = item.id;
+          });
+          if (categoryBudget !== undefined) state.categoryBudgets[item.id] = categoryBudget;
+        }
       }
 
       state.lastDeleted = null;
@@ -4131,7 +4190,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = renderCategoryDisplay(category, t.type);
 
       return `
         <div class="calendar-transaction-row" onclick="openTransactionDetailModal('${t.id}')">
@@ -4190,7 +4249,7 @@
 
           return (
             (t.memo && t.memo.toLowerCase().includes(query)) ||
-            (category && category.name.toLowerCase().includes(query)) ||
+            ((category?.name || '미지정').toLowerCase().includes(query)) ||
             (paymentMethod && paymentMethod.name.toLowerCase().includes(query)) ||
             (user && user.name.toLowerCase().includes(query)) ||
             (asset && asset.name.toLowerCase().includes(query)) ||
@@ -4249,7 +4308,7 @@
 
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
-      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = renderCategoryDisplay(category, t.type);
       const contextDisplay = t.type === 'transfer'
         ? `${asset?.name || ''} → ${toAsset?.name || ''}`
         : [paymentMethod?.name, asset?.name].filter(Boolean).join(' · ');
@@ -4286,7 +4345,7 @@
       const amountClass = t.type === 'income' ? 'income' : (t.type === 'expense' ? 'expense' : 'transfer');
       const amountPrefix = t.type === 'income' ? '+' : (t.type === 'expense' ? '-' : '');
 
-      const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : (t.type === 'transfer' ? '자산이동' : '');
+      const categoryDisplay = renderCategoryDisplay(category, t.type);
 
       const dateDisplay = showDate ? formatDateKo(t.transactionDate) : '';
 
@@ -4625,7 +4684,7 @@
         sortedCategories.forEach(([catId, amount]) => {
           const category = state.categories.find(c => c.id === catId);
           const percent = (amount / maxCategoryExpense) * 100;
-          const categoryDisplay = category ? (category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}` : escapeHTML(category.name)) : '기타';
+          const categoryDisplay = renderCategoryDisplay(category, 'expense');
           html += `
             <div class="bar-item">
               <div class="bar-label">
@@ -4869,7 +4928,7 @@
         return `
         <div class="settings-item-card">
           <div class="item-content">
-            <div class="item-name">${escapeHTML(cat.name)}</div>
+            <div class="item-name"><span class="category-icon">${escapeHTML(cat.icon || getCategoryIcon(cat.name))}</span>${escapeHTML(cat.name)}</div>
             <div class="item-meta">${cat.type === 'income' ? '수입' : '지출'} • ${cat.isFavorite ? '즐겨찾기 • ' : ''}순서 ${cat.displayOrder}</div>
           </div>
           <div class="item-actions">
@@ -5182,10 +5241,10 @@
         </div>`;
       }
 
-      if (category) {
+      if (transaction.type !== 'transfer') {
         html += `<div class="detail-row">
           <span class="detail-label">카테고리</span>
-          <span class="detail-value">${category.icon ? `<span class="category-icon">${escapeHTML(category.icon)}</span>` : ''}${escapeHTML(category.name)}</span>
+          <span class="detail-value">${renderCategoryDisplay(category, transaction.type)}</span>
         </div>`;
       }
 
@@ -5538,6 +5597,7 @@
       const newName = prompt('새 이름을 입력하세요:', item.name);
       if (newName && newName.trim()) {
         item.name = newName.trim();
+        if (type === 'categories') item.icon = getCategoryIcon(item.name);
         saveData();
 
         if (type === 'paymentMethods') {
@@ -5607,19 +5667,26 @@
     }
 
     function deleteItem(type, id) {
-      if (!confirm('정말 삭제하시겠습니까?')) return;
-
       const items = state[type];
       const index = items.findIndex(i => i.id === id);
       if (index > -1) {
-        const isUsed = state.transactions.some(t => {
+        const affectedTransactions = state.transactions.filter(t => {
           if (type === 'paymentMethods') return t.paymentMethodId === id;
           if (type === 'assets') return t.assetId === id || t.toAssetId === id;
           if (type === 'categories') return t.categoryId === id;
           return false;
         });
 
-        if (isUsed) {
+        if (type === 'categories') {
+          const message = affectedTransactions.length
+            ? `이 카테고리를 삭제하면 기존 거래 ${affectedTransactions.length}건의 카테고리가 '미지정'으로 바뀝니다. 거래 내역은 삭제되지 않습니다. 계속할까요?`
+            : '이 카테고리를 삭제할까요? 거래 내역은 삭제되지 않습니다.';
+          if (!confirm(message)) return;
+        } else {
+          if (!confirm('정말 삭제하시겠습니까?')) return;
+        }
+
+        if (type !== 'categories' && affectedTransactions.length) {
           showToast('기존 거래에서 사용 중이라 삭제할 수 없습니다. 이름을 수정해 보관해 주세요.');
           return;
         }
@@ -5627,8 +5694,19 @@
         state.lastDeleted = {
           type,
           item: { ...items[index] },
-          index
+          index,
+          affectedTransactionIds: affectedTransactions.map(transaction => transaction.id),
+          categoryBudget: type === 'categories' ? state.categoryBudgets[id] : undefined
         };
+
+        if (type === 'categories') {
+          affectedTransactions.forEach(transaction => {
+            transaction.categoryId = null;
+          });
+          delete state.categoryBudgets[id];
+          if (state.selectedCategory === id) state.selectedCategory = null;
+        }
+
         items.splice(index, 1);
         saveData();
 
@@ -5641,7 +5719,9 @@
         }
 
         renderAll();
-        showToast('항목을 삭제했어요.');
+        showToast(type === 'categories' && affectedTransactions.length
+          ? `카테고리를 삭제하고 거래 ${affectedTransactions.length}건을 미지정으로 바꿨어요.`
+          : '항목을 삭제했어요.');
       }
     }
 
@@ -5661,7 +5741,7 @@
 
       if (type === 'categories') {
         newItem.type = categoryType;
-        newItem.icon = '📁';
+        newItem.icon = getCategoryIcon(newItem.name);
       }
 
       if (type === 'assets') {
