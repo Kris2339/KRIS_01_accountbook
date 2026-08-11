@@ -2035,6 +2035,28 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
+    .numpad-buttons {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .numpad-btn {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #FFFFFF;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .numpad-btn:active {
+      background: #F2F4F6;
+      transform: scale(0.97);
+    }
+
     #transactionModal .modal {
       max-height: min(86vh, 760px);
     }
@@ -2130,7 +2152,38 @@
       bottom: 0;
       z-index: 2;
       min-height: 52px;
+      background: #00A887;
+      border-color: #00A887;
+      color: #FFFFFF;
       box-shadow: 0 -8px 18px var(--paper);
+    }
+
+    #saveTransaction:hover,
+    #saveTransaction:active {
+      background: #008F73;
+    }
+
+    .payment-user-settings {
+      display: flex;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .payment-user-chip {
+      min-height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #FFFFFF;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .payment-user-chip.active {
+      border-color: #8DBAF8;
+      background: #E8F3FF;
+      color: #1B64DA;
     }
 
     .transaction-amount.expense,
@@ -2239,12 +2292,10 @@
       box-shadow: none;
     }
 
-    .select-item.selected,
-    .filter-btn.active,
-    .user-filter-btn.active {
-      background: var(--soft-blue);
-      border-color: var(--soft-blue);
-      color: #FFFFFF;
+    .select-item.selected {
+      background: #E8F3FF;
+      border-color: #8DBAF8;
+      color: #1B64DA;
     }
 
     .bottom-nav {
@@ -3026,7 +3077,7 @@
           <button class="filter-btn active" data-filter="all">전체</button>
           <button class="filter-btn" data-filter="income">수입</button>
           <button class="filter-btn" data-filter="expense">지출</button>
-          <button class="filter-btn" data-filter="transfer">자산이동</button>
+          <button class="filter-btn" data-filter="transfer">예산이동</button>
         </div>
         <div class="transaction-list" id="transactionList"></div>
       </div>
@@ -3113,14 +3164,15 @@
 
         <details class="settings-section settings-disclosure">
           <summary class="settings-title">결제수단 관리</summary>
+          <div class="settings-hint">각 결제수단을 사용할 사람을 선택할 수 있어요.</div>
           <div id="paymentMethodsList"></div>
           <button class="btn btn-secondary" id="addPaymentMethod">+ 결제수단 추가</button>
         </details>
 
         <details class="settings-section settings-disclosure">
-          <summary class="settings-title">자산 관리</summary>
+          <summary class="settings-title">예산 관리</summary>
           <div id="assetsSettingsList"></div>
-          <button class="btn btn-secondary" id="addAsset">+ 자산 추가</button>
+          <button class="btn btn-secondary" id="addAsset">+ 예산 추가</button>
         </details>
 
         <details class="settings-section settings-disclosure">
@@ -3216,6 +3268,18 @@
           <button class="quick-amount-btn" data-amount="1000">+1천</button>
           <button class="quick-amount-btn" data-amount="100">+1백</button>
         </div>
+        <div class="numpad-buttons" aria-label="금액 숫자 키패드">
+          <button type="button" class="numpad-btn" data-num="1">1</button>
+          <button type="button" class="numpad-btn" data-num="2">2</button>
+          <button type="button" class="numpad-btn" data-num="3">3</button>
+          <button type="button" class="numpad-btn" data-num="4">4</button>
+          <button type="button" class="numpad-btn" data-num="5">5</button>
+          <button type="button" class="numpad-btn" data-num="6">6</button>
+          <button type="button" class="numpad-btn" data-num="7">7</button>
+          <button type="button" class="numpad-btn" data-num="8">8</button>
+          <button type="button" class="numpad-btn" data-num="9">9</button>
+          <button type="button" class="numpad-btn" data-num="0">0</button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -3230,8 +3294,8 @@
         </summary>
         <div class="entry-options-body">
           <div class="form-group">
-            <label class="form-label">사용자</label>
-            <div class="select-grid" id="userSelect"></div>
+            <label class="form-label" for="memoInput">메모 (선택)</label>
+            <input type="text" class="form-input" id="memoInput" placeholder="필요할 때만 입력하세요">
           </div>
 
           <div class="form-group">
@@ -3240,7 +3304,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">자산</label>
+            <label class="form-label">예산</label>
             <div class="select-grid" id="assetSelect"></div>
           </div>
 
@@ -3250,8 +3314,8 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="memoInput">메모 (선택)</label>
-            <input type="text" class="form-input" id="memoInput" placeholder="필요할 때만 입력하세요">
+            <label class="form-label">사용자</label>
+            <div class="select-grid" id="userSelect"></div>
           </div>
         </div>
       </details>
@@ -3260,23 +3324,23 @@
     </div>
   </div>
 
-  <!-- 자산 이동 모달 -->
+  <!-- 예산 이동 모달 -->
   <div class="modal-overlay" id="transferModal">
     <div class="modal">
       <div class="modal-header">
-        <h2 class="modal-title">자산 이동</h2>
-        <button class="modal-close" aria-label="자산 이동 닫기" onclick="closeModal('transferModal')">&times;</button>
+        <h2 class="modal-title">예산 이동</h2>
+        <button class="modal-close" aria-label="예산 이동 닫기" onclick="closeModal('transferModal')">&times;</button>
       </div>
 
       <div class="form-group">
-        <label class="form-label">출발 자산</label>
+        <label class="form-label">출발 예산</label>
         <div class="select-grid" id="fromAssetSelect"></div>
       </div>
 
       <div class="transfer-arrow">↓</div>
 
       <div class="form-group">
-        <label class="form-label">도착 자산</label>
+        <label class="form-label">도착 예산</label>
         <div class="select-grid" id="toAssetSelect"></div>
       </div>
 
@@ -3303,12 +3367,12 @@
     </div>
   </div>
 
-  <!-- 자산 내역 모달 -->
+  <!-- 예산 내역 모달 -->
   <div class="modal-overlay" id="assetTransactionsModal">
     <div class="modal">
       <div class="modal-header">
-        <h2 class="modal-title" id="assetModalTitle">자산 내역</h2>
-        <button class="modal-close" aria-label="자산 내역 닫기" onclick="closeModal('assetTransactionsModal')">&times;</button>
+        <h2 class="modal-title" id="assetModalTitle">예산 내역</h2>
+        <button class="modal-close" aria-label="예산 내역 닫기" onclick="closeModal('assetTransactionsModal')">&times;</button>
       </div>
       <div class="transaction-list" id="assetTransactionsList"></div>
     </div>
@@ -3384,10 +3448,10 @@
       ],
 
       paymentMethods: [
-        { id: '1', name: '현금', displayOrder: 1, isFavorite: true },
-        { id: '2', name: '체크카드', displayOrder: 2, isFavorite: true },
-        { id: '3', name: '신용카드1', displayOrder: 3, isFavorite: true },
-        { id: '4', name: '신용카드2', displayOrder: 4, isFavorite: true }
+        { id: '1', name: '현금', displayOrder: 1, isFavorite: true, userIds: ['1', '2'] },
+        { id: '2', name: '체크카드', displayOrder: 2, isFavorite: true, userIds: ['1', '2'] },
+        { id: '3', name: '신용카드1', displayOrder: 3, isFavorite: true, userIds: ['1', '2'] },
+        { id: '4', name: '신용카드2', displayOrder: 4, isFavorite: true, userIds: ['1', '2'] }
       ],
 
       assets: [
@@ -3490,6 +3554,18 @@
       });
     }
 
+    function normalizePaymentMethodUsers() {
+      const validUserIds = new Set(state.users.map(user => String(user.id)));
+      const allUserIds = [...validUserIds];
+
+      state.paymentMethods.forEach(method => {
+        const configuredUserIds = Array.isArray(method.userIds)
+          ? method.userIds.map(String).filter(userId => validUserIds.has(userId))
+          : allUserIds;
+        method.userIds = configuredUserIds.length ? [...new Set(configuredUserIds)] : [...allUserIds];
+      });
+    }
+
     function showToast(message) {
       const toast = document.getElementById('appToast');
       if (!toast) return;
@@ -3547,7 +3623,7 @@
     }
 
     function renderCategoryDisplay(category, transactionType = 'expense') {
-      if (transactionType === 'transfer') return '자산이동';
+      if (transactionType === 'transfer') return '예산이동';
       if (!category) return '<span class="category-icon">❔</span>미지정';
       return category.icon
         ? `<span class="category-icon">${escapeHTML(category.icon)}</span>${escapeHTML(category.name)}`
@@ -3752,6 +3828,7 @@
           state.categoryBudgets = data.categoryBudgets || {};
           state.lastSavedAt = data.lastSavedAt || state.lastSavedAt;
           normalizeCategoryIcons();
+          normalizePaymentMethodUsers();
         } catch (error) {
           console.error('localStorage 데이터 복구 실패:', error);
           localStorage.setItem(`household_data_corrupt_${Date.now()}`, saved);
@@ -3770,6 +3847,7 @@
       state.categoryBudgets = payload.categoryBudgets || {};
       state.lastSavedAt = payload.lastSavedAt || state.lastSavedAt;
       normalizeCategoryIcons();
+      normalizePaymentMethodUsers();
     }
 
     async function loadFromCloud() {
@@ -3884,6 +3962,7 @@
       state.categoryBudgets = payload.categoryBudgets || {};
       state.lastSavedAt = new Date().toISOString();
       normalizeCategoryIcons();
+      normalizePaymentMethodUsers();
       saveData();
       renderAll();
       showToast(`거래 ${state.transactions.length}건을 가져왔어요.`);
@@ -4554,7 +4633,7 @@
       const { start, end } = getMonthRange(state.currentDate);
       const currentMonth = state.currentDate.getMonth() + 1;
       const asset = state.assets.find(a => a.id === assetId);
-      const assetName = asset ? asset.name : '자산';
+      const assetName = asset ? asset.name : '예산';
 
       const assetTransactions = state.transactions.filter(t => {
         const tDate = new Date(t.transactionDate);
@@ -4879,12 +4958,19 @@
     }
 
     function renderPaymentMethodsSettings() {
+      normalizePaymentMethodUsers();
       const sorted = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
       const html = sorted.map(method => `
         <div class="settings-item-card">
           <div class="item-content">
             <div class="item-name">${escapeHTML(method.name)}</div>
-            <div class="item-meta">${method.isFavorite ? '즐겨찾기 • ' : ''}순서 ${method.displayOrder}</div>
+            <div class="item-meta">${method.isFavorite ? '즐겨찾기 • ' : ''}순서 ${method.displayOrder} • ${state.users.filter(user => method.userIds.includes(String(user.id))).map(user => escapeHTML(user.name)).join(' · ')} 사용</div>
+            <div class="payment-user-settings" aria-label="${escapeAttr(method.name)} 사용 사용자">
+              ${state.users.map(user => {
+                const active = method.userIds.includes(String(user.id));
+                return `<button type="button" class="payment-user-chip ${active ? 'active' : ''}" aria-pressed="${active}" onclick="togglePaymentMethodUser('${method.id}', '${user.id}')">${escapeHTML(user.name)}</button>`;
+              }).join('')}
+            </div>
           </div>
           <div class="item-actions">
             <button class="icon-btn reorder" aria-label="${escapeAttr(method.name)} 위로 이동" onclick="moveItemUp('paymentMethods', '${method.id}')">↑</button>
@@ -4953,17 +5039,33 @@
       return (favorite || sorted[0] || {}).id || null;
     }
 
+    function getPaymentMethodsForUser(userId) {
+      normalizePaymentMethodUsers();
+      const normalizedUserId = String(userId || '');
+      const editingTransaction = state.editingTransactionId
+        ? state.transactions.find(transaction => transaction.id === state.editingTransactionId)
+        : null;
+      return state.paymentMethods.filter(method =>
+        method.userIds.includes(normalizedUserId) || method.id === editingTransaction?.paymentMethodId
+      );
+    }
+
     function openTransactionModal(defaults = {}) {
       if (!defaults || defaults instanceof Event) {
         defaults = {};
       }
 
+      state.editingTransactionId = null;
+      document.querySelector('#transactionModal .modal-title').textContent = '거래 추가';
       const deviceUser = getDeviceUser();
       state.selectedUser = defaults.userId || deviceUser?.id || state.users[0]?.id || null;
       state.selectedType = defaults.type || 'expense';
       state.selectedCategory = defaults.categoryId || getDefaultItemId(state.categories.filter(c => c.type === state.selectedType));
+      const availablePaymentMethods = getPaymentMethodsForUser(state.selectedUser);
       state.selectedPaymentMethod = defaults.paymentMethodId ||
-        (state.paymentMethods.some(item => item.id === state.uiPreferences.lastPaymentMethodId) ? state.uiPreferences.lastPaymentMethodId : getDefaultItemId(state.paymentMethods));
+        (availablePaymentMethods.some(item => item.id === state.uiPreferences.lastPaymentMethodId)
+          ? state.uiPreferences.lastPaymentMethodId
+          : getDefaultItemId(availablePaymentMethods));
       state.selectedAsset = defaults.assetId ||
         (state.assets.some(item => item.id === state.uiPreferences.lastAssetId) ? state.uiPreferences.lastAssetId : getDefaultItemId(state.assets));
 
@@ -5008,8 +5110,13 @@
       const categories = state.categories
         .filter(c => c.type === state.selectedType)
         .sort((a, b) => a.displayOrder - b.displayOrder);
-      const paymentMethods = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
+      const paymentMethods = getPaymentMethodsForUser(state.selectedUser)
+        .sort((a, b) => a.displayOrder - b.displayOrder);
       const assets = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
+
+      if (!paymentMethods.some(method => method.id === state.selectedPaymentMethod)) {
+        state.selectedPaymentMethod = getDefaultItemId(paymentMethods);
+      }
 
       renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
       renderSelectGrid('paymentMethodSelect', paymentMethods, state.selectedPaymentMethod, null, true);
@@ -5026,20 +5133,21 @@
       const dateValue = document.getElementById('dateInput')?.value;
       const date = dateValue ? new Date(`${dateValue}T12:00:00`) : null;
       const dateText = date && !Number.isNaN(date.getTime()) ? `${date.getMonth() + 1}/${date.getDate()}` : '날짜 선택';
-      summary.textContent = [user?.name, paymentMethod?.name, asset?.name, dateText].filter(Boolean).join(' · ');
+      summary.textContent = [paymentMethod?.name, asset?.name, dateText, user?.name].filter(Boolean).join(' · ');
     }
 
     function selectItem(containerId, itemId) {
       if (containerId === 'userSelect') {
         state.selectedUser = itemId;
         renderSelectGrid('userSelect', state.users, state.selectedUser);
+        updateTransactionModalForType();
       } else if (containerId === 'categorySelect') {
         state.selectedCategory = itemId;
         const categories = state.categories.filter(c => c.type === state.selectedType);
         renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
       } else if (containerId === 'paymentMethodSelect') {
         state.selectedPaymentMethod = itemId;
-        renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod, null, true);
+        renderSelectGrid('paymentMethodSelect', getPaymentMethodsForUser(state.selectedUser), state.selectedPaymentMethod, null, true);
       } else if (containerId === 'assetSelect') {
         state.selectedAsset = itemId;
         renderSelectGrid('assetSelect', state.assets, state.selectedAsset, null, true);
@@ -5060,7 +5168,7 @@
         const categories = state.categories.filter(c => c.type === state.selectedType);
         renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
       } else if (containerId === 'paymentMethodSelect') {
-        renderSelectGrid('paymentMethodSelect', state.paymentMethods, state.selectedPaymentMethod, null, true);
+        renderSelectGrid('paymentMethodSelect', getPaymentMethodsForUser(state.selectedUser), state.selectedPaymentMethod, null, true);
       } else if (containerId === 'assetSelect') {
         renderSelectGrid('assetSelect', state.assets, state.selectedAsset, null, true);
       }
@@ -5226,7 +5334,7 @@
 
       html += `<div class="detail-row">
         <span class="detail-label">유형</span>
-        <span class="detail-value">${transaction.type === 'income' ? '수입' : transaction.type === 'expense' ? '지출' : '자산이동'}</span>
+        <span class="detail-value">${transaction.type === 'income' ? '수입' : transaction.type === 'expense' ? '지출' : '예산이동'}</span>
       </div>`;
 
       html += `<div class="detail-row">
@@ -5250,11 +5358,11 @@
 
       if (transaction.type === 'transfer' && asset && toAsset) {
         html += `<div class="detail-row">
-          <span class="detail-label">출발 자산</span>
+          <span class="detail-label">출발 예산</span>
           <span class="detail-value">${escapeHTML(asset.name)}</span>
         </div>`;
         html += `<div class="detail-row">
-          <span class="detail-label">도착 자산</span>
+          <span class="detail-label">도착 예산</span>
           <span class="detail-value">${escapeHTML(toAsset.name)}</span>
         </div>`;
       } else {
@@ -5267,7 +5375,7 @@
 
         if (asset) {
           html += `<div class="detail-row">
-            <span class="detail-label">자산</span>
+            <span class="detail-label">예산</span>
             <span class="detail-value">${escapeHTML(asset.name)}</span>
           </div>`;
         }
@@ -5329,7 +5437,7 @@
       }
 
       if (!state.selectedAsset) {
-        showToast('자산을 선택해 주세요.');
+        showToast('예산을 선택해 주세요.');
         return;
       }
 
@@ -5394,17 +5502,17 @@
       }
 
       if (!state.selectedFromAsset) {
-        showToast('출발 자산을 선택해 주세요.');
+        showToast('출발 예산을 선택해 주세요.');
         return;
       }
 
       if (!state.selectedToAsset) {
-        showToast('도착 자산을 선택해 주세요.');
+        showToast('도착 예산을 선택해 주세요.');
         return;
       }
 
       if (state.selectedFromAsset === state.selectedToAsset) {
-        showToast('같은 자산으로는 이동할 수 없습니다.');
+        showToast('같은 예산으로는 이동할 수 없습니다.');
         return;
       }
 
@@ -5421,7 +5529,7 @@
         assetId: state.selectedFromAsset,
         toAssetId: state.selectedToAsset,
         transactionDate: date,
-        memo: '자산이동',
+        memo: '예산이동',
         createdAt: new Date().toISOString()
       };
 
@@ -5429,7 +5537,7 @@
       saveData();
       renderAll();
       closeModal('transferModal');
-      showToast('자산이동을 저장했어요.');
+      showToast('예산이동을 저장했어요.');
     }
 
     function editTransaction(transactionId) {
@@ -5438,7 +5546,7 @@
 
       // 거래 추가 모달을 열고 기존 값으로 채우기
       if (transaction.type === 'transfer') {
-        alert('자산이동 거래는 수정할 수 없습니다.');
+        alert('예산이동 거래는 수정할 수 없습니다.');
         return;
       }
 
@@ -5501,7 +5609,7 @@
       const { start, end } = getMonthRange(state.currentDate);
       let html = `
         <div class="settings-hint" style="margin-bottom: 14px;">
-          자산별 월 예산을 입력하세요. 아래 금액 버튼으로 빠르게 조정할 수 있어요.
+          항목별 월 예산을 입력하세요. 아래 금액 버튼으로 빠르게 조정할 수 있어요.
         </div>
       `;
 
@@ -5725,6 +5833,26 @@
       }
     }
 
+    function togglePaymentMethodUser(methodId, userId) {
+      normalizePaymentMethodUsers();
+      const method = state.paymentMethods.find(item => item.id === methodId);
+      if (!method) return;
+
+      const normalizedUserId = String(userId);
+      const isActive = method.userIds.includes(normalizedUserId);
+      if (isActive && method.userIds.length === 1) {
+        showToast('결제수단은 최소 한 명에게 연결해야 해요.');
+        return;
+      }
+
+      method.userIds = isActive
+        ? method.userIds.filter(id => id !== normalizedUserId)
+        : [...method.userIds, normalizedUserId];
+      saveData();
+      renderPaymentMethodsSettings();
+      updateTransactionModalForType();
+    }
+
     function addNewItem(type, categoryType = null) {
       const name = prompt('이름을 입력하세요:');
       if (!name || !name.trim()) return;
@@ -5747,6 +5875,10 @@
       if (type === 'assets') {
         newItem.balance = 0;
         newItem.budget = 0;
+      }
+
+      if (type === 'paymentMethods') {
+        newItem.userIds = state.users.map(user => String(user.id));
       }
 
       items.push(newItem);
@@ -5994,6 +6126,14 @@
           const currentAmount = parseFormattedNumber(input.value);
           const newAmount = currentAmount + amount;
           input.value = formatNumber(newAmount);
+        });
+      });
+
+      document.querySelectorAll('.numpad-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = document.getElementById('amountInput');
+          const currentValue = String(input.value || '').replace(/,/g, '');
+          input.value = formatNumber(`${currentValue === '0' ? '' : currentValue}${btn.dataset.num}`);
         });
       });
 
