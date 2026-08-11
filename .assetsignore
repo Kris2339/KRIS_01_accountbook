@@ -1,0 +1,16 @@
+worker.js
+wrangler.jsonc
+.git/**
+.gitignore
+.dev.vars
+.wrangler/**
+.github/**
+.claude/**
+migrations/**
+*.md
+*.sql
+*.txt
+*.backup
+index.html.backup
+index_backup_*.html
+index_new.html

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saenghwal-gagyebu-v1';
+const CACHE_NAME = 'saenghwal-gagyebu-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -41,7 +41,8 @@ self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
   const isStaticGet = event.request.method === 'GET' && requestUrl.origin === self.location.origin;
 
-  if (!isStaticGet) {
+  // API 응답은 개인정보이며 최신성이 중요하므로 절대 캐시하지 않습니다.
+  if (!isStaticGet || requestUrl.pathname.startsWith('/api/')) {
     return;
   }
 
@@ -64,7 +65,7 @@ self.addEventListener('fetch', (event) => {
             return response;
           }
           // HTML 요청이면 index.html 반환 (SPA 라우팅 지원)
-          if (event.request.headers.get('accept').includes('text/html')) {
+          if ((event.request.headers.get('accept') || '').includes('text/html')) {
             return caches.match('/index.html');
           }
         });

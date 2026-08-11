@@ -9,7 +9,6 @@
   <link rel="manifest" href="manifest.json">
   <!-- System font only -->
   <title>생활 가계부</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     * {
@@ -2458,6 +2457,7 @@
             <button class="btn btn-secondary" id="importDataBtn">가져오기</button>
             <button class="btn btn-secondary" id="undoDeleteBtn">삭제 취소</button>
             <button class="btn btn-secondary" id="backupSnapshotBtn">월별 백업</button>
+            <button class="btn btn-secondary" id="recoveryBackupBtn">이전 로컬 사본</button>
           </div>
           <input type="file" id="importDataInput" class="hidden-file-input" accept="application/json,.json">
         </div>
@@ -2778,7 +2778,9 @@
       },
 
       useLocalStorage: true,
-      supabaseClient: null,
+      cloudAvailable: false,
+      remoteRevision: 0,
+      syncConflict: null,
       trendChart: null
     };
 
@@ -2823,6 +2825,8 @@
         assets: state.assets,
         categories: state.categories,
         transactions: state.transactions,
+        monthlyBudget: state.monthlyBudget,
+        categoryBudgets: state.categoryBudgets,
         lastSavedAt: state.lastSavedAt
       };
     }
@@ -2903,12 +2907,16 @@
 
       const statusLabels = {
         local: '로컬 저장 모드',
-        pending: 'Supabase 저장 대기 중',
-        synced: 'Supabase 동기화 완료',
-        failed: 'Supabase 저장 실패'
+        pending: '클라우드 저장 대기 중',
+        synced: '클라우드 동기화 완료',
+        failed: '클라우드 저장 실패',
+        conflict: '다른 기기의 변경 확인 필요'
       };
 
-      statusCard.classList.toggle('warning', state.lastSyncStatus === 'failed' || state.pendingSyncCount > 0);
+      statusCard.classList.toggle(
+        'warning',
+        state.lastSyncStatus === 'failed' || state.lastSyncStatus === 'conflict' || state.pendingSyncCount > 0
+      );
       statusText.textContent = statusLabels[state.lastSyncStatus] || statusLabels.local;
       lastSavedText.textContent = `마지막 저장: ${state.lastSavedAt ? new Date(state.lastSavedAt).toLocaleString('ko-KR') : '-'}`;
       pendingSyncText.textContent = `대기 중인 변경: ${state.pendingSyncCount}건`;
@@ -2920,78 +2928,52 @@
       updateSyncStatus();
     }
 
-    async function saveToSupabase() {
-      if (!state.supabaseClient) return;
+    async function saveToCloud() {
+      if (!state.cloudAvailable) return false;
 
       try {
-        const data = {
-          users: state.users,
-          payment_methods: state.paymentMethods,
-          assets: state.assets,
-          categories: state.categories,
-          transactions: state.transactions,
-          monthly_budget: state.monthlyBudget,
-          category_budgets: state.categoryBudgets,
-          updated_at: new Date().toISOString()
-        };
+        const response = await fetch('/api/data', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            baseRevision: state.remoteRevision,
+            data: getSerializableData()
+          })
+        });
+        const result = await response.json();
 
-        const { data: existing, error: selectError } = await state.supabaseClient
-          .from('household_data')
-          .select('id')
-          .limit(1);
-
-        if (selectError) {
-          console.error('Supabase 조회 실패:', selectError);
-          state.lastSyncStatus = 'failed';
-          updateSyncStatus();
-          return;
+        if (response.status === 409) {
+          state.syncConflict = result.server || null;
+          state.lastSyncStatus = 'conflict';
+          throw new Error('다른 기기에서 먼저 저장했습니다. 수동 동기화로 최신 데이터를 확인해 주세요.');
         }
+        if (!response.ok) throw new Error(result.error || '클라우드 저장에 실패했습니다.');
 
-        if (existing && existing.length > 0) {
-          const { error: updateError } = await state.supabaseClient
-            .from('household_data')
-            .update(data)
-            .eq('id', existing[0].id);
-
-          if (updateError) {
-            console.error('Supabase 업데이트 실패:', updateError);
-            state.lastSyncStatus = 'failed';
-          } else {
-            state.pendingSyncCount = 0;
-            state.lastSyncStatus = 'synced';
-            console.log('✅ Supabase 자동 저장 완료');
-          }
-        } else {
-          const { error: insertError } = await state.supabaseClient
-            .from('household_data')
-            .insert([data]);
-
-          if (insertError) {
-            console.error('Supabase 삽입 실패:', insertError);
-            state.lastSyncStatus = 'failed';
-          } else {
-            state.pendingSyncCount = 0;
-            state.lastSyncStatus = 'synced';
-            console.log('✅ Supabase 자동 저장 완료');
-          }
-        }
+        state.remoteRevision = result.revision;
+        state.pendingSyncCount = 0;
+        state.lastSyncStatus = 'synced';
+        state.syncConflict = null;
+        return true;
       } catch (error) {
-        state.lastSyncStatus = 'failed';
-        console.error('Supabase 저장 실패:', error);
+        if (state.lastSyncStatus !== 'conflict') state.lastSyncStatus = 'failed';
+        console.error('클라우드 저장 실패:', error);
+        return false;
       } finally {
         updateSyncStatus();
       }
     }
 
-    const debouncedSyncToSupabase = debounce(saveToSupabase, 1000);
+    // 이전 함수명은 기존 이벤트 코드와의 호환을 위해 유지합니다.
+    const saveToSupabase = saveToCloud;
+    const debouncedSyncToCloud = debounce(saveToCloud, 1200);
 
     function saveData() {
       saveLocalData();
-      if (!state.useLocalStorage && state.supabaseClient) {
+      if (state.cloudAvailable) {
         state.pendingSyncCount += 1;
         state.lastSyncStatus = 'pending';
         updateSyncStatus();
-        debouncedSyncToSupabase();
+        debouncedSyncToCloud();
       }
     }
 
@@ -3005,6 +2987,8 @@
           state.assets = data.assets || state.assets;
           state.categories = data.categories || state.categories;
           state.transactions = data.transactions || [];
+          state.monthlyBudget = data.monthlyBudget || 0;
+          state.categoryBudgets = data.categoryBudgets || {};
           state.lastSavedAt = data.lastSavedAt || state.lastSavedAt;
         } catch (error) {
           console.error('localStorage 데이터 복구 실패:', error);
@@ -3014,47 +2998,55 @@
       }
     }
 
-    async function loadFromSupabase() {
-      if (!state.supabaseClient) return;
+    function applyCloudPayload(payload) {
+      state.users = payload.users || state.users;
+      state.paymentMethods = payload.paymentMethods || state.paymentMethods;
+      state.assets = payload.assets || state.assets;
+      state.categories = payload.categories || state.categories;
+      state.transactions = payload.transactions || [];
+      state.monthlyBudget = payload.monthlyBudget || 0;
+      state.categoryBudgets = payload.categoryBudgets || {};
+      state.lastSavedAt = payload.lastSavedAt || state.lastSavedAt;
+    }
 
+    async function loadFromCloud() {
       try {
-        const { data, error } = await state.supabaseClient
-          .from('household_data')
-          .select('*')
-          .order('updated_at', { ascending: false })
-          .limit(1);
+        const response = await fetch('/api/data', { headers: { accept: 'application/json' } });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '클라우드 데이터를 불러오지 못했습니다.');
 
-        if (error) {
-          console.error('Supabase 로드 실패:', error);
-          return;
-        }
+        state.cloudAvailable = true;
+        state.useLocalStorage = false;
+        state.remoteRevision = result.revision || 0;
 
-        if (data && data.length > 0) {
-          const loadedData = data[0];
-          state.users = loadedData.users || state.users;
-          state.paymentMethods = loadedData.payment_methods || state.paymentMethods;
-          state.assets = loadedData.assets || state.assets;
-          state.categories = loadedData.categories || state.categories;
-          state.transactions = loadedData.transactions || [];
-          state.monthlyBudget = loadedData.monthly_budget || 0;
-          state.categoryBudgets = loadedData.category_budgets || {};
-          state.lastSavedAt = loadedData.updated_at || state.lastSavedAt;
+        if (result.initialized) {
+          preserveLocalBeforeCloudOverwrite(result.data || {}, result.revision || 0);
+          applyCloudPayload(result.data || {});
           state.pendingSyncCount = 0;
           state.lastSyncStatus = 'synced';
-
           saveLocalData();
-          console.log('✅ Supabase 데이터 로드 완료');
+        } else {
+          // 새 DB에서는 휴대폰에 남아 있는 로컬 데이터를 자동 덮어쓰지 않습니다.
+          // 설정의 수동 동기화를 누를 때만 최초 업로드합니다.
+          state.lastSyncStatus = state.transactions.length ? 'pending' : 'synced';
+          state.pendingSyncCount = state.transactions.length ? 1 : 0;
         }
+        return true;
       } catch (error) {
-        console.error('Supabase 로드 실패:', error);
+        state.cloudAvailable = false;
+        state.useLocalStorage = true;
+        state.lastSyncStatus = 'local';
+        console.error('클라우드 로드 실패, 로컬 데이터를 유지합니다:', error);
+        return false;
+      } finally {
+        updateSyncStatus();
       }
     }
 
+    const loadFromSupabase = loadFromCloud;
+
     async function loadData() {
       loadLocalData();
-      if (!state.useLocalStorage && state.supabaseClient) {
-        await loadFromSupabase();
-      }
     }
 
     function downloadJSON(filename, data) {
@@ -3067,6 +3059,43 @@
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
+    }
+
+    function preserveLocalBeforeCloudOverwrite(cloudData, revision) {
+      if (!state.transactions.length) return;
+
+      const localIds = state.transactions.map((item) => String(item.id)).sort().join('|');
+      const cloudIds = (cloudData.transactions || []).map((item) => String(item.id)).sort().join('|');
+      if (localIds === cloudIds) return;
+
+      const backupKey = `household_recovery_before_cloud_${Date.now()}`;
+      localStorage.setItem(backupKey, JSON.stringify({
+        reason: 'cloud-overwrite-protection',
+        cloudRevision: revision,
+        createdAt: new Date().toISOString(),
+        data: getSerializableData()
+      }));
+
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith('household_recovery_before_cloud_'))
+        .sort()
+        .reverse()
+        .slice(3)
+        .forEach((key) => localStorage.removeItem(key));
+    }
+
+    function exportLatestRecoveryBackup() {
+      const key = Object.keys(localStorage)
+        .filter((item) => item.startsWith('household_recovery_before_cloud_'))
+        .sort()
+        .reverse()[0];
+      if (!key) {
+        alert('보관된 이전 로컬 사본이 없습니다.');
+        return;
+      }
+
+      const backup = JSON.parse(localStorage.getItem(key));
+      downloadJSON(`household-recovery-${formatDate(new Date())}.json`, backup);
     }
 
     function exportData() {
@@ -4883,29 +4912,15 @@
       setupBottomSheetDismissal();
       setupKeyboardAvoidance();
 
-      // Supabase 자동 연결 (하드코딩)
-      try {
-        if (typeof supabase !== 'undefined') {
-          state.supabaseClient = supabase.createClient(
-            'https://zmnzfeicabvquwbxgjwt.supabase.co',
-            'sb_publishable_EUBiU6pKPHdimu-roGXrag_CK9rWVdm'
-          );
-          state.useLocalStorage = false;
+      // Cloudflare D1 연결. 실패해도 먼저 읽은 로컬 사본은 그대로 유지합니다.
+      await loadFromCloud();
+      renderAll();
 
-          // 자동으로 최신 데이터 로드
-          await loadFromSupabase();
+      // 앱으로 돌아왔을 때 다른 기기에서 저장한 내용을 새로 확인합니다.
+      window.addEventListener('focus', async () => {
+        if (state.cloudAvailable && state.pendingSyncCount === 0) {
+          await loadFromCloud();
           renderAll();
-          console.log('✅ Supabase 자동 연결 및 데이터 로드 완료');
-        }
-      } catch (error) {
-        console.error('Supabase 자동 연결 실패:', error);
-      }
-
-      // 페이지 닫기 전 데이터 저장 (데이터 유실 방지)
-      window.addEventListener('beforeunload', () => {
-        if (!state.useLocalStorage && state.supabaseClient) {
-          // debounce를 거치지 않고 즉시 저장
-          saveToSupabase();
         }
       });
 
@@ -5035,6 +5050,7 @@
       });
       document.getElementById('undoDeleteBtn').addEventListener('click', undoLastDelete);
       document.getElementById('backupSnapshotBtn').addEventListener('click', createMonthlyBackupSnapshot);
+      document.getElementById('recoveryBackupBtn').addEventListener('click', exportLatestRecoveryBackup);
 
       // 필터 버튼
       document.querySelectorAll('#logFilters .filter-btn').forEach(btn => {
@@ -5072,8 +5088,11 @@
           button.innerHTML = '<span>🔄</span><span>동기화 중...</span>';
           button.style.opacity = '0.6';
 
-          await saveToSupabase();
-          await loadFromSupabase();
+          if (!state.cloudAvailable) await loadFromCloud();
+          if (!state.cloudAvailable) throw new Error('클라우드에 연결할 수 없습니다.');
+          const saved = await saveToCloud();
+          if (!saved) throw new Error('로컬 데이터는 보존했지만 클라우드 저장에 실패했습니다.');
+          await loadFromCloud();
           renderAll();
 
           // 성공 피드백
