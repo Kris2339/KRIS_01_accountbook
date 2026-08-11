@@ -29,7 +29,7 @@ function secureAsset(response, noStore = false) {
   secured.headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=()');
   secured.headers.set(
     'content-security-policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self'; font-src 'self' data: https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
   );
   if (noStore) secured.headers.set('cache-control', 'no-store');
   return secured;

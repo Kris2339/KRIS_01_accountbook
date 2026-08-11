@@ -7,7 +7,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="생활 가계부">
   <link rel="manifest" href="manifest.json">
-  <!-- System font only -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <!-- Korean-first UI font with system fallbacks -->
   <title>생활 가계부</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
@@ -44,8 +46,9 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
       font-size: 14px;
+      font-optical-sizing: auto;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       background: #FAFAFA;
@@ -53,6 +56,13 @@
       -webkit-overflow-scrolling: touch;
       color: var(--gray-900);
       line-height: 1.5;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
     }
 
     body.modal-open {
@@ -2963,6 +2973,21 @@
         margin-right: auto;
       }
 
+      .header-topline {
+        position: relative;
+        justify-content: center;
+      }
+
+      .header-topline .month-selector {
+        flex: 0 0 240px;
+        max-width: 240px;
+      }
+
+      .header-topline .today-button {
+        position: absolute;
+        right: 0;
+      }
+
       body[data-active-tab="calendar"] .content {
         overflow-y: auto !important;
       }
@@ -3666,15 +3691,22 @@
       };
     }
 
+    function parseLocalDate(date) {
+      if (date instanceof Date) return new Date(date.getTime());
+      const match = String(date || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12);
+      return new Date(date);
+    }
+
     function formatDate(date) {
-      const d = new Date(date);
+      const d = parseLocalDate(date);
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
     function formatDateKo(date) {
-      const d = new Date(date);
-      const days = ['일', '월', '화', '수', '목', '금', '토'];
-      return `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+      const d = parseLocalDate(date);
+      const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+      return `${d.getMonth() + 1}월 ${d.getDate()}일 ${days[d.getDay()]}`;
     }
 
     function getMonthRange(date) {
