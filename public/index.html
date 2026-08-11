@@ -2177,9 +2177,12 @@
       display: flex;
       gap: 6px;
       margin-top: 9px;
+      flex-wrap: wrap;
     }
 
     .payment-user-chip {
+      flex: 0 0 auto;
+      min-width: 64px;
       min-height: 32px;
       padding: 0 12px;
       border: 1px solid var(--line);
@@ -2188,12 +2191,32 @@
       color: var(--muted);
       font-size: 11px;
       font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      word-break: keep-all;
     }
 
     .payment-user-chip.active {
       border-color: #8DBAF8;
       background: #E8F3FF;
       color: #1B64DA;
+    }
+
+    .payment-method-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      gap: 12px;
+    }
+
+    .payment-method-card .item-content {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .payment-method-card .item-actions {
+      width: 100%;
+      justify-content: flex-start;
     }
 
     .transaction-amount.expense,
@@ -5016,7 +5039,7 @@
       normalizePaymentMethodUsers();
       const sorted = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
       const html = sorted.map(method => `
-        <div class="settings-item-card">
+        <div class="settings-item-card payment-method-card">
           <div class="item-content">
             <div class="item-name">${escapeHTML(method.name)}</div>
             <div class="item-meta">${method.isFavorite ? '즐겨찾기 • ' : ''}순서 ${method.displayOrder} • ${state.users.filter(user => method.userIds.includes(String(user.id))).map(user => escapeHTML(user.name)).join(' · ')} 사용</div>
