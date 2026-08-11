@@ -2084,7 +2084,12 @@
       overflow-x: hidden;
       overflow-y: auto;
       overscroll-behavior: contain;
+      touch-action: pan-y;
       -webkit-overflow-scrolling: touch;
+    }
+
+    body.modal-open {
+      touch-action: pan-y;
     }
 
     .transaction-entry-type .select-grid {
@@ -3179,6 +3184,20 @@
     }
 
     @media (max-width: 899px) {
+      .modal-overlay {
+        top: var(--visual-viewport-top, 0px);
+        left: var(--visual-viewport-left, 0px);
+        right: auto;
+        bottom: auto;
+        width: var(--visual-viewport-width, 100vw);
+        height: var(--visual-viewport-height, 100dvh);
+      }
+
+      .modal,
+      #transactionModal .modal {
+        max-height: calc(var(--visual-viewport-height, 100dvh) - 8px);
+      }
+
       input,
       textarea,
       select {
@@ -5505,8 +5524,36 @@
 
     function setupKeyboardAvoidance() {
       const updateVisualViewport = () => {
-        const viewportHeight = window.visualViewport?.height || window.innerHeight;
+        const viewport = window.visualViewport;
+        const viewportHeight = viewport?.height || window.innerHeight;
+        const viewportWidth = viewport?.width || window.innerWidth;
+        const viewportTop = viewport?.offsetTop || 0;
+        const viewportLeft = viewport?.offsetLeft || 0;
         document.documentElement.style.setProperty('--visual-viewport-height', `${Math.round(viewportHeight)}px`);
+        document.documentElement.style.setProperty('--visual-viewport-width', `${Math.round(viewportWidth)}px`);
+        document.documentElement.style.setProperty('--visual-viewport-top', `${Math.round(viewportTop)}px`);
+        document.documentElement.style.setProperty('--visual-viewport-left', `${Math.round(viewportLeft)}px`);
+
+        const activeInput = document.activeElement;
+        if (activeInput instanceof HTMLElement && activeInput.closest('.modal')) {
+          requestAnimationFrame(() => keepModalInputVisible(activeInput));
+        }
+      };
+
+      const keepModalInputVisible = (target) => {
+        const scrollContainer = target.closest('.transaction-form-scroll') || target.closest('.modal');
+        if (!(scrollContainer instanceof HTMLElement)) return;
+
+        const targetRect = target.getBoundingClientRect();
+        const scrollRect = scrollContainer.getBoundingClientRect();
+        const topLimit = scrollRect.top + 12;
+        const bottomLimit = scrollRect.bottom - 12;
+
+        if (targetRect.bottom > bottomLimit) {
+          scrollContainer.scrollTop += targetRect.bottom - bottomLimit;
+        } else if (targetRect.top < topLimit) {
+          scrollContainer.scrollTop -= topLimit - targetRect.top;
+        }
       };
 
       if (window.visualViewport) {
@@ -5523,8 +5570,12 @@
 
         setTimeout(() => {
           updateVisualViewport();
-          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }, 120);
+          keepModalInputVisible(target);
+        }, 80);
+        setTimeout(() => {
+          updateVisualViewport();
+          keepModalInputVisible(target);
+        }, 320);
       });
     }
 
