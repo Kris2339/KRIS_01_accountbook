@@ -2122,54 +2122,6 @@
       overflow: hidden;
     }
 
-    .entry-options summary {
-      min-height: 58px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      cursor: pointer;
-      list-style: none;
-    }
-
-    .entry-options summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .entry-options summary span {
-      flex: 0 0 auto;
-      color: var(--ink);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .entry-options summary strong {
-      min-width: 0;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      text-align: right;
-    }
-
-    .entry-options summary::after {
-      content: '⌄';
-      color: var(--muted);
-      font-size: 18px;
-      transition: transform 0.18s ease;
-    }
-
-    .entry-options[open] summary {
-      border-bottom: 1px solid var(--line);
-    }
-
-    .entry-options[open] summary::after {
-      transform: rotate(180deg);
-    }
-
     .entry-options-body {
       padding: 14px 14px 2px;
     }
@@ -3535,11 +3487,7 @@
         <div class="select-grid" id="categorySelect"></div>
       </div>
 
-      <details class="entry-options" id="transactionOptions">
-        <summary>
-          <span>상세 정보</span>
-          <strong id="entryOptionsSummary"></strong>
-        </summary>
+      <div class="entry-options">
         <div class="entry-options-body">
           <div class="form-group">
             <label class="form-label" for="memoInput">메모 (선택)</label>
@@ -3566,7 +3514,7 @@
             <div class="select-grid" id="userSelect"></div>
           </div>
         </div>
-      </details>
+      </div>
       </div>
 
       <button class="btn btn-primary" id="saveTransaction">저장</button>
@@ -5331,7 +5279,6 @@
 
       renderSelectGrid('userSelect', state.users, state.selectedUser);
       updateTransactionModalForType();
-      document.getElementById('transactionOptions').open = false;
 
       const modal = document.getElementById('transactionModal');
       modal.classList.add('active');
@@ -5377,19 +5324,6 @@
       renderSelectGrid('categorySelect', categories, state.selectedCategory, null, true);
       renderSelectGrid('paymentMethodSelect', paymentMethods, state.selectedPaymentMethod, null, true);
       renderSelectGrid('assetSelect', assets, state.selectedAsset, null, true);
-      updateEntryOptionsSummary();
-    }
-
-    function updateEntryOptionsSummary() {
-      const summary = document.getElementById('entryOptionsSummary');
-      if (!summary) return;
-      const user = state.users.find(item => item.id === state.selectedUser);
-      const paymentMethod = state.paymentMethods.find(item => item.id === state.selectedPaymentMethod);
-      const asset = state.assets.find(item => item.id === state.selectedAsset);
-      const dateValue = document.getElementById('dateInput')?.value;
-      const date = dateValue ? new Date(`${dateValue}T12:00:00`) : null;
-      const dateText = date && !Number.isNaN(date.getTime()) ? `${date.getMonth() + 1}/${date.getDate()}` : '날짜 선택';
-      summary.textContent = [paymentMethod?.name, asset?.name, dateText, user?.name].filter(Boolean).join(' · ');
     }
 
     function selectItem(containerId, itemId) {
@@ -5414,7 +5348,6 @@
         state.selectedToAsset = itemId;
         renderSelectGrid('toAssetSelect', state.assets, state.selectedToAsset);
       }
-      updateEntryOptionsSummary();
     }
 
     function toggleExpand(containerId) {
@@ -5883,7 +5816,6 @@
       });
 
       updateTransactionModalForType();
-      document.getElementById('transactionOptions').open = true;
 
       // 모달 제목 변경
       document.querySelector('#transactionModal .modal-title').textContent = '거래 수정';
@@ -6405,8 +6337,6 @@
         const formatted = formatNumber(e.target.value);
         e.target.value = formatted;
       });
-
-      document.getElementById('dateInput').addEventListener('change', updateEntryOptionsSummary);
 
       // 금액 초기화
       document.getElementById('resetAmountBtn').addEventListener('click', () => {
