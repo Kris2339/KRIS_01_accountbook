@@ -1,17 +1,34 @@
 /* Scoped settings refinements: no changes to the calendar or entry form. */
 .settings-disclosure:not([open]) { padding-top: 8px; padding-bottom: 8px; }
 .settings-disclosure:not([open]) > summary { margin-bottom: 0; }
-.settings-list-toolbar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.managed-section { position: relative; padding: 12px; }
+.managed-section > summary { padding-right: 96px; }
+.managed-section > summary::after { position: absolute; right: 12px; }
+.managed-section[open] > summary { margin-bottom: 8px; }
+.settings-list-toolbar { position: absolute; right: 48px; top: 12px; height: 44px; display: flex; align-items: center; }
+.managed-section:not([open]) .settings-list-toolbar { display: none; }
+.managed-section .settings-list-toolbar .icon-btn { padding: 0 8px; background: transparent; font-size: 12px; }
 .settings-item-card.managed-setting { display: block; min-height: 0; }
-.managed-setting-heading { display: flex; align-items: center; gap: 6px; }
+.managed-setting-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 8px; }
+.managed-heading-actions { display: flex; align-items: center; gap: 6px; grid-column: 2; grid-row: 1; }
+.has-users .managed-heading-actions { grid-row: 1 / span 2; }
+.managed-setting-heading .item-name .item-meta { display: inline; margin-left: 8px; white-space: nowrap; }
 .managed-setting-heading .item-name { min-width: 0; overflow-wrap: anywhere; margin: 0; }
-.managed-setting .payment-user-settings { align-items: center; margin-top: 6px; }
-.managed-setting .payment-user-chip { min-height: 44px; }
+.managed-setting .payment-user-settings { grid-column: 1; grid-row: 2; align-items: center; margin: 0; gap: 4px; }
+.managed-setting .payment-user-chip { min-height: 36px; min-width: 56px; padding: 0 10px; border-radius: 10px; }
+.managed-section .managed-setting { padding: 10px; margin-bottom: 6px; border-radius: 12px; }
+.managed-setting .icon-btn, .managed-editor-actions .btn { box-sizing: border-box; height: 44px; min-height: 44px; min-width: 44px; margin: 0; padding: 0 12px; border: 0; border-radius: 10px; font-size: 12px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
 .managed-order { margin-top: 8px; }
 .managed-setting button:disabled { opacity: .35; cursor: default; }
-.managed-editor { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
-.managed-editor label { display: block; font-size: 12px; color: var(--muted); }
-.managed-editor input { box-sizing: border-box; width: 100%; min-height: 44px; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 16px; background: white; color: var(--ink); }
-.managed-editor-actions { display: flex; gap: 6px; align-items: center; margin-top: 10px; }
+.managed-editor { display: grid; gap: 8px; margin-top: 8px; border-top: 1px solid var(--line); padding-top: 8px; }
+.managed-editor label { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; font-size: 12px; color: var(--muted); }
+.managed-editor input { box-sizing: border-box; width: 100%; min-width: 0; height: 44px; margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 16px; background: white; color: var(--ink); }
+.managed-editor-actions { display: flex; gap: 6px; align-items: center; margin: 0; }
 .managed-editor-actions .delete { margin-right: auto; }
-.managed-editor-actions .btn { width: auto; min-height: 44px; padding: 8px 12px; }
+.managed-editor-actions .btn { width: auto; }
+@media (min-width: 600px) {
+  .managed-setting-heading.has-users { grid-template-columns: minmax(120px, 1fr) auto auto; }
+  .has-users .managed-heading-actions { grid-column: 3; grid-row: 1; }
+  .managed-setting .payment-user-settings { grid-column: 2; grid-row: 1; flex-wrap: nowrap; }
+  .managed-editor { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+}

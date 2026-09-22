@@ -6,6 +6,8 @@ const settingsLists = { paymentMethods: 'paymentMethodsList', assets: 'assetsSet
 function renderManagedSettings(type) {
   if (type === 'paymentMethods') normalizePaymentMethodUsers();
   const container = document.getElementById(settingsLists[type]);
+  container.closest('details').classList.add('managed-section');
+  container.closest('details').querySelector('.settings-list-toolbar')?.remove();
   const sorted = [...state[type]].sort((a, b) =>
     type === 'categories' && a.type !== b.type
       ? (a.type === 'income' ? -1 : 1)
@@ -23,7 +25,7 @@ function renderManagedSettings(type) {
     renderManagedSettings(type);
   });
   reorder.setAttribute('aria-pressed', String(settingsReordering.has(type)));
-  toolbar.append(reorder); container.append(toolbar);
+  toolbar.append(reorder); container.before(toolbar);
   for (const item of sorted) {
     const card = document.createElement('div');
     card.className = 'settings-item-card managed-setting';
@@ -35,20 +37,22 @@ function renderManagedSettings(type) {
     const edit = button(settingsEditors.has(type + ':' + item.id) ? '닫기' : '수정', () => editItem(type, item.id), 'icon-btn edit');
     edit.setAttribute('aria-expanded', String(settingsEditors.has(type + ':' + item.id)));
     edit.setAttribute('aria-label', item.name + ' 수정');
-    heading.append(name, star, edit); card.append(heading);
+    const controls = document.createElement('div'); controls.className = 'managed-heading-actions';
+    controls.append(star, edit);
+    heading.append(name, controls); card.append(heading);
     if (type === 'categories') {
       const meta = document.createElement('div'); meta.className = 'item-meta';
-      meta.textContent = item.type === 'income' ? '수입' : '지출'; card.append(meta);
+      meta.textContent = item.type === 'income' ? '수입' : '지출'; name.append(meta);
     }
     if (type === 'paymentMethods') {
       const users = document.createElement('div'); users.className = 'payment-user-settings';
-      const label = document.createElement('span'); label.className = 'item-meta'; label.textContent = '사용하는 사람'; users.append(label);
+      users.setAttribute('role', 'group'); users.setAttribute('aria-label', item.name + ' 사용하는 사람');
       for (const user of state.users) {
         const active = item.userIds.includes(String(user.id));
         const chip = button((active ? '✓ ' : '') + user.name, () => togglePaymentMethodUser(item.id, user.id), 'payment-user-chip' + (active ? ' active' : ''));
         chip.setAttribute('aria-pressed', String(active)); users.append(chip);
       }
-      card.append(users);
+      heading.classList.add('has-users'); heading.append(users);
     }
     if (settingsReordering.has(type)) {
       const actions = document.createElement('div'); actions.className = 'item-actions managed-order';

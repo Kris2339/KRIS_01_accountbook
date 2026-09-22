@@ -1,8 +1,8 @@
-const CACHE = "accountbook-shell-classic-1.0.2";
+const CACHE = "accountbook-shell-classic-1.0.3a";
 const SHELL = [
   "/",
-  "/settings-management.css?v=1",
-  "/settings-management.js?v=1",
+  "/settings-management.css?v=3",
+  "/settings-management.js?v=2",
   "/legacy-storage.js?v=classic-1",
   "/core.js",
   "/sync.js",

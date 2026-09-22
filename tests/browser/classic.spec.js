@@ -57,8 +57,8 @@ test("pre-redesign markup and styles are restored exactly", async ({
     { encoding: "utf8", maxBuffer: 2000000 },
   );
   const current = readFileSync("public/index.html", "utf8");
-  expect(current.split("  <script>")[0].replaceAll("\r\n", "\n").replace('  <link rel="stylesheet" href="/settings-management.css?v=1">\n', '')).toBe(
-    original.split("  <script>")[0].replaceAll("\r\n", "\n").replace(
+  expect(current.split("  <script>")[0].replaceAll("\r\n", "\n").replace('  <link rel="stylesheet" href="/settings-management.css?v=3">\n', '')).toBe(
+    original.split("  <script>")[0].replaceAll("\r\n", "\n").replace('          <div class="settings-hint">각 결제수단을 사용할 사람을 선택할 수 있어요.</div>\n', '').replace(
       '      position: sticky;\n      bottom: calc(92px + env(safe-area-inset-bottom));\n      z-index: 8;',
       '      position: static;',
     ),
