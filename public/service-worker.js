@@ -1,12 +1,10 @@
-const CACHE = "accountbook-shell-v2.1";
+const CACHE = "accountbook-shell-classic-1";
 const SHELL = [
   "/",
-  "/style.css?v=2.1.0",
-  "/app.js?v=2.1.0",
+  "/legacy-storage.js?v=classic-1",
   "/core.js",
   "/sync.js",
   "/manifest.json",
-  "/icon.svg",
 ];
 self.addEventListener("install", (event) =>
   event.waitUntil(

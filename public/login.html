@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#1769e0">
-  <title>가계부 로그인</title>
+  <meta name="theme-color" content="#6c5ce7">
+  <title>우리집 가계부 로그인</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -15,16 +15,16 @@
       place-items: center;
       padding: 24px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #172033;
-      background: #f3f6fb;
+      color: #28263a;
+      background: linear-gradient(160deg, #f3f0ff 0%, #fff 52%, #eef8ff 100%);
     }
     .card {
       width: min(100%, 390px);
       padding: 34px 28px 30px;
-      border: 1px solid #e8ecf0;
-      border-radius: 12px;
+      border: 1px solid rgba(108, 92, 231, 0.14);
+      border-radius: 28px;
       background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 12px 35px rgba(32,43,54,.06);
+      box-shadow: 0 22px 55px rgba(75, 65, 145, 0.15);
     }
     .icon {
       display: grid;
@@ -35,7 +35,7 @@
       border-radius: 18px;
       color: white;
       font-size: 28px;
-      background: #1769e0;
+      background: linear-gradient(135deg, #7c6df0, #5f52d9);
     }
     h1 { margin: 0 0 8px; font-size: 25px; }
     p { margin: 0 0 26px; color: #777386; line-height: 1.55; }
@@ -44,7 +44,7 @@
       width: 100%;
       height: 58px;
       border: 1px solid #dedbea;
-      border-radius: 8px;
+      border-radius: 16px;
       padding: 0 18px;
       text-align: center;
       font-size: 24px;
@@ -53,17 +53,17 @@
       outline: none;
       background: #fbfaff;
     }
-    input:focus { border-color: #1769e0; box-shadow: 0 0 0 3px #1769e018; }
+    input:focus { border-color: #6c5ce7; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.11); }
     button {
       width: 100%;
       height: 56px;
       margin-top: 16px;
       border: 0;
-      border-radius: 8px;
+      border-radius: 16px;
       color: white;
       font-size: 17px;
       font-weight: 750;
-      background: #1769e0;
+      background: linear-gradient(135deg, #7566eb, #5b4fd2);
       cursor: pointer;
     }
     button:disabled { opacity: 0.55; cursor: wait; }
@@ -73,8 +73,9 @@
 </head>
 <body>
   <main class="card">
-    <h1>가계부</h1>
-    <p>6자리 번호로 로그인하세요.</p>
+    <div class="icon">₩</div>
+    <h1>우리집 가계부</h1>
+    <p>가족에게 공유된 6자리 번호를 입력해 주세요.</p>
     <form id="loginForm">
       <label for="pin">사용 번호</label>
       <input id="pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required autofocus>

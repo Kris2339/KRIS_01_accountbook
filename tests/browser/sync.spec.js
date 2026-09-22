@@ -26,7 +26,7 @@ test.beforeEach(async ({ request, page }) => {
     ).ok(),
   ).toBeTruthy();
   await page.goto("/");
-  await expect(page.locator("#sync")).toHaveText("동기화 완료");
+  await expect(page.locator("#globalSyncPill")).toHaveText("저장 완료");
 });
 test("new edit made during PUT remains pending until its own acknowledgement", async ({
   page,
