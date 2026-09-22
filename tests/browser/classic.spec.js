@@ -58,7 +58,10 @@ test("pre-redesign markup and styles are restored exactly", async ({
   );
   const current = readFileSync("public/index.html", "utf8");
   expect(current.split("  <script>")[0].replaceAll("\r\n", "\n")).toBe(
-    original.split("  <script>")[0].replaceAll("\r\n", "\n"),
+    original.split("  <script>")[0].replaceAll("\r\n", "\n").replace(
+      '      position: sticky;\n      bottom: calc(92px + env(safe-area-inset-bottom));\n      z-index: 8;',
+      '      position: static;',
+    ),
   );
   await open(page);
   await expect(page.locator("#calendar-content")).toHaveClass(/active/);

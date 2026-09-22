@@ -1,4 +1,4 @@
-const CACHE = "accountbook-shell-classic-1";
+const CACHE = "accountbook-shell-classic-1.0.1";
 const SHELL = [
   "/",
   "/legacy-storage.js?v=classic-1",
