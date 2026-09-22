@@ -1,0 +1,17 @@
+/* Scoped settings refinements: no changes to the calendar or entry form. */
+.settings-disclosure:not([open]) { padding-top: 8px; padding-bottom: 8px; }
+.settings-disclosure:not([open]) > summary { margin-bottom: 0; }
+.settings-list-toolbar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.settings-item-card.managed-setting { display: block; min-height: 0; }
+.managed-setting-heading { display: flex; align-items: center; gap: 6px; }
+.managed-setting-heading .item-name { min-width: 0; overflow-wrap: anywhere; margin: 0; }
+.managed-setting .payment-user-settings { align-items: center; margin-top: 6px; }
+.managed-setting .payment-user-chip { min-height: 44px; }
+.managed-order { margin-top: 8px; }
+.managed-setting button:disabled { opacity: .35; cursor: default; }
+.managed-editor { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+.managed-editor label { display: block; font-size: 12px; color: var(--muted); }
+.managed-editor input { box-sizing: border-box; width: 100%; min-height: 44px; margin-top: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; font: inherit; font-size: 16px; background: white; color: var(--ink); }
+.managed-editor-actions { display: flex; gap: 6px; align-items: center; margin-top: 10px; }
+.managed-editor-actions .delete { margin-right: auto; }
+.managed-editor-actions .btn { width: auto; min-height: 44px; padding: 8px 12px; }

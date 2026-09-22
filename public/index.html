@@ -3192,6 +3192,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/settings-management.css?v=1">
 </head>
 <body data-active-tab="calendar">
   <div class="container">
@@ -3745,7 +3746,7 @@
 
     function normalizeCategoryIcons() {
       state.categories.forEach(category => {
-        category.icon = getCategoryIcon(category.name);
+        if (!category.icon) category.icon = getCategoryIcon(category.name);
       });
     }
 
@@ -5097,78 +5098,6 @@
       });
     }
 
-    function renderPaymentMethodsSettings() {
-      normalizePaymentMethodUsers();
-      const sorted = [...state.paymentMethods].sort((a, b) => a.displayOrder - b.displayOrder);
-      const html = sorted.map(method => `
-        <div class="settings-item-card payment-method-card">
-          <div class="item-content">
-            <div class="item-name">${escapeHTML(method.name)}</div>
-            <div class="item-meta">${method.isFavorite ? '즐겨찾기 • ' : ''}순서 ${method.displayOrder} • ${state.users.filter(user => method.userIds.includes(String(user.id))).map(user => escapeHTML(user.name)).join(' · ')} 사용</div>
-            <div class="payment-user-settings" aria-label="${escapeAttr(method.name)} 사용 사용자">
-              ${state.users.map(user => {
-                const active = method.userIds.includes(String(user.id));
-                return `<button type="button" class="payment-user-chip ${active ? 'active' : ''}" aria-pressed="${active}" onclick="togglePaymentMethodUser('${method.id}', '${user.id}')">${escapeHTML(user.name)}</button>`;
-              }).join('')}
-            </div>
-          </div>
-          <div class="item-actions">
-            <button class="icon-btn reorder" aria-label="${escapeAttr(method.name)} 위로 이동" onclick="moveItemUp('paymentMethods', '${method.id}')">↑</button>
-            <button class="icon-btn reorder" aria-label="${escapeAttr(method.name)} 아래로 이동" onclick="moveItemDown('paymentMethods', '${method.id}')">↓</button>
-            <button class="icon-btn ${method.isFavorite ? 'favorite' : ''}" aria-label="${escapeAttr(method.name)} 즐겨찾기 ${method.isFavorite ? '해제' : '설정'}" aria-pressed="${method.isFavorite}" onclick="toggleFavorite('paymentMethods', '${method.id}')">★</button>
-            <button class="icon-btn edit" onclick="editItem('paymentMethods', '${method.id}')">수정</button>
-            <button class="icon-btn delete" onclick="deleteItem('paymentMethods', '${method.id}')">삭제</button>
-          </div>
-        </div>
-      `).join('');
-      document.getElementById('paymentMethodsList').innerHTML = html;
-    }
-
-    function renderAssetsSettings() {
-      const sorted = [...state.assets].sort((a, b) => a.displayOrder - b.displayOrder);
-      const html = sorted.map(asset => `
-        <div class="settings-item-card">
-          <div class="item-content">
-            <div class="item-name">${escapeHTML(asset.name)}</div>
-            <div class="item-meta">${asset.isFavorite ? '즐겨찾기 • ' : ''}순서 ${asset.displayOrder}</div>
-          </div>
-          <div class="item-actions">
-            <button class="icon-btn reorder" aria-label="${escapeAttr(asset.name)} 위로 이동" onclick="moveItemUp('assets', '${asset.id}')">↑</button>
-            <button class="icon-btn reorder" aria-label="${escapeAttr(asset.name)} 아래로 이동" onclick="moveItemDown('assets', '${asset.id}')">↓</button>
-            <button class="icon-btn ${asset.isFavorite ? 'favorite' : ''}" aria-label="${escapeAttr(asset.name)} 즐겨찾기 ${asset.isFavorite ? '해제' : '설정'}" aria-pressed="${asset.isFavorite}" onclick="toggleFavorite('assets', '${asset.id}')">★</button>
-            <button class="icon-btn edit" onclick="editItem('assets', '${asset.id}')">수정</button>
-            <button class="icon-btn delete" onclick="deleteItem('assets', '${asset.id}')">삭제</button>
-          </div>
-        </div>
-      `).join('');
-      document.getElementById('assetsSettingsList').innerHTML = html;
-    }
-
-    function renderCategoriesSettings() {
-      const sorted = [...state.categories].sort((a, b) => {
-        if (a.type !== b.type) return a.type === 'income' ? -1 : 1;
-        return a.displayOrder - b.displayOrder;
-      });
-
-      const html = sorted.map(cat => {
-        return `
-        <div class="settings-item-card">
-          <div class="item-content">
-            <div class="item-name"><span class="category-icon">${escapeHTML(cat.icon || getCategoryIcon(cat.name))}</span>${escapeHTML(cat.name)}</div>
-            <div class="item-meta">${cat.type === 'income' ? '수입' : '지출'} • ${cat.isFavorite ? '즐겨찾기 • ' : ''}순서 ${cat.displayOrder}</div>
-          </div>
-          <div class="item-actions">
-            <button class="icon-btn reorder" aria-label="${escapeAttr(cat.name)} 위로 이동" onclick="moveItemUp('categories', '${cat.id}')">↑</button>
-            <button class="icon-btn reorder" aria-label="${escapeAttr(cat.name)} 아래로 이동" onclick="moveItemDown('categories', '${cat.id}')">↓</button>
-            <button class="icon-btn ${cat.isFavorite ? 'favorite' : ''}" aria-label="${escapeAttr(cat.name)} 즐겨찾기 ${cat.isFavorite ? '해제' : '설정'}" aria-pressed="${cat.isFavorite}" onclick="toggleFavorite('categories', '${cat.id}')">★</button>
-            <button class="icon-btn edit" onclick="editItem('categories', '${cat.id}')">수정</button>
-            <button class="icon-btn delete" onclick="deleteItem('categories', '${cat.id}')">삭제</button>
-          </div>
-        </div>
-      `;
-      }).join('');
-      document.getElementById('categoriesList').innerHTML = html;
-    }
 
     // ============================================
     // 이벤트 핸들러
@@ -5872,28 +5801,6 @@
       }
     }
 
-    function editItem(type, id) {
-      const items = state[type];
-      const item = items.find(i => i.id === id);
-      if (!item) return;
-
-      const newName = prompt('새 이름을 입력하세요:', item.name);
-      if (newName && newName.trim()) {
-        item.name = newName.trim();
-        if (type === 'categories') item.icon = getCategoryIcon(item.name);
-        saveData();
-
-        if (type === 'paymentMethods') {
-          renderPaymentMethodsSettings();
-        } else if (type === 'assets') {
-          renderAssetsSettings();
-        } else if (type === 'categories') {
-          renderCategoriesSettings();
-        }
-
-        renderAll();
-      }
-    }
 
     function moveItemUp(type, id) {
       const items = state[type];
@@ -6433,5 +6340,6 @@
       });
     }
   </script>
+  <script src="/settings-management.js?v=1"></script>
 </body>
 </html>
