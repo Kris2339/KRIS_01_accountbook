@@ -1,11 +1,11 @@
 {
   "name": "가계부",
   "short_name": "가계부",
-  "description": "간편한 기록과 함께 보는 지출 흐름",
+  "description": "거래 기록 및 예산 관리",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f7f9",
-  "theme_color": "#287d73",
+  "theme_color": "#1769e0",
   "icons": [
     {
       "src": "/icon.svg",

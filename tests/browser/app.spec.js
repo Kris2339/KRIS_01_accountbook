@@ -67,7 +67,7 @@ test("mobile memo input, save next resets actual scroll and amount, draft surviv
   await page.getByRole("button", { name: "거래 입력", exact: true }).click();
   await page.locator("#amount").fill("25900");
   await page.locator("#memo").fill("긴 메모\n줄바꿈도 유지\n사용한 물건 기록");
-  await page.locator("[name=merchant]").fill("새 사용처");
+  await page.locator("[name=asset]").selectOption("a1");
   await page
     .locator("#editor .dialog-body")
     .evaluate((e) => (e.scrollTop = 500));
@@ -81,6 +81,7 @@ test("mobile memo input, save next resets actual scroll and amount, draft surviv
     )
     .toBe(0);
   await expect(page.locator("#memo")).toHaveValue("");
+  await expect(page.locator("[name=asset]")).toHaveValue("a1");
   await page.locator("#amount").fill("7800");
   await page.locator("#memo").fill("아직 저장하지 않은 초안");
   await page.reload();
@@ -153,6 +154,7 @@ test("offline save reload and reconnect keeps addition", async ({
   await page.getByRole("button", { name: "거래 입력", exact: true }).click();
   await page.locator("#amount").fill("3300");
   await page.locator("#memo").fill("오프라인 기록");
+  await page.locator("[name=asset]").selectOption("a1");
   await page.locator("#save-record").click();
   await expect(page.locator("#editor")).not.toBeVisible();
   await context.setOffline(false);
@@ -187,7 +189,7 @@ test("851 records save via real D1, stale/legacy writes rejected", async ({
   ).toBe(426);
   expect((await request.get("/api/data")).status()).toBe(426);
 });
-test("memo snippets, search and desktop layout", async ({ page }) => {
+test("simple memo input, search and desktop layout", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await open(page);
   await page.locator("#search").fill("주방");
@@ -197,11 +199,10 @@ test("memo snippets, search and desktop layout", async ({ page }) => {
     fullPage: true,
   });
   await page.getByRole("button", { name: "거래 입력", exact: true }).click();
-  await page.locator("#memo").fill("자주 쓰는 문구");
-  await page.locator("#save-snippet").click();
-  await page.locator("[data-close=editor]").click();
-  await page.getByRole("button", { name: "거래 입력", exact: true }).click();
-  await expect(page.locator("[data-snippet]")).toHaveCount(1);
+  await expect(page.locator("#memo")).toBeVisible();
+  await expect(page.locator("[name=merchant]")).toHaveCount(0);
+  await expect(page.locator("#recent-memo")).toHaveCount(0);
+  await expect(page.locator("#memo-count")).toHaveCount(0);
 });
 test("two simultaneous remote writers are atomic, history survives changes", async ({
   request,
@@ -248,4 +249,92 @@ test("small screen and shortened keyboard viewport preserve save controls", asyn
   await page.locator("[data-close=editor]").click();
   await page.getByRole("button", { name: "거래 입력", exact: true }).click();
   await expect(page.locator("#amount")).toBeInViewport();
+});
+
+test("calendar is default, no slogan or brand icon, date selects inline records", async ({
+  page,
+}) => {
+  await open(page);
+  await expect(page.locator(".calendar")).toBeVisible();
+  await expect(page.locator(".brand")).toHaveText("가계부");
+  await expect(page.locator(".brand-mark,.edition")).toHaveCount(0);
+  await page.locator(`[data-day="${today}"]`).click();
+  await expect(page.locator(".transaction")).toHaveCount(12);
+  await page.locator("#clear-filter").click();
+  await expect(page.locator(".calendar")).toBeVisible();
+});
+
+test("reports contain records and drill down without changing tabs", async ({
+  page,
+}) => {
+  await open(page);
+  await page.getByRole("link", { name: "리포트", exact: true }).click();
+  await expect(page.locator("#report-records .transaction")).toHaveCount(12);
+  await page.locator("[data-category=c1]").click();
+  await expect(page).toHaveURL(/#reports$/);
+  await expect(page.locator("#report-records .transaction")).toHaveCount(4);
+  await page.locator("#clear-filter").click();
+  await expect(page.locator("#report-records .transaction")).toHaveCount(12);
+  await page.locator("[data-report-asset=a1]").click();
+  await expect(page.locator("#report-records .transaction")).toHaveCount(12);
+  await page.locator("[data-transaction=t0]").click();
+  await expect(page.locator("#utility")).toBeVisible();
+});
+
+test("asset is visible and mandatory before saving", async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  await page.locator("#add").click();
+  await page.locator("#amount").fill("5500");
+  await expect(page.locator("[name=asset]")).toBeVisible();
+  await page.locator("#save-record").click();
+  await expect(page.locator("#editor")).toBeVisible();
+  expect((await get(request)).data.transactions).toHaveLength(12);
+  await page.locator("[name=asset]").selectOption("a1");
+  await page.locator("#save-record").click();
+  await expect(page.locator("#editor")).not.toBeVisible();
+  await expect
+    .poll(async () => (await get(request)).data.transactions.length)
+    .toBe(13);
+});
+
+test("detail dismisses on backdrop but not on content or inside-to-outside drag", async ({
+  page,
+}) => {
+  await open(page);
+  await page.locator("[data-transaction=t0]").click();
+  await page.locator("#utility .detail-memo").click();
+  await expect(page.locator("#utility")).toBeVisible();
+  const r = await page.locator("#utility .detail-memo").boundingBox();
+  await page.mouse.move(r.x + 10, r.y + 10);
+  await page.mouse.down();
+  await page.mouse.move(2, 2);
+  await page.mouse.up();
+  await expect(page.locator("#utility")).toBeVisible();
+  await page.mouse.click(2, 2);
+  await expect(page.locator("#utility")).not.toBeVisible();
+});
+
+test("editing legacy merchant preserves it and memo without duplicate input", async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  await page.locator("[data-transaction=t0]").click();
+  await page.locator("#edit-record").click();
+  await expect(page.locator("[name=merchant]")).toHaveCount(0);
+  await expect(page.locator(".legacy-merchant")).toContainText("점심 식사");
+  await page.locator("#memo").fill("메모 수정");
+  await page.locator("#save-record").click();
+  await expect
+    .poll(
+      async () =>
+        (await get(request)).data.transactions.find((t) => t.id === "t0").memo,
+    )
+    .toBe("메모 수정");
+  expect(
+    (await get(request)).data.transactions.find((t) => t.id === "t0").merchant,
+  ).toBe("점심 식사");
 });

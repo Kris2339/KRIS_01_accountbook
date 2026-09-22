@@ -1056,3 +1056,697 @@ h1 {
     transition: none !important;
   }
 }
+
+/* 2.1: MixBox's navy/blue palette and compact, bordered workspace. */
+.summary-grid .card:first-child {
+  grid-column: auto;
+}
+:root {
+  --ink: #172033;
+  --muted: #687386;
+  --line: #dde3ec;
+  --bg: #f3f6fb;
+  --accent: #1769e0;
+  --soft: #e9f1ff;
+  --red: #c94d52;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+}
+input:focus,
+textarea:focus,
+select:focus,
+button:focus-visible,
+a:focus-visible {
+  outline-color: #86b4f6;
+}
+input,
+select,
+textarea {
+  border-radius: 8px;
+  padding: 11px 12px;
+}
+textarea {
+  min-height: 88px;
+  line-height: 1.55;
+}
+h1 {
+  font-size: 23px;
+  letter-spacing: -0.7px;
+}
+h2 {
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+.shell {
+  max-width: 1320px;
+  padding: 0 32px;
+}
+.topbar {
+  height: 68px;
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  letter-spacing: -0.5px;
+  font-size: 20px;
+}
+.sync-label {
+  color: var(--muted);
+  font-size: 11px;
+}
+#main {
+  padding-top: 24px;
+}
+.page-head {
+  margin-bottom: 20px;
+}
+.card,
+.list-card,
+.calendar-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 14px rgb(24 59 114 / 3%);
+}
+.card {
+  padding: 20px;
+}
+.summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.summary-grid .card,
+.summary-grid .card:first-child {
+  display: block;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 16px 20px;
+}
+.summary-grid .card:first-child {
+  border-top: 3px solid var(--accent);
+  padding-top: 14px;
+}
+.summary-grid .card:first-child .muted {
+  color: var(--muted);
+}
+.summary-grid .big-number,
+.summary-grid .card:first-child .big-number {
+  font-size: 25px;
+  margin: 7px 0 0;
+  letter-spacing: -0.7px;
+}
+.summary-grid .big-number span {
+  font-size: 12px;
+}
+.summary-grid .card:first-child .big-number {
+  color: var(--accent);
+}
+.calendar-card {
+  overflow: hidden;
+}
+.calendar-heading,
+.records-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  gap: 10px;
+}
+.records-heading {
+  flex-wrap: wrap;
+}
+.records-heading small {
+  font-size: 11px;
+}
+.records-heading .text-button {
+  padding: 0;
+  min-height: 24px;
+}
+.segmented {
+  padding: 3px;
+  border-radius: 7px;
+  gap: 2px;
+  background: #edf1f7;
+}
+.segmented button {
+  min-height: 30px;
+  border-radius: 5px;
+  padding: 5px 13px;
+  font-size: 12px;
+}
+.segmented button.active {
+  color: var(--accent);
+}
+.calendar {
+  padding: 12px 10px;
+  gap: 2px;
+}
+.calendar .weekday {
+  font-size: 11px;
+  padding: 8px 0;
+}
+.calendar .weekday:first-child {
+  color: var(--red);
+}
+.calendar .weekday:nth-child(7) {
+  color: var(--accent);
+}
+.calendar button {
+  min-height: 78px;
+  border-radius: 8px;
+  font-size: 13px;
+  justify-content: flex-start;
+  padding: 10px 0;
+  gap: 9px;
+}
+.calendar button:hover {
+  background: #f3f6fb;
+}
+.calendar button.selected {
+  border-color: #1769e0;
+  background: #e9f1ff;
+}
+.calendar button.today > span {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 23px;
+  height: 23px;
+  line-height: 23px;
+  margin-top: -3px;
+  margin-bottom: -3px;
+}
+.calendar button small {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  letter-spacing: -0.25px;
+}
+.toolbar {
+  margin: 16px 0;
+  gap: 8px;
+}
+.toolbar input,
+.toolbar select {
+  min-height: 40px;
+  font-size: 13px;
+}
+.toolbar .search {
+  min-width: 120px;
+}
+.transaction {
+  padding: 15px 18px;
+  gap: 12px;
+}
+.transaction .tile {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+.tile {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+}
+.tile svg {
+  width: 19px;
+  height: 19px;
+}
+.transaction-title {
+  font-size: 14px;
+}
+.transaction-meta {
+  font-size: 11px;
+  line-height: 1.5;
+}
+.transaction-memo {
+  font-size: 12px;
+}
+.transaction:hover,
+.setting-row:hover {
+  background: #f6f8fc;
+}
+.amount {
+  font-size: 14px;
+}
+.day-heading {
+  background: #f7f9fc;
+  padding: 11px 18px;
+  font-size: 11px;
+  border-bottom: 1px solid #edf0f5;
+}
+.report-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 18px;
+}
+.report-layout .section-head {
+  margin-bottom: 6px;
+}
+.report-layout .section-head small {
+  font-size: 11px;
+}
+.breakdown {
+  padding: 11px 0;
+  border-radius: 6px;
+}
+.breakdown.selected {
+  background: var(--soft);
+  padding: 11px 8px;
+}
+.breakdown-line {
+  gap: 10px;
+}
+.breakdown-line strong {
+  font-size: 13px;
+}
+.breakdown-label {
+  font-size: 13px;
+}
+.progress {
+  height: 4px;
+}
+.asset-summary {
+  border-top: 1px solid var(--line);
+  margin-top: 22px;
+  padding-top: 16px;
+}
+.asset-summary h3 {
+  margin-bottom: 8px;
+}
+.asset-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 0;
+  font-size: 12px;
+  text-align: left;
+}
+.asset-total.selected {
+  color: var(--accent);
+}
+#report-records {
+  scroll-margin-top: 20px;
+}
+.settings-grid {
+  align-items: start;
+  gap: 18px;
+}
+.setting-row {
+  padding: 16px 0;
+  gap: 12px;
+  border-bottom: 1px solid #edf0f5;
+}
+.setting-row:last-child {
+  border-bottom: 0;
+}
+.setting-row strong {
+  font-size: 14px;
+}
+.setting-row small {
+  font-size: 11px;
+  margin-top: 4px;
+}
+.settings-field {
+  margin: 20px 0 12px;
+}
+.version {
+  margin-top: 24px;
+}
+.primary,
+.secondary,
+.danger {
+  border-radius: 8px;
+  min-height: 44px;
+}
+.secondary {
+  background: #edf2f9;
+  color: #345177;
+}
+dialog {
+  border-radius: 14px;
+  width: min(520px, calc(100vw - 32px));
+  box-shadow: 0 18px 80px #0c183333;
+}
+dialog::backdrop {
+  background: #0d1b325c;
+}
+.dialog-head {
+  padding: 16px 22px;
+}
+.dialog-head h2 {
+  font-size: 17px;
+}
+.dialog-head small {
+  font-size: 11px;
+}
+.dialog-body {
+  padding: 20px 22px;
+}
+.dialog-body form {
+  gap: 16px;
+}
+.dialog-footer {
+  padding: 14px 22px;
+}
+.money-field input {
+  font-size: 34px;
+  font-weight: 650;
+  border-bottom: 1px solid var(--line);
+}
+.editor-type {
+  gap: 6px;
+}
+.editor-type button {
+  border-radius: 7px;
+  padding: 9px 18px;
+  font-size: 13px;
+}
+.editor-type .active {
+  background: var(--accent);
+  color: #fff;
+}
+.form-grid {
+  gap: 14px;
+}
+.full-field {
+  grid-column: 1 / -1;
+}
+.legacy-merchant {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: -8px;
+}
+.discard-draft {
+  justify-self: start;
+  padding: 0;
+  min-height: 30px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.form-error:empty {
+  display: none;
+}
+.detail-memo {
+  border-radius: 8px;
+  background: #f3f6fb;
+  padding: 14px;
+  font-size: 14px;
+}
+.detail-grid {
+  font-size: 13px;
+  gap: 16px;
+}
+.navigation {
+  border-radius: 10px;
+}
+.navigation a,
+.add-button {
+  border-radius: 7px;
+}
+
+@media (min-width: 1100px) {
+  .shell {
+    margin-left: 208px;
+    max-width: none;
+  }
+  .brand {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    color: #fff;
+    z-index: 12;
+  }
+  .topbar {
+    justify-content: flex-end;
+  }
+  .navigation {
+    inset: 0 auto 0 0;
+    transform: none;
+    width: 208px;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    background: #0d1b31;
+    padding: 90px 14px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    box-shadow: none;
+  }
+  .navigation a {
+    color: #a7bdd9;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 18px;
+    min-height: 46px;
+  }
+  .navigation a.active {
+    background: #eef4ff;
+    color: #175ec3;
+  }
+  .navigation .add-button {
+    order: 4;
+    margin-top: 20px;
+    padding: 13px 18px;
+    text-align: left;
+    font-size: 14px;
+  }
+  #main {
+    padding-bottom: 50px;
+  }
+  #main[data-page="ledger"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+  #main[data-page="ledger"] > .page-head,
+  #main[data-page="ledger"] > .summary-grid {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  #main[data-page="ledger"] > .calendar-card {
+    grid-column: 1;
+    grid-row: 3 / span 2;
+    position: sticky;
+    top: 20px;
+  }
+  #main[data-page="ledger"] > .toolbar {
+    grid-column: 2;
+    grid-row: 3;
+    margin: 0;
+  }
+  #ledger-records {
+    grid-column: 2;
+    grid-row: 4;
+  }
+}
+@media (max-width: 700px) {
+  .shell {
+    padding: 0 16px;
+  }
+  .topbar {
+    height: 58px;
+  }
+  .brand {
+    font-size: 19px;
+  }
+  #main {
+    padding-top: 16px;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+  }
+  h1 {
+    font-size: 19px;
+  }
+  .page-head {
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .month-nav {
+    gap: 0;
+  }
+  .month-nav input {
+    width: 135px;
+    padding: 8px 4px;
+    font-size: 14px;
+  }
+  .month-nav .icon-button {
+    min-width: 28px;
+    min-height: 36px;
+  }
+  .summary-grid {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .summary-grid .card,
+  .summary-grid .card:first-child {
+    padding: 11px 10px;
+    border-radius: 8px;
+  }
+  .summary-grid .card:first-child {
+    padding-top: 9px;
+  }
+  .summary-grid .muted {
+    font-size: 10px;
+  }
+  .summary-grid .big-number,
+  .summary-grid .card:first-child .big-number {
+    font-size: clamp(13px, 4vw, 18px);
+    margin-top: 6px;
+    letter-spacing: -0.5px;
+  }
+  .summary-grid .big-number span {
+    font-size: 9px;
+  }
+  .calendar-heading {
+    padding: 10px 12px;
+  }
+  .calendar-heading h2 {
+    font-size: 14px;
+  }
+  .calendar {
+    padding: 5px 5px 10px;
+    gap: 0;
+  }
+  .calendar button {
+    min-height: 62px;
+    padding: 9px 0;
+    gap: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+  .calendar button small {
+    font-size: 9px;
+  }
+  .calendar .weekday {
+    font-size: 10px;
+  }
+  .toolbar {
+    margin: 12px 0;
+    gap: 6px;
+  }
+  .toolbar .search {
+    flex-basis: 100%;
+  }
+  .toolbar select {
+    padding: 8px;
+    min-height: 36px;
+    font-size: 12px;
+  }
+  .records-heading {
+    padding: 12px;
+    gap: 5px;
+  }
+  .records-heading h2 {
+    font-size: 14px;
+  }
+  .records-heading small {
+    font-size: 10px;
+  }
+  .transaction {
+    padding: 14px 12px;
+    gap: 9px;
+  }
+  .transaction .tile {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .transaction .tile svg {
+    width: 17px;
+    height: 17px;
+  }
+  .transaction-title {
+    font-size: 13px;
+  }
+  .transaction-meta {
+    font-size: 10px;
+  }
+  .amount {
+    font-size: 13px;
+  }
+  .day-heading {
+    padding: 9px 12px;
+  }
+  .navigation {
+    bottom: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    gap: 5px;
+    background: #fff;
+    box-shadow: 0 -3px 16px #17203304;
+  }
+  .navigation a {
+    font-size: 12px;
+    min-height: 42px;
+  }
+  .navigation a.active {
+    background: transparent;
+    color: var(--accent);
+  }
+  .add-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  .report-layout,
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .card {
+    padding: 16px;
+  }
+  .report-budget .big-number {
+    font-size: 24px;
+  }
+  #editor .dialog-head {
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+  }
+  #editor .dialog-body {
+    padding: 16px;
+  }
+  #editor .dialog-footer {
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  }
+  .dialog-body form {
+    gap: 14px;
+  }
+  .money-field input {
+    font-size: 32px;
+  }
+  .form-grid {
+    gap: 12px;
+  }
+  #utility {
+    width: calc(100vw - 28px);
+    border-radius: 12px;
+  }
+}
+@media (max-width: 370px) {
+  .shell {
+    padding: 0 10px;
+  }
+  .month-nav input {
+    width: 115px;
+  }
+  .summary-grid .card,
+  .summary-grid .card:first-child {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+  .calendar button small {
+    font-size: 8px;
+  }
+}

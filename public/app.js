@@ -80,7 +80,7 @@ function suggested(name = "") {
 }
 function icon(key = "tag", color) {
   key = paths[key] ? key : "tag";
-  color = /^#[0-9a-f]{6}$/i.test(color || "") ? color : "#287d73";
+  color = /^#[0-9a-f]{6}$/i.test(color || "") ? color : "#1769e0";
   return `<span class="tile" style="color:${color};background:${color}12"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[key]}"/></svg></span>`;
 }
 const find = (key, id) => store.data[key]?.find((x) => x.id === id);
@@ -122,7 +122,8 @@ const ui = {
   type: "all",
   category: "all",
   query: "",
-  view: "list",
+  view: "calendar",
+  asset: "all",
   day: "",
   limit: 80,
   scroll: {},
@@ -165,7 +166,7 @@ function header(title, sub) {
       : page === "reports"
         ? "지출 리포트"
         : "설정";
-  return `<div class="page-head"><div><div class="eyebrow">${sub}</div><h1>${title}</h1></div>${page !== "settings" ? `<div class="month-nav"><button class="icon-button" data-month-step="-1" aria-label="이전 달">‹</button><input type="month" id="month" aria-label="조회 월" value="${ui.month}"><button class="icon-button" data-month-step="1" aria-label="다음 달">›</button></div>` : ""}</div>`;
+  return `<div class="page-head"><h1>${title}</h1>${page !== "settings" ? `<div class="month-nav"><button class="icon-button" data-month-step="-1" aria-label="이전 달">‹</button><input type="month" id="month" aria-label="조회 월" value="${ui.month}"><button class="icon-button" data-month-step="1" aria-label="다음 달">›</button></div>` : ""}</div>`;
 }
 function summary(rows) {
   const t = totals(rows);
@@ -174,11 +175,12 @@ function summary(rows) {
 function transactionRow(t) {
   const c = find("categories", t.categoryId),
     title =
-      t.merchant ||
       t.memo?.split("\n")[0] ||
+      t.merchant ||
       (t.type === "transfer" ? "항목 간 이동" : c?.name) ||
       "거래";
-  return `<button class="transaction" data-transaction="${esc(t.id)}">${icon(t.type === "transfer" ? "transfer" : c?.iconKey || suggested(c?.name), c?.color)}<div class="transaction-copy"><div class="transaction-title">${esc(title)}</div><div class="transaction-meta">${esc(t.type === "transfer" ? "이동" : c?.name || "미분류")} · ${esc(name("paymentMethods", t.paymentMethodId))} · ${esc(name("users", t.userId))}</div>${t.memo ? `<div class="transaction-memo">${esc(t.memo)}</div>` : ""}</div><div class="amount ${t.type === "income" ? "income" : t.type === "transfer" ? "neutral" : ""}">${t.type === "income" ? "+" : t.type === "transfer" ? "" : "−"}${money(t.amount)}</div></button>`;
+  const remainingMemo = (t.memo || "").split("\n").slice(1).join("\n");
+  return `<button class="transaction" data-transaction="${esc(t.id)}">${icon(t.type === "transfer" ? "transfer" : c?.iconKey || suggested(c?.name), c?.color)}<div class="transaction-copy"><div class="transaction-title">${esc(title)}</div><div class="transaction-meta">${esc(t.type === "transfer" ? "이동" : c?.name || "미분류")} · ${esc(name("assets", t.assetId))} · ${esc(name("users", t.userId))}</div>${remainingMemo ? `<div class="transaction-memo">${esc(remainingMemo)}</div>` : ""}</div><div class="amount ${t.type === "income" ? "income" : t.type === "transfer" ? "neutral" : ""}">${t.type === "income" ? "+" : t.type === "transfer" ? "" : "−"}${money(t.amount)}</div></button>`;
 }
 function filteredRows() {
   const query = ui.query.trim().toLocaleLowerCase();
@@ -187,6 +189,7 @@ function filteredRows() {
       (t) =>
         (ui.type === "all" || t.type === ui.type) &&
         (ui.category === "all" || (t.categoryId || "") === ui.category) &&
+        (ui.asset === "all" || t.assetId === ui.asset) &&
         (!ui.day || t.transactionDate === ui.day) &&
         (!query ||
           [
@@ -243,87 +246,80 @@ function calendar() {
     (_, i) => {
       const date = `${ui.month}-${String(i + 1).padStart(2, "0")}`,
         spent = totals(rows.filter((t) => t.transactionDate === date)).expense;
-      return `<button data-day="${date}" class="${ui.day === date ? "selected" : ""}"><span>${i + 1}</span><small>${spent ? money(spent) : "·"}</small></button>`;
+      return `<button data-day="${date}" aria-label="${m}월 ${i + 1}일 내역" class="${ui.day === date ? "selected" : ""} ${date === localDate() ? "today" : ""}"><span>${i + 1}</span><small>${spent ? money(spent) : ""}</small></button>`;
     },
   ).join("")}</div>`;
 }
+function ledgerToolbar() {
+  return `<div class="toolbar"><input class="search" id="search" type="search" placeholder="메모·금액 검색" aria-label="내역 검색" value="${esc(ui.query)}"><select id="user-filter" aria-label="사용자 필터"><option value="all">모든 사용자</option>${options("users", ui.user)}</select><select id="type-filter" aria-label="거래 종류"><option value="all">모든 내역</option>${["expense", "income", "transfer"].map((k, i) => `<option value="${k}" ${ui.type === k ? "selected" : ""}>${["지출", "수입", "이동"][i]}</option>`).join("")}</select></div>`;
+}
+function recordSection(report = false) {
+  return `<section class="list-card" id="${report ? "report-records" : "ledger-records"}"><div class="records-heading"><h2>${ui.day ? dateLabel(ui.day) : "거래 내역"}</h2><small id="result-count"></small>${ui.day || ui.category !== "all" || ui.asset !== "all" ? '<button class="text-button" id="clear-filter">전체 보기</button>' : ""}</div><div id="rows"></div></section>`;
+}
 function renderLedger() {
   return (
-    header("하루하루의 기록", "내역") +
+    header() +
     summary(monthRows(store.data, ui.month, ui.user)) +
-    `<div class="toolbar"><input class="search" id="search" type="search" placeholder="메모, 사용처, 금액 검색" aria-label="내역 검색" value="${esc(ui.query)}"><select id="user-filter" aria-label="사용자 필터"><option value="all">모든 사용자</option>${options("users", ui.user)}</select><select id="type-filter" aria-label="거래 종류"><option value="all">모든 내역</option>${["expense", "income", "transfer"].map((k, i) => `<option value="${k}" ${ui.type === k ? "selected" : ""}>${["지출", "수입", "이동"][i]}</option>`).join("")}</select><div class="segmented"><button data-view="list" class="${ui.view === "list" ? "active" : ""}">목록</button><button data-view="calendar" class="${ui.view === "calendar" ? "active" : ""}">달력</button></div></div><div class="section-head"><small id="result-count"></small>${ui.day || ui.category !== "all" ? '<button class="text-button" id="clear-filter">선택 해제</button>' : ""}</div><div class="list-card">${ui.view === "calendar" ? calendar() : ""}<div id="rows"></div></div>`
+    `<section class="calendar-card"><div class="calendar-heading"><h2>달력</h2><div class="segmented"><button data-view="calendar" class="${ui.view === "calendar" ? "active" : ""}">달력</button><button data-view="list" class="${ui.view === "list" ? "active" : ""}">목록</button></div></div>${ui.view === "calendar" ? calendar() : ""}</section>` +
+    ledgerToolbar() +
+    recordSection()
   );
 }
+
 function budgetForMonth() {
   return store.data.monthlyBudgets[ui.month] || null;
 }
 function renderReports() {
   const rows = monthRows(store.data, ui.month, ui.user),
-    spent = totals(rows).expense,
     expense = rows.filter((t) => t.type === "expense");
+  const spent = totals(rows).expense,
+    b = budgetForMonth(),
+    total = b?.total || 0;
+  const allSpent = totals(monthRows(store.data, ui.month)).expense;
   const groups = new Map();
   for (const t of expense)
     groups.set(t.categoryId, (groups.get(t.categoryId) || 0) + t.amount);
   const sorted = [...groups].sort((a, b) => b[1] - a[1]);
-  const b = budgetForMonth(),
-    total = b?.total || 0,
-    allSpent = totals(monthRows(store.data, ui.month)).expense;
-  const months = Array.from({ length: 6 }, (_, i) => {
-      const [y, m] = ui.month.split("-").map(Number),
-        d = new Date(y, m - 6 + i, 1),
-        key = localDate(d).slice(0, 7);
-      return {
-        key,
-        label: `${d.getMonth() + 1}월`,
-        amount: totals(monthRows(store.data, key, ui.user)).expense,
-      };
-    }),
-    max = Math.max(...months.map((m) => m.amount), 1);
   return (
-    header("한눈에 보는 흐름", "리포트") +
-    `<div class="toolbar"><select id="user-filter" aria-label="리포트 사용자"><option value="all">모든 사용자</option>${options("users", ui.user)}</select><small>지출 기준 · 항목 간 이동 제외</small></div>` +
+    header() +
     summary(rows) +
-    `<div class="two-col"><div class="stack"><section class="card"><div class="section-head"><h2>어디에 많이 썼을까요</h2><small>분류별 지출</small></div>${
-      sorted.length
-        ? sorted
-            .map(([id, n]) => {
-              const c = find("categories", id);
-              return `<button class="breakdown" data-category="${esc(id || "")}" aria-label="${esc(c?.name || "미분류")} 내역 보기"><div class="breakdown-line"><span class="breakdown-label">${icon(c?.iconKey || suggested(c?.name), c?.color)}${esc(c?.name || "미분류")}</span><strong>${won(n)}</strong><small>${Math.round((n / spent) * 100)}%</small></div><div class="progress"><i style="width:${(n / spent) * 100}%"></i></div></button>`;
-            })
-            .join("")
-        : '<p class="muted">지출을 기록하면 분류별로 모아드려요.</p>'
-    }</section><section class="card"><div class="section-head"><h2>최근 6개월</h2><small>월 전체 지출</small></div><div class="trend">${months.map((m, i) => `<div class="trend-col ${i === 5 ? "current" : ""}"><small>${won(m.amount)}</small><i style="height:${Math.max(2, (m.amount / max) * 95)}px"></i><span>${m.label}</span></div>`).join("")}</div></section></div><div class="stack"><section class="card"><div class="section-head"><h2>이번 달 예산</h2><button class="text-button" id="budget-edit">${b ? "수정" : "설정"}</button></div><p class="muted">모든 사용자 합산</p>${total ? `<div class="big-number ${allSpent > total ? "expense" : ""}">${won(Math.abs(total - allSpent))}</div><p class="muted">${allSpent > total ? "예산보다 더 썼어요" : "남아 있어요"}</p><div class="progress ${allSpent > total ? "over" : ""}" style="margin:18px 0"><i style="width:${Math.min(100, (allSpent / total) * 100)}%"></i></div><p class="muted">${won(allSpent)} 사용 / ${won(total)} 한도</p>` : '<p style="margin:16px 0">원할 때 한도만 정해보세요.</p><p class="muted">예산 없이도 모든 거래를 기록할 수 있어요.</p>'}${Object.entries(
-      b?.categories || {},
-    )
-      .filter(([, n]) => n > 0)
-      .map(([id, n]) => {
-        const used = totals(
-          monthRows(store.data, ui.month).filter((t) => t.categoryId === id),
-        ).expense;
-        return `<div class="breakdown"><div class="breakdown-line"><span>${esc(name("categories", id))}</span><small>${won(used)} / ${won(n)}</small></div><div class="progress ${used > n ? "over" : ""}"><i style="width:${Math.min(100, (used / n) * 100)}%"></i></div></div>`;
-      })
-      .join(
-        "",
-      )}</section><section class="card"><div class="section-head"><h2>사용자별 지출</h2></div>${store.data.users.map((u) => `<div class="breakdown-line" style="padding:12px 0"><span>${esc(u.name)}</span><strong>${won(totals(monthRows(store.data, ui.month, u.id)).expense)}</strong></div>`).join("")}<small>기록에 지정한 사용자 기준</small></section></div></div>`
+    `<div class="report-layout"><section class="card report-categories"><div class="section-head"><h2>분류별 지출</h2><small>선택하면 내역 표시</small></div>${
+      sorted
+        .map(([id, n]) => {
+          const c = find("categories", id);
+          return `<button class="breakdown ${ui.category === (id || "") ? "selected" : ""}" data-category="${esc(id || "")}" aria-label="${esc(c?.name || "미분류")} 내역 보기"><div class="breakdown-line"><span class="breakdown-label">${icon(c?.iconKey || suggested(c?.name), c?.color)}${esc(c?.name || "미분류")}</span><strong>${won(n)}</strong><small>${Math.round((n / spent) * 100)}%</small></div><div class="progress"><i style="width:${(n / spent) * 100}%"></i></div></button>`;
+        })
+        .join("") || '<p class="muted">지출 내역 없음</p>'
+    }</section>
+  <section class="card report-budget"><div class="section-head"><h2>월 지출 한도</h2><button class="text-button" id="budget-edit">${b ? "수정" : "설정"}</button></div>${total ? `<div class="big-number">${won(Math.abs(total - allSpent))}</div><p class="muted">${allSpent > total ? "초과" : "잔여"}</p><div class="progress" style="margin:16px 0"><i style="width:${Math.min(100, (allSpent / total) * 100)}%"></i></div><p class="muted">${won(allSpent)} 사용 / ${won(total)} 한도</p>` : '<p class="muted">설정된 한도 없음</p>'}
+  <div class="asset-summary"><h3>예산 항목별 지출</h3>${store.data.assets.map((a) => `<button data-report-asset="${esc(a.id)}" class="asset-total ${ui.asset === a.id ? "selected" : ""}"><span>${esc(a.name)}</span><strong>${won(totals(rows.filter((t) => t.assetId === a.id)).expense)}</strong></button>`).join("")}</div></section></div>` +
+    ledgerToolbar() +
+    recordSection(true)
   );
 }
+
 const entityTitles = {
   users: "사용자",
   paymentMethods: "계좌·카드",
   categories: "분류",
-  assets: "기존 예산 항목",
+  assets: "예산 항목",
 };
 function settingRow(key, title, description) {
   return `<button class="setting-row" data-setting="${key}">${icon({ users: "user", paymentMethods: "card", categories: "tag", assets: "wallet", snippets: "note", backup: "bank", recoveries: "transfer", import: "note" }[key] || "dots")}<div><strong>${title}</strong><small>${description}</small></div><span class="chevron">›</span></button>`;
 }
 function renderSettings() {
   return (
-    header("필요한 것만, 내 방식으로", "설정") +
-    `<div class="settings-grid"><section class="card"><h2>기록 관리</h2>${settingRow("categories", "분류와 아이콘", "이름·색상·아이콘을 자유롭게")}${settingRow("paymentMethods", "계좌·카드", "자주 쓰는 결제수단 관리")}${settingRow("users", "사용자", `${store.data.users.length}명 · 이름과 기본 사용자 설정`)}${settingRow("assets", "기존 예산 항목", "기존 기록의 연결을 보존합니다")}</section><section class="card"><h2>입력 편의</h2>${settingRow("snippets", "자주 쓰는 메모", `${prefs.snippets.length}개 문구 · 입력 중 바로 붙여넣기`)}<label style="margin-top:18px">이 기기의 기본 사용자<select id="default-user">${options("users", prefs.userId)}</select></label><p class="field-help" style="margin-top:12px">마지막 결제수단을 기억합니다. 메모는 줄바꿈과 긴 내용을 그대로 보관합니다.</p></section><section class="card"><h2>데이터 보관</h2>${settingRow("backup", "전체 내보내기", `${store.data.transactions.length}건 · 미전송 기록도 포함`)}${settingRow("recoveries", "이전 기기 사본", "이전 앱의 복구 사본을 개별 내보내기")}${settingRow("import", "파일에서 합치기", "현재 기록을 유지하고 차이를 확인")}</section><section class="card"><h2>연결 상태</h2><p style="margin:16px 0">${esc(store.status)}</p><p class="field-help">이 기기에 먼저 저장하고 연결되면 서버에 반영합니다. 같은 내용을 서로 다르게 수정한 경우 선택할 수 있도록 보관합니다.</p><button class="secondary" id="sync-now" style="margin-top:18px">다시 동기화</button><a class="text-button" href="/login.html">로그인 화면</a><p class="muted" style="margin-top:24px">가계부 · 2.0.0</p></section></div>`
+    header() +
+    `<div class="settings-grid"><section class="card"><h2>항목 관리</h2>${settingRow("assets", "예산 항목", "거래에 연결할 예산 관리")}${settingRow("categories", "분류", "이름 · 아이콘 · 색상")}${settingRow("paymentMethods", "계좌·카드", "결제수단 관리")}${settingRow("users", "사용자", store.data.users.length + "명")}</section>
+  <section class="card"><h2>입력 설정</h2><label class="settings-field">기본 사용자<select id="default-user">${options("users", prefs.userId)}</select></label><p class="field-help">마지막 예산 항목과 결제수단을 기억합니다.</p></section>
+  <section class="card"><h2>백업 및 복구</h2>${settingRow("backup", "전체 내보내기", store.data.transactions.length + "건 · 미전송 기록 포함")}${settingRow("recoveries", "기기 보관 사본", "이전 데이터 확인 및 내보내기")}${settingRow("import", "파일에서 합치기", "기존 기록을 유지하며 병합")}</section>
+  <section class="card"><h2>동기화</h2><p id="settings-sync" class="settings-field">${esc(store.status)}</p><button class="secondary" id="sync-now">다시 동기화</button><a class="text-button" href="/login.html">로그인</a><p class="field-help version">2.1.0</p></section></div>`
   );
 }
+
 function render() {
   if (!store.state) return;
+  $("#main").dataset.page = page;
   $("#main").innerHTML =
     page === "reports"
       ? renderReports()
@@ -385,16 +381,38 @@ function render() {
   $("#clear-filter")?.addEventListener("click", () => {
     ui.day = "";
     ui.category = "all";
+    ui.asset = "all";
+    ui.type = "all";
     render();
   });
   document.querySelectorAll("[data-category]").forEach(
     (x) =>
       (x.onclick = () => {
         ui.category = x.dataset.category;
+        ui.asset = "all";
         ui.day = "";
         ui.query = "";
         ui.type = "expense";
-        location.hash = "ledger";
+        render();
+        $("#report-records")?.scrollIntoView({
+          block: "start",
+          behavior: "smooth",
+        });
+      }),
+  );
+  document.querySelectorAll("[data-report-asset]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        ui.asset = b.dataset.reportAsset;
+        ui.category = "all";
+        ui.day = "";
+        ui.type = "expense";
+        ui.query = "";
+        render();
+        $("#report-records").scrollIntoView({
+          block: "start",
+          behavior: "smooth",
+        });
       }),
   );
   $("#budget-edit")?.addEventListener("click", budgetEditor);
@@ -407,11 +425,12 @@ function render() {
       toast("기본 사용자를 바꿨어요.");
     }),
   );
-  if (page === "ledger") renderList();
+  if (page === "ledger" || page === "reports") renderList();
 }
 function notice() {
   const conflicts = store.state?.conflicts || [];
   $("#sync").textContent = store.status;
+  if ($("#settings-sync")) $("#settings-sync").textContent = store.status;
   $("#notice").innerHTML = conflicts.length
     ? `<div class="banner"><span>같은 기록에 서로 다른 변경 ${conflicts.length}건이 있어요. 두 내용을 보관하고 있습니다.</span><button id="review-conflicts">확인</button></div>`
     : store.error
@@ -440,7 +459,7 @@ function detail(id) {
   if (!t) return;
   utility(
     "거래 상세",
-    `<p class="muted">${dateLabel(t.transactionDate)}</p><div class="big-number ${t.type === "income" ? "income" : ""}">${won(t.amount)}</div><h2 style="margin-top:14px">${esc(t.merchant || name("categories", t.categoryId))}</h2><div class="detail-grid"><div><small>사용자</small>${esc(name("users", t.userId))}</div><div><small>결제수단</small>${esc(name("paymentMethods", t.paymentMethodId))}</div><div><small>분류</small>${esc(name("categories", t.categoryId))}</div>${t.assetId ? `<div><small>기존 예산 항목</small>${esc(name("assets", t.assetId))}</div>` : ""}</div><div class="detail-memo">${esc(t.memo || "메모가 없습니다.")}</div><div class="danger-zone"><button class="danger" id="delete-record">거래 삭제</button><button class="text-button" id="duplicate-record">복사해서 입력</button></div>`,
+    `<p class="muted">${dateLabel(t.transactionDate)}</p><div class="big-number ${t.type === "income" ? "income" : ""}">${won(t.amount)}</div><h2 style="margin-top:14px">${esc(t.merchant || name("categories", t.categoryId))}</h2><div class="detail-grid"><div><small>사용자</small>${esc(name("users", t.userId))}</div><div><small>결제수단</small>${esc(name("paymentMethods", t.paymentMethodId))}</div><div><small>분류</small>${esc(name("categories", t.categoryId))}</div>${t.assetId ? `<div><small>예산 항목</small>${esc(name("assets", t.assetId))}</div>` : ""}</div><div class="detail-memo">${esc(t.memo || "메모가 없습니다.")}</div><div class="danger-zone"><button class="danger" id="delete-record">거래 삭제</button><button class="text-button" id="duplicate-record">복사해서 입력</button></div>`,
     '<button class="primary" id="edit-record">수정하기</button>',
   );
   $("#edit-record").onclick = () => {
@@ -486,7 +505,7 @@ function formValue() {
   return {
     ...editorRecord,
     amount: f.elements.amount.value,
-    merchant: f.elements.merchant.value,
+    merchant: editorRecord.merchant || "",
     memo: f.elements.memo.value,
     transactionDate: f.elements.date.value,
     userId: f.elements.user.value,
@@ -529,7 +548,7 @@ function openEditor(record = null, copy = false, resume = false) {
     userId: prefs.userId || active("users")[0]?.id || "",
     paymentMethodId: prefs.methodId || active("paymentMethods")[0]?.id || null,
     categoryId: null,
-    assetId: null,
+    assetId: active("assets").find((a) => a.id === prefs.assetId)?.id || "",
     ...record,
   };
   if (copy) {
@@ -539,92 +558,41 @@ function openEditor(record = null, copy = false, resume = false) {
   const t = editorRecord,
     isEdit = !!t.id,
     formType = t.type === "transfer";
-  const recent = [
-    ...new Set(
-      [...store.data.transactions]
-        .sort((a, b) =>
-          (b.createdAt || b.transactionDate).localeCompare(
-            a.createdAt || a.transactionDate,
-          ),
-        )
-        .map((x) => x.memo?.trim())
-        .filter(Boolean),
-    ),
-  ].slice(0, 4);
-  const merchants = [
-    ...new Set(store.data.transactions.map((x) => x.merchant).filter(Boolean)),
-  ].slice(-300);
   const el = $("#editor");
-  el.innerHTML = `<div class="dialog-head"><div><h2 id="editor-title">${isEdit ? "거래 수정" : "새 기록"}</h2><small id="draft-state">메모도 자동으로 초안에 보관해요</small></div><button class="icon-button" data-close="editor" aria-label="입력 닫기">×</button></div><div class="dialog-body"><form id="transaction-form"><div class="editor-type">${["expense", "income", "transfer"].map((k, i) => `<button type="button" data-entry-type="${k}" class="${t.type === k ? "active" : ""}">${["지출", "수입", "항목 이동"][i]}</button>`).join("")}</div><label class="money-field">금액<input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" placeholder="0" value="${esc(t.amount ? money(Number(String(t.amount).replaceAll(",", ""))) : "")}" required><span>원</span></label><label>사용처 <small>선택</small><input name="merchant" maxlength="200" list="merchants" autocomplete="off" placeholder="어디에 썼나요?" value="${esc(t.merchant)}"></label><datalist id="merchants">${merchants.map((m) => `<option value="${esc(m)}"></option>`).join("")}</datalist><div><div class="memo-header"><label for="memo">메모</label><button type="button" class="text-button" id="save-snippet">자주 쓰는 문구로 저장</button></div><textarea name="memo" id="memo" rows="4" maxlength="10000" placeholder="무엇을 샀는지, 누구와 함께했는지 자유롭게 적어보세요.">${esc(t.memo)}</textarea><div class="memo-tools">${prefs.snippets
-    .slice(0, 6)
-    .map(
-      (s, i) =>
-        `<button type="button" data-snippet="${i}" title="${esc(s)}">${esc(s.slice(0, 25))}</button>`,
-    )
-    .join(
-      "",
-    )}<button type="button" id="recent-memo">최근 메모 불러오기</button></div><div id="recent-memos" hidden class="memo-tools">${recent.map((s, i) => `<button type="button" data-recent="${i}" title="${esc(s)}">${esc(s.slice(0, 30))}</button>`).join("") || "<small>아직 메모가 없어요.</small>"}</div><small id="memo-count">${(t.memo || "").length.toLocaleString()} / 10,000자</small></div><div class="form-grid"><label>날짜<input type="date" name="date" value="${esc(t.transactionDate)}" required></label><label>사용자<select name="user" required>${options("users", t.userId)}</select></label>${!formType ? `<label>분류<select name="category">${options("categories", t.categoryId, "미분류", (x) => x.type === t.type)}</select></label><label>계좌·카드<select name="method">${options("paymentMethods", t.paymentMethodId, "선택 안 함")}</select></label>` : `<input type="hidden" name="category" value=""><input type="hidden" name="method" value=""><label>출발 항목<select name="asset" required>${options("assets", t.assetId, "선택")}</select></label><label>도착 항목<select name="toAsset" required>${options("assets", t.toAssetId, "선택")}</select></label>`}</div>${!formType ? `<details ${t.assetId ? "open" : ""}><summary class="muted">기존 예산 항목 · 선택</summary><label style="margin-top:12px">연결 항목<select name="asset">${options("assets", t.assetId, "연결하지 않음")}</select></label></details>` : '<p class="field-help">기존 항목 사이의 금액 이동입니다. 지출과 월 예산 한도에는 포함되지 않습니다.</p>'}<div class="form-error" id="editor-error" role="alert"></div><div><button type="button" class="text-button" id="discard-draft">초안 지우고 새로 입력</button></div></form></div><div class="dialog-footer">${!isEdit ? '<button class="secondary" id="save-next">저장 후 계속 입력</button>' : ""}<button class="primary" id="save-record">${isEdit ? "수정 저장" : "저장"}</button></div>`;
+  el.innerHTML = `<div class="dialog-head"><div><h2 id="editor-title">${isEdit ? "거래 수정" : "거래 입력"}</h2><small id="draft-state">초안 자동 저장</small></div><button class="icon-button" data-close="editor" aria-label="입력 닫기">×</button></div>
+  <div class="dialog-body"><form id="transaction-form">
+    <div class="editor-type">${["expense", "income", "transfer"].map((k, i) => `<button type="button" data-entry-type="${k}" class="${t.type === k ? "active" : ""}">${["지출", "수입", "항목 이동"][i]}</button>`).join("")}</div>
+    <label class="money-field">금액<input id="amount" name="amount" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" placeholder="0" value="${esc(t.amount ? money(Number(String(t.amount).replaceAll(",", ""))) : "")}" required><span>원</span></label>
+    <div class="form-grid">
+      <label>${formType ? "출발 항목" : "예산 항목"}<select name="asset" required>${options("assets", t.assetId, "선택해주세요")}</select></label>
+      ${formType ? `<label>도착 항목<select name="toAsset" required>${options("assets", t.toAssetId, "선택해주세요")}</select></label>` : `<label>분류<select name="category">${options("categories", t.categoryId, "미분류", (x) => x.type === t.type)}</select></label>`}
+    </div>
+    <label for="memo">메모<textarea name="memo" id="memo" rows="3" placeholder="내용을 입력하세요">${esc(t.memo || "")}</textarea></label>
+    ${t.merchant ? `<p class="legacy-merchant">이전 사용처: ${esc(t.merchant)}</p>` : ""}
+    <div class="form-grid">
+      <label>날짜<input type="date" name="date" value="${esc(t.transactionDate)}" required></label>
+      <label>사용자<select name="user" required>${options("users", t.userId)}</select></label>
+      ${!formType ? `<label class="full-field">계좌·카드<select name="method">${options("paymentMethods", t.paymentMethodId, "선택 안 함")}</select></label>` : '<input type="hidden" name="category" value=""><input type="hidden" name="method" value="">'}
+    </div>
+    <div class="form-error" id="editor-error" role="alert"></div>
+    <button type="button" class="text-button discard-draft" id="discard-draft">입력 초기화</button>
+  </form></div>
+  <div class="dialog-footer">${!isEdit ? '<button class="secondary" id="save-next">저장 후 계속 입력</button>' : ""}<button class="primary" id="save-record">${isEdit ? "수정 저장" : "저장"}</button></div>`;
+
   if (!el.open) {
     history.pushState({ editor: true }, "", location.href);
     el.showModal();
   }
   el.querySelector(".dialog-body").scrollTop = 0;
   const f = $("#transaction-form");
-  f.addEventListener("input", () => {
-    rememberDraft();
-    $("#memo-count").textContent =
-      `${f.elements.memo.value.length.toLocaleString()} / 10,000자`;
-  });
+  f.addEventListener("input", rememberDraft);
   f.addEventListener("change", rememberDraft);
   f.elements.amount.addEventListener("blur", () => {
     const raw = f.elements.amount.value.replaceAll(",", "");
     if (/^\d+$/.test(raw)) f.elements.amount.value = money(Number(raw));
     rememberDraft();
   });
-  f.elements.merchant.addEventListener("change", () => {
-    const match = [...store.data.transactions]
-      .reverse()
-      .find(
-        (x) =>
-          x.merchant === f.elements.merchant.value &&
-          x.type === t.type &&
-          x.categoryId,
-      );
-    if (match && !f.elements.category.value) {
-      f.elements.category.value = match.categoryId;
-      rememberDraft();
-    }
-  });
-  const append = (s) => {
-    const m = f.elements.memo,
-      start = m.selectionStart,
-      end = m.selectionEnd;
-    m.setRangeText(s, start, end, "end");
-    m.dispatchEvent(new Event("input", { bubbles: true }));
-    m.focus({ preventScroll: true });
-  };
-  document
-    .querySelectorAll("[data-snippet]")
-    .forEach(
-      (b) =>
-        (b.onclick = () => append(prefs.snippets[Number(b.dataset.snippet)])),
-    );
-  document
-    .querySelectorAll("[data-recent]")
-    .forEach(
-      (b) => (b.onclick = () => append(recent[Number(b.dataset.recent)])),
-    );
-  $("#recent-memo").onclick = () => {
-    $("#recent-memos").hidden = !$("#recent-memos").hidden;
-  };
-  $("#save-snippet").onclick = run(() => {
-    const m = f.elements.memo,
-      s = m.value.slice(m.selectionStart, m.selectionEnd) || m.value.trim();
-    if (!s) throw Error("먼저 메모를 입력하거나 저장할 부분을 선택해주세요.");
-    if (!prefs.snippets.includes(s)) prefs.snippets.push(s);
-    persistPrefs();
-    toast("자주 쓰는 문구에 추가했어요. 다음 입력부터 표시돼요.");
-  });
+
   document.querySelectorAll("[data-entry-type]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -714,6 +682,7 @@ async function saveEntry(next) {
     });
     prefs.userId = v.userId;
     prefs.methodId = v.paymentMethodId;
+    prefs.assetId = v.assetId;
     try {
       persistPrefs();
       localStorage.removeItem(draftKey);
@@ -727,6 +696,7 @@ async function saveEntry(next) {
         userId: v.userId,
         paymentMethodId: v.paymentMethodId,
         categoryId: v.categoryId,
+        assetId: v.assetId,
         type: v.type,
       });
     } else closeEditor();
@@ -780,7 +750,7 @@ function entityEditor(key, item) {
       )
       .join(
         "",
-      )}</div></div><label class="palette">색상<input type="color" name="color" value="${/^#[0-9a-f]{6}$/i.test(item?.color || "") ? item.color : "#287d73"}"></label><p class="field-help">이름을 변경해도 선택한 아이콘은 바뀌지 않습니다.</p><div id="entity-error" class="form-error"></div>${item ? `<button type="button" class="secondary" id="archive-entity">${item.archived ? "보관 해제" : "보관하기"}</button>` : ""}</form>`,
+      )}</div></div><label class="palette">색상<input type="color" name="color" value="${/^#[0-9a-f]{6}$/i.test(item?.color || "") ? item.color : "#1769e0"}"></label><p class="field-help">이름을 변경해도 선택한 아이콘은 바뀌지 않습니다.</p><div id="entity-error" class="form-error"></div>${item ? `<button type="button" class="secondary" id="archive-entity">${item.archived ? "보관 해제" : "보관하기"}</button>` : ""}</form>`,
     '<button class="primary" id="save-entity">저장</button>',
   );
   document.querySelectorAll("[data-icon]").forEach(
@@ -957,7 +927,7 @@ function reviewConflicts() {
   const labels = {
     transactions: "거래",
     users: "사용자",
-    assets: "기존 예산 항목",
+    assets: "예산 항목",
     paymentMethods: "결제수단",
     categories: "분류",
     monthlyBudgets: "월 예산",
@@ -1045,6 +1015,29 @@ $("#sync").onclick = () => {
   if (store.state?.conflicts.length) reviewConflicts();
   else void store.sync();
 };
+// Only gestures that start AND end outside the dialog dismiss it.
+for (const d of document.querySelectorAll("dialog")) {
+  let outsideDown = false;
+  const outside = (e) => {
+    const r = d.getBoundingClientRect();
+    return (
+      e.clientX < r.left ||
+      e.clientX > r.right ||
+      e.clientY < r.top ||
+      e.clientY > r.bottom
+    );
+  };
+  d.addEventListener("pointerdown", (e) => {
+    outsideDown = e.target === d && outside(e);
+  });
+  d.addEventListener("click", (e) => {
+    if (outsideDown && e.target === d && outside(e)) {
+      if (d.id === "editor") closeEditor();
+      else d.close();
+    }
+    outsideDown = false;
+  });
+}
 $("#editor").addEventListener("cancel", (e) => {
   e.preventDefault();
   closeEditor();
@@ -1054,6 +1047,11 @@ window.addEventListener("popstate", () => {
 });
 window.addEventListener("hashchange", () => {
   ui.scroll[page] = scrollY;
+  ui.day = "";
+  ui.category = "all";
+  ui.asset = "all";
+  ui.type = "all";
+  ui.query = "";
   page = ["ledger", "reports", "settings"].includes(location.hash.slice(1))
     ? location.hash.slice(1)
     : "ledger";

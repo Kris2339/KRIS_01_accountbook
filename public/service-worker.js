@@ -1,8 +1,8 @@
-const CACHE = "accountbook-shell-v2";
+const CACHE = "accountbook-shell-v2.1";
 const SHELL = [
   "/",
-  "/style.css?v=2.0.0",
-  "/app.js?v=2.0.0",
+  "/style.css?v=2.1.0",
+  "/app.js?v=2.1.0",
   "/core.js",
   "/sync.js",
   "/manifest.json",
