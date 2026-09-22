@@ -1,0 +1,14 @@
+{
+  "name": "accountbook",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/core.test.js",
+    "test:browser": "playwright test",
+    "dev": "wrangler dev --local --port 8899 --var LOCAL_DEV:true"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "wrangler": "^4.136.1"
+  }
+}
